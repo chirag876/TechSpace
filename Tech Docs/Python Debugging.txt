@@ -1,7 +1,6 @@
-=========================================================
+=============================================================
 FASTAPI DEBUGGING GUIDE FOR VISUAL STUDIO CODE (WINDOWS)
-=========================================================
-
+=============================================================
 
 ---------------------------------------------------------- PREREQUISITES
 1 Python extension installed in VS Code
@@ -13,7 +12,6 @@ FASTAPI DEBUGGING GUIDE FOR VISUAL STUDIO CODE (WINDOWS)
    if __name__ == "__main__":
        import uvicorn
        uvicorn.run("appfastapi:app", host="127.0.0.1", port=8000, reload=False)
-
 
 ----------------------------------------------- Freeing port 8000 (if already occupied)
 If port 8000 is already in use, follow the steps below to identify and terminate the process using it:
@@ -31,7 +29,6 @@ If port 8000 is already in use, follow the steps below to identify and terminate
 
 4. To terminate the process:
    > taskkill /PID 9204 /F
-
 
 ---------------------------------------- Configuring Launc.json in VS Code
 1. Open your FastAPI project in Visual Studio Code.
@@ -63,13 +60,11 @@ If port 8000 is already in use, follow the steps below to identify and terminate
     ]
 }
 
-
 EXPLANATION:
 "module": Specifies Uvicorn as a Python module to be run.
 "args": Command-line arguments passed to Uvicorn.
 "appfastapi:app": Format is <filename without .py>:<FastAPI instance>.
 "--reload": Enables live reload. Use this only during development.
-
 
 STEP 3: SET BREAKPOINTS
 ------------------------
@@ -110,7 +105,6 @@ Issue: Port already in use
 Solution:
 Use the "netstat" and "taskkill" commands as shown in Step 1.
 
-
 CLEANUP TIP
 -----------
 If port 8000 is frequently used by other services, consider using a different port such as 8001.
@@ -124,7 +118,7 @@ You are now fully set up to debug FastAPI applications in VS Code with breakpoin
 
 Get-ChildItem -Path . -Recurse -Directory -Name "__pycache__" | ForEach-Object { Remove-Item -Path $_ -Recurse -Force }
 
-------------------------------------------
+------------------------------------------ Basic Github command after creating repository
 echo "# BookServiceRedisCache" >> README.md
 git init
 git add README.md
