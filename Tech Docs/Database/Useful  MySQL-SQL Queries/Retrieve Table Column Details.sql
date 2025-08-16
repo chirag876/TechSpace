@@ -1,0 +1,17 @@
+-- Works SQL Server and MySQL
+
+SELECT COLUMN_NAME, DATA_TYPE, NUMERIC_PRECISION, NUMERIC_SCALE, CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'emails';
+
+--------------------------------------------------
+More cleaner version
+SELECT 
+    COLUMN_NAME, 
+    DATA_TYPE, 
+    NUMERIC_PRECISION, 
+    NUMERIC_SCALE, 
+    CHARACTER_MAXIMUM_LENGTH
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'emails'
+  AND TABLE_SCHEMA = 'dbo';  -- or whatever your schema is
