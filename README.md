@@ -90,9 +90,8 @@ I built this repo to:
 
 ## 📬 Connect With Me
 
-* 💼 [LinkedIn](https://linkedin.com/in/your-profile)
-* 🐙 [GitHub](https://github.com/your-profile)
-* ✉️ **[your-email@example.com](mailto:your-email@example.com)**
+* 💼 [LinkedIn](https://www.linkedin.com/in/chiraggupta1706/)
+* ✉️ **[chirag1706gupta@gmail.com](mailto:chirag1706gupta@gmail.com)**
 
 ---
 
