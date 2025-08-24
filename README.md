@@ -1,6 +1,6 @@
 # 🌌 TechSpace
 
-Welcome to **TechSpace** 🚀 — my personal space where I keep both my **career achievements** and my **technical knowledge collection**.
+Welcome to **TechSpace** 🚀 my personal space where I keep both my **career achievements** and my **technical knowledge collection**.
 
 This repository is divided into **two parts**:
 
@@ -95,6 +95,6 @@ I built this repo to:
 
 ---
 
-✨ *TechSpace is both my **trophy shelf** and my **library of knowledge** — a true reflection of my journey as a software engineer.*
+✨ *TechSpace is both my **trophy shelf** and my **library of knowledge** a true reflection of my journey as a software engineer.*
 
 ---
