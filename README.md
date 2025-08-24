@@ -7,7 +7,8 @@ This repository is divided into **two parts**:
 1. 🏆 **Certificates & Achievements** → My personal career milestones and recognitions
 2. 📘 **Tech Docs** → A curated collection of technical notes, interview prep, and scripts
 
-👉 This repository will be updated regularly with new learnings, certifications, scripts, and technical resources as I continue to grow in my career.
+👉 *This repository will be updated regularly with new learnings, certifications, scripts, and technical resources.*
+
 ---
 
 ## 🏆 Part 1: Certificates & Achievements
