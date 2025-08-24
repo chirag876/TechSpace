@@ -8,35 +8,7 @@ This repository is divided into **two parts**:
 2. 📘 **Tech Docs** → A curated collection of technical notes, interview prep, and scripts
 
 ---
-🧭 How to Navigate This Repo
 
-🏆 Certificates & Achievements
-
-📘 Tech Docs
-
-🔹 Backend & System Design
-
-🔹 Cloud & DevOps
-
-🔹 Data Structures & Algorithms
-
-🔹 Database
-
-🔹 Python
-
-🔹 Miscellaneous
-
-⚡ Utilities
-
-🐍 Python Scripts
-
-🗄️ SQL Scripts
-
-🚀 Why TechSpace?
-
-📬 Connect With Me
-
----
 ## 🏆 Part 1: Certificates & Achievements
 
 This section contains all my **career milestones** in the form of certifications, recommendation letters, and achievements.
