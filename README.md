@@ -98,5 +98,3 @@ I built this repo to:
 ✨ *TechSpace is both my **trophy shelf** and my **library of knowledge** — a true reflection of my journey as a software engineer.*
 
 ---
-
-Would you like me to also add a **“How to Navigate This Repo”** section (with quick links to `Certificates`, `Python Scripts`, `SQL Scripts`, etc.) so recruiters or collaborators can jump directly? That will make it even more user-friendly.
