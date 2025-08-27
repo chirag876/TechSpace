@@ -1,0 +1,109 @@
+### INTERMEDIATE PYTHON TOPICS
+
+ 1. Data Structures  
+ - Collections module (Counter, defaultdict, namedtuple)
+ - Stacks, Queues, Deques (using collections and queue)
+ - Linked Lists (implementation using classes) 
+ 
+ 2. OOP (Object-Oriented Programming)  
+ - Classes and Objects
+ - __init__, self, instance vs class variables
+ - Inheritance, Polymorphism- Encapsulation and Abstraction
+ - super() and method overriding 
+ 
+ 3. File Handling  
+ - Reading/Writing text and CSV files
+ - Working with JSON files
+ - Context Managers (with statement) 
+ 
+ 4. Modules & Packages  
+ - Creating and importing your own modules
+ - Python Standard Library (os, sys, math, datetime, random, time) 
+ 
+ 5. Iterators & Generators
+ - __iter__, __next__ methods- yield keyword and lazy evaluation
+ - Generator expressions 
+ 
+ 6. Decorators  
+ - Function decorators
+ - Chaining decorators
+ - Practical use cases (logging, authentication) 
+ 
+ 7. Error Handling (Advanced)  
+ - Custom exceptions
+ - try-except-else-finally with multiple exception types
+ - Raising exceptions in functions 
+ 
+ 8. Functional Programming 
+ - map(), filter(), reduce() (from functools)
+ - zip(), enumerate() deep usage
+ - Immutability and pure functions 
+
+### ADVANCED PYTHON TOPICS
+
+1. Advanced OOP  
+- @classmethod and @staticmethod
+- Dunder/Magic Methods (__str__, __repr__, __eq__, etc.)
+- Metaclasses (basic understanding) 
+
+ 2. Multithreading & Multiprocessing  
+ - Thread vs Process
+ - GIL (Global Interpreter Lock) concept
+ - threading, multiprocessing modules
+ - Using concurrent.futures 
+ 
+ 3. Asynchronous Programming  
+ - async and await keywords
+ - asyncio module
+ - Event loops and coroutines 
+ 
+ 4. Context Managers & with Keyword  
+ - Custom context managers using __enter__ and __exit__
+ - contextlib module 
+ 
+ 5. Memory Management & Performance  
+ - Memory profiling tools (tracemalloc, memory_profiler)
+ - Time profiling with timeit
+ - List vs generator performance 
+ 
+ 6. Type Hinting & Annotations  
+ - Basic typing (List, Dict, Tuple from typing module)
+ - Custom type hints and static type checkers (like mypy) 
+ 
+ 7. Testing  
+ - unittest and pytest frameworks
+ - Mocking and fixtures
+ - Writing testable code 
+ 
+ 8. Design Patterns in Python  
+ - Singleton, Factory, Observer, Strategy (Python versions)
+ - When and how to apply 
+ 
+ 9. Working with APIs & Web Requests  
+ - requests module
+ - Consuming JSON APIs
+ - Handling responses, status codes 
+ 
+ 10. File I/O Advanced  
+ - Reading large files efficiently
+ - Working with Excel/CSV/PDF using libraries like pandas, openpyxl, PyPDF2 
+
+---
+
+### Bonus Topics (Useful as you advance)
+
+- Logging (logging module)
+- Virtual Environments & pip
+- Using argparse for CLI scripts
+- Refactoring and writing clean, maintainable code (PEP8, docstrings)
+- Working with databases in Python (sqlite3, SQLAlchemy)
+- Introduction to Python with Data Science (NumPy, Pandas, Matplotlib)
+
+---
+
+### Suggested Learning Flow:
+
+1. Start with OOP + File Handling + Collections
+2. Then go for Decorators + Iterators + Functional Programming
+3. Move to Multithreading + Async + Advanced OOP
+4. Finally dive into Testing + Memory Mgmt + Real-world project

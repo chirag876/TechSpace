@@ -1,0 +1,313 @@
+# -------------------------------
+# Python FastAPI Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for FastAPI with comments and examples
+# -------------------------------
+
+# -------------------------------
+# Prerequisites and Setup
+# -------------------------------
+# Before using FastAPI, ensure you have the following prerequisites installed:
+
+# 1. Python: FastAPI is compatible with Python 3.7 and above.
+# 2. FastAPI: Install FastAPI using pip.
+# 3. Uvicorn: A high-performance ASGI server to serve FastAPI applications.
+# 4. Pydantic: For data validation and serialization of request/response bodies.
+
+# Install required libraries using pip (if not installed):
+#   pip install fastapi uvicorn pydantic
+
+# -------------------------------
+# Imports
+# -------------------------------
+from fastapi import FastAPI, HTTPException  # FastAPI for building APIs, HTTPException for handling errors
+from pydantic import BaseModel               # Pydantic is used for data validation and structured request/response bodies
+from typing import List                      # For typing hint, here it's a list of Movie objects
+
+# -------------------------------
+# Initialize FastAPI app instance
+# -------------------------------
+# FastAPI requires an instance of FastAPI to be created. 
+# This instance is the entry point for defining and handling all your API endpoints.
+# All route decorators (@app.get, @app.post, etc.) will attach endpoints to this object.
+# This provides all the functionality for your API.
+app = FastAPI()
+
+# -------------------------------
+# Create Pydantic Model for Data Validation
+# -------------------------------
+# Pydantic is used to define models which enforce data validation and serialization.
+# Here, we define a `Movie` class which will be used to structure request/response data.
+# This class inherits from `BaseModel` and defines attributes like `id`, `name`, and `genre`.
+class Movie(BaseModel):
+    id: int            # Unique identifier for the movie (integer type)
+    name: str          # Name or title of the movie (string type)
+    genre: str         # Genre or category of the movie (string type, e.g., "Action", "Comedy")
+
+# -------------------------------
+# In-Memory Storage
+# -------------------------------
+# FastAPI does not come with a built-in database. Here, we use a Python list to temporarily store movie data.
+# This means that the data will reset every time the server restarts.
+# For production-grade applications, we want to use a database like PostgreSQL, MySQL, etc.
+movies: List[Movie] = []
+
+# -------------------------------
+# Root endpoint
+# -------------------------------
+# This endpoint acts as a health check or landing page.
+# When users open the root URL, this message is returned.
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Movie Workshop"}
+
+# -------------------------------
+# Get all movies
+# -------------------------------
+# This endpoint retrieves the full list of movies from memory.
+# The response_model=List[Movie] automatically documents and validates the response.
+# This a path operation decorator
+@app.get("/movies", response_model=List[Movie])
+def get_movies(): # Path operation function
+    return movies
+
+# -------------------------------
+# Get all movies by Id
+# -------------------------------
+
+# This endpoint fetches a specific movie based on its ID.
+# The {movie_id} in the URL path is a dynamic path parameter passed to the function.
+# FastAPI automatically converts it to an integer (int) using type hints.
+# If a movie with the given ID exists in the in-memory list, it is returned.
+# If no such movie is found, an HTTP 404 error is raised with a clear message.
+# The `response_model=Movie` ensures the output is validated and documented.
+@app.get("/movies/{movie_id}", response_model=Movie)
+def get_movies_by_id(movie_id : int):
+    for existing_movie in movies:
+        if existing_movie.id == movie_id:
+            return existing_movie
+        
+    # If movie is not found, raise a 404 Not Found error
+    # f-string is used to dynamically show the requested ID in the error message
+    raise HTTPException(status_code=404, detail=f"Movie with the id {movie_id} does not exists")
+
+# -------------------------------
+# Add a new movie
+# -------------------------------
+# This endpoint allows users to send a POST request with JSON data to add a movie.
+# If a movie with the same ID already exists, it returns an error.
+@app.post("/movies", response_model=Movie)
+def add_movie(movie: Movie):
+    for existing_movie in movies:
+        if existing_movie.id == movie.id:
+            raise HTTPException(status_code=400, detail="Movie with this ID already exists")
+    
+    # Append the new movie to the in-memory list
+    movies.append(movie)
+    return movie
+
+# -------------------------------
+# Update an existing movie
+# -------------------------------
+# This endpoint updates a movie by its ID.
+# The PUT method is generally used for full updates (replace existing data).
+# If movie not found, raises 404 error.
+@app.put("/movies/{movie_id}", response_model=Movie)
+def update_movie(movie_id: int, updated_movie: Movie):
+    for index, movie in enumerate(movies):
+        if movie.id == movie_id:
+            movies[index] = updated_movie
+            return updated_movie
+    raise HTTPException(status_code=404, detail="Movie not found")
+
+# -------------------------------
+# Delete a movie
+# -------------------------------
+# This endpoint deletes a movie with a specific ID.
+# If found, it removes the movie from the list and returns it.
+# If not found, returns a 404 error.
+@app.delete("/movies/{movie_id}", response_model=Movie)
+def delete_movie(movie_id: int):
+    for index, movie in enumerate(movies):
+        if movie.id == movie_id:
+            deleted_movie = movies.pop(index)
+            return deleted_movie
+    raise HTTPException(status_code=404, detail="Movie not found")
+
+# This block checks whether the script is being run directly (not imported)
+if __name__ == "__main__":
+    import uvicorn  # Uvicorn is the ASGI server used to run FastAPI apps
+
+    # This line runs the FastAPI app using uvicorn, specifying:
+    # - the app instance (from appfastapi.py file)
+    # - host = localhost
+    # - port = 8000
+    # - reload = False (reload is used for development to auto-reload on changes)
+    uvicorn.run("appfastapi:app", host="127.0.0.1", port=8000, reload=False)
+
+
+# -------------------------------
+# How to run this app:
+# -------------------------------
+# Save this file as `main.py` and follow these steps to run the app.
+
+# Step 1: Install the required dependencies (FastAPI and Uvicorn) if you haven’t already:
+#   pip install fastapi uvicorn pydantic
+
+# Step 2: Run the FastAPI app using Uvicorn:
+#   uvicorn main:app --reload
+#
+# --reload enables hot-reloading on code changes, meaning the server will automatically restart when you modify your code.
+# The API will be live at:
+#   http://127.0.0.1:8000
+#
+# The app will also generate automatic and interactive documentation for your API at:
+#   Swagger UI: http://127.0.0.1:8000/docs
+#   ReDoc UI: http://127.0.0.1:8000/redoc
+
+# -------------------------------
+# Summary of Endpoints:
+# -------------------------------
+# GET     /                   -> Welcome message or landing page
+# GET     /movies             -> Get all movies
+# POST    /movies             -> Add a new movie
+# PUT     /movies/{movie_id}  -> Update an existing movie by ID
+# DELETE  /movies/{movie_id}  -> Delete a movie by ID
+
+# -------------------------------
+# Benefits of using FastAPI:
+# -------------------------------
+# FastAPI is known for its speed and ease of use. Some key benefits include:
+
+# 1. Auto-validates inputs: FastAPI uses Pydantic models to automatically validate incoming request data, reducing errors.
+# 2. Automatic documentation: FastAPI automatically generates OpenAPI and Swagger documentation, making it easy to interact with and test APIs.
+# 3. Asynchronous support: FastAPI is built on Starlette, which supports asynchronous operations, improving performance in concurrent applications.
+# 4. Type hints: FastAPI uses Python type hints to ensure both runtime validation and IDE support, helping developers work more efficiently.
+
+# ----------------
+# Ideal for:
+# ----------------
+# FastAPI is perfect for the following use cases:
+# - Building REST APIs for web or mobile apps.
+# - Backend for microservices: Its lightweight and fast nature makes it ideal for distributed systems.
+# - Rapid Prototyping: Since FastAPI automatically generates interactive documentation, it’s excellent for quickly building APIs.
+# - Data-centric applications: Its support for complex data validation (through Pydantic) is perfect for handling data-rich APIs, such as for movies, products, or user data.
+
+# -----------------
+# Example Use Case
+# -----------------
+# Imagine you are building a movie recommendation platform. 
+# This FastAPI app can serve as the backend for listing, adding, updating, and deleting movies.
+# You can integrate it with a frontend that consumes the API for a smooth, interactive user experience.
+
+# --------------------------------
+# What is FastAPI?
+# --------------------------------
+
+# It is a modern, high performance web framework for building APIs with python based on standard type hints.
+
+# ----------------------------------
+# FastAPI vs Flask Comparison Table
+# ----------------------------------
+# Below is a tabular comparison between FastAPI and Flask for backend development in Python.
+
+# | Feature                 | FastAPI                                         | Flask                                     |
+# |-------------------------|-------------------------------------------------|-------------------------------------------|
+# | Framework Type          | Modern, async-based web framework               | Traditional, sync-based web framework     |
+# | Performance             | Very high (comparable to NodeJS and Go)         | Moderate (slower than FastAPI)            |
+# | Asynchronous Support    | Built-in (uses ASGI)                            | Not built-in (requires extensions)        |
+# | Data Validation         | Built-in via Pydantic                           | Manual or via Marshmallow or WTForms      |
+# | API Docs (Swagger)      | Auto-generated with OpenAPI and ReDoc           | Manual (requires Flask-RESTX/Swagger UI)  |
+# | Dependency Injection    | Native support                                  | No built-in support                       |
+# | Request Parsing         | Automatically parses and validates with types   | Manual parsing via request.form/json      |
+# | Type Annotations        | Enforced and leveraged                          | Optional                                  |
+# | Learning Curve          | Steeper (requires typing, Pydantic, async)      | Easier (good for beginners)               |
+# | Community Support       | Growing quickly                                 | Very mature and large                     |
+# | Use in Production       | Increasing, great for modern microservices      | Widely used, battle-tested                |
+# | Best Use Cases          | Modern APIs, async-heavy systems, microservices | Lightweight apps, quick prototypes        |
+# | Extensibility           | Good, but newer ecosystem                       | Excellent, massive plugin ecosystem       |
+
+# -----------------------------
+# When to Use FastAPI vs Flask
+# -----------------------------
+
+# | Criteria                  | Choose FastAPI When...                                  | Choose Flask When...                               |
+# |---------------------------|---------------------------------------------------------|----------------------------------------------------|
+# | Performance Critical Apps | You need high performance and concurrency               | Performance isn’t a bottleneck                     |
+# | Type Safety Required      | You want enforced typing and validation                 | You’re okay handling types manually                |
+# | API-first Design          | You need built-in Swagger/ReDoc API documentation       | You’ll build docs manually or via extensions       |
+# | Async Tasks               | Your app heavily relies on I/O or async operations      | Your app is mostly synchronous                     |
+# | Rapid Prototyping         | You want ready-to-test auto-documented endpoints        | You want to build something quick with less setup  |
+# | Team Size / Scaling       | You’re in a team that benefits from typing & validation | You’re solo or in early stages                     |
+
+# ---------------------------------
+# Advantages of FastAPI over Flask
+# ---------------------------------
+# 1. Automatic Docs: Swagger and ReDoc generation is out-of-the-box.
+# 2. Type-safe: Uses Python type hints, making IDE support and debugging better.
+# 3. Faster Execution: Thanks to asynchronous programming via ASGI.
+# 4. Better Validation: Pydantic handles validation with cleaner syntax.
+# 5. Production-Ready: Built with microservices and async APIs in mind.
+
+# -------------------------
+# Disadvantages of FastAPI
+# -------------------------
+# 1. Learning Curve: Requires understanding of async, type hints, and Pydantic.
+# 2. New Ecosystem: Not as many extensions/plugins as Flask (yet).
+# 3. Overkill for Simple Apps: For very small apps, FastAPI might be too much.
+
+# ---------------------------------
+# Advantages of Flask over FastAPI
+# ---------------------------------
+# 1. Simple and Lightweight: Easier to get started, ideal for small projects.
+# 2. Extensive Community: Tons of extensions and third-party support.
+# 3. Mature Ecosystem: Battle-tested in production for over a decade.
+
+# -----------------------
+# Disadvantages of Flask
+# -----------------------
+# 1. Manual Validation: No built-in support like FastAPI's Pydantic.
+# 2. Slower: Especially when handling concurrent users or async tasks.
+# 3. No Auto Docs: Requires Flask-RESTX or manual Swagger setup.
+
+# --------------------------
+# Documentation Differences
+# --------------------------
+
+# FastAPI:
+# - Generates OpenAPI docs automatically using type hints.
+# - Interactive Swagger UI at /docs.
+# - Redoc UI at /redoc.
+# - Auto-validates both request and response models using Pydantic.
+# - Great for frontend/backend devs working together.
+
+# Flask:
+# - No built-in docs unless you use Flask-RESTX or Flask-RESTful with Swagger.
+# - Request/response validation must be implemented manually or using plugins.
+# - Good for custom or minimal API documentation, but more setup required.
+
+# --------
+# Summary
+# --------
+# Use FastAPI if you're building scalable, async APIs with high performance requirements and need automatic validation/docs.
+# Use Flask if you're building simple, synchronous applications or quick prototypes with minimal boilerplate.
+
+# For your use case as a modern backend engineer, FastAPI is a great choice if you're working on structured, scalable APIs — especially if you plan to integrate with frontend or mobile teams needing Swagger docs.
+
+# ------------------------------------
+# Swagger UI (/docs) vs ReDoc (/redoc)
+# ------------------------------------
+
+# | Feature            | Swagger UI (/docs)                           | ReDoc (/redoc)                             |
+# |--------------------|--------------------------------------------- |--------------------------------------------|
+# | Look & Feel        | Interactive and developer-friendly UI        | Clean, elegant, and documentation-style UI |
+# | Interactivity      | Fully interactive (you can test APIs inline) | Read-only, for browsing API specs          |
+# | Best For           | Testing and trying out APIs quickly          | Sharing public-facing, well-formatted docs |
+# | Search Support     | Basic                                        | Excellent full-text search                 |
+# | Customization      | Moderate                                     | Highly customizable layout and structure   |
+# | Load Time          | Slightly heavier due to interactivity        | Lightweight and faster to render           |
+# | Default in FastAPI | Yes (/docs endpoint)                         | Yes (/redoc endpoint)                      |
+
+#  Use Swagger UI when you're developing and testing.
+#  Use ReDoc when you're sharing polished documentation with clients or other teams.
+

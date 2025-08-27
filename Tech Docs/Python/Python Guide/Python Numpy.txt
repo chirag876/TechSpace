@@ -1,0 +1,400 @@
+# -------------------------------
+# Python Numpy Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Numpy with comments and examples
+# -------------------------------
+
+# -------------------------------
+# Module 1 - Introduction
+# -------------------------------
+
+# Q1. What is numpy? 
+# Numerical python, it is used for working with arrays, performing mathematical operations, and handling large datasets efficiently,  NumPy is around 10–15x faster! because NumPy is implemented in C, so it's compiled code and Uses vectorized operations, avoiding Python loops
+
+# --------------------------------------------------------------------------------------------------------
+# | Feature            | Python List                          | NumPy Array                              |
+# --------------------------------------------------------------------------------------------------------
+# | Speed              | Slower (interpreted Python code)     | Much faster (runs on C under the hood)   |
+# | Functionality      | Limited built-in operations          | Rich set of mathematical functions       |
+# | Memory             | Inefficient (stores objects)         | Memory optimized (fixed-type arrays)     |
+# | Vectorized Ops     | Not possible (needs loops)           | Possible and very fast (no loops needed) |
+# --------------------------------------------------------------------------------------------------------
+
+# Q3. Installation
+# pip install numpy 
+
+# Q4. Importing 
+# import numpy as np
+
+# Python Lists vs NumPy Arrays – Speed Test
+
+# Using Lists 
+import time
+
+size = 1000000
+
+list1 = list(range(size))
+list2 = list(range(size))
+
+starttime = time.time()
+
+# Element wise addtion using loop
+
+result = [list1[i] + list2[i] for i in range(size)]
+
+endtime = time.time()
+
+print("Time taken by list: ", endtime - starttime) # 0.1037454605102539
+
+# using numpy
+
+import numpy as np
+import time 
+
+size = 1000000
+
+# creating arrays
+arr1 = np.arange(size)
+arr2 = np.arange(size)
+
+starttime = time.time()
+
+result = arr1 + arr2
+
+endtime = time.time()
+
+print("Time taken by numpy arrays: ", endtime - starttime) #  0.01606011390686035
+
+# ---------------------------------------
+# Module 2 - Creating Arrays in NumPy
+# ---------------------------------------
+
+# Creating array from python lists
+import numpy as np
+arr1 = np.array([1,2,3,5])
+arr2 = np.array([[1,2,3,5], [3,5,6,7]]) # 2-D array
+print("arr1: ", arr1)
+print("arr2: ", arr2)
+
+# Using np.arange() - For sequences like range()
+arr3 = np.arange(1, 20, 1) # start=1, stop=20, step=1, exclude 20
+print("array 3 using arange: ", arr3)
+
+# Using np.linspace() – For evenly spaced values, Use this when you want precision in spacing (e.g. plotting).
+arr4 = np.linspace(1, 20, 5) # 5 values between 1 and 20
+print("array 4 using np.linespace: ", arr4)
+
+# Using np.zeros() and np.ones(), Very useful to initialize arrays before filling them.
+
+arr5 = np.zeros((2, 3)) # 2 rows, 3 columns of zeros
+arr6 = np.ones((3, 2))    # 3 rows, 2 columns of ones
+print("arr5: ", arr5)
+print("arr6: ", arr6)
+
+# Using np.eye() – Identity matrix
+
+arr7 = np.eye(3)
+print(arr7)
+
+# using np.full()
+arr8 = np.full((2,2), 7) # A 2x2 matrix filled with 7
+
+# --------------------------------------------------------------------------------------
+# | Function            | Purpose                               | Example              |
+# --------------------------------------------------------------------------------------
+# | np.array()          | Convert from list                     | np.array([1, 2])     |
+# | np.arange()         | Generate a range with a step          | np.arange(1, 10, 2)  |
+# | np.linspace()       | Create evenly spaced points           | np.linspace(0, 1, 5) |
+# | np.zeros()          | Create an array of all zeros          | np.zeros((2, 3))     |
+# | np.ones()           | Create an array of all ones           | np.ones((2, 2))      |
+# | np.full()           | Create an array with a constant value | np.full((2, 2), 9)   |
+# | np.eye()            | Create an identity matrix             | np.eye(3)            |
+# | np.random.rand()    | Generate random floats in [0, 1)      | np.random.rand(3, 2) |
+# --------------------------------------------------------------------------------------
+
+
+# ---------------------------------------
+# Module 3: Array Attributes in NumPy
+# ---------------------------------------
+
+# This is all about understanding the shape, type, and structure of any NumPy array you've created. Think of it like learning how to "ask questions" about your array: its size, shape, datatype, dimensions, etc.
+
+arr9 = np.array([[10, 20, 30], [40, 50, 60]])
+
+arr10 = np.array([1, 2, 3], dtype='float32')
+print(arr10.dtype) # float32
+
+
+# ---------------------------------------------------------------
+# | Attribute      | Purpose                        | Output     |
+# ---------------------------------------------------------------
+# | arr.shape      | Shape of the array             | (2, 3)     |
+# | arr.ndim       | Number of dimensions           | 2          |
+# | arr.size       | Total number of elements       | 6          |
+# | arr.dtype      | Data type of elements          | int64      |
+# | arr.itemsize   | Memory per element in bytes    | 8          |
+# | arr.nbytes     | Total memory used (bytes)      | 48         |
+# ---------------------------------------------------------------
+
+# ---------------------------------------
+# Module 4: Indexing and Slicing in NumPy
+# ---------------------------------------
+
+# This module is all about accessing and manipulating elements in arrays — like cutting, filtering, or selecting data.
+
+import numpy as np
+
+arr11 = np.array([[10, 20, 30],
+                [40, 50, 60],
+                [70, 80, 90]])
+
+# Indexing – Access Elements by Position
+arr11[0, 1]  # Element at 1st row, 2nd column → 20
+arr11[2, 2]  # Element at 3rd row, 3rd column → 90
+
+# Slicing – Get a Subsection
+
+arr11[0:2, 1:] # Get rows 0 & 1, columns 1 onwards → [[20, 30], [50, 60]]
+
+# Using : to Select Whole Rows or Columns
+arr11[:, 0]  # First column → [10, 40, 70]
+arr11[1, :]  # Second row → [40, 50, 60]
+
+# Negative indexing
+arr11[-1, -2]  # Second last element in last row → 80
+
+# Boolean Indexing – Filter by Condition
+arr11[arr11 > 50] # Returns array([60, 70, 80, 90])
+
+# Fancy Indexing – Using Arrays of Indices
+arr11[[0, 2], [1, 2]]  # Picks elements (0,1) and (2,2) → [20, 90]
+
+# |--------------------------------------------------------------------------------|
+# | Expression              | Purpose                         | Output             |
+# ---------------------------------------------------------------------------------|
+# | arr[0, 1]               | Element at 1st row, 2nd col     | 20                 |
+# | arr[:, 0]               | All rows, 1st column            | [10 40 70]         |
+# | arr[1, :]               | 2nd row, all columns            | [40 50 60]         |
+# | arr[0:2, 1:]            | Slice rows 0-1, cols 1+         | [[20 30], [50 60]] |
+# | arr[arr > 50]           | Filter values > 50              | [60 70 80 90]      |
+# | arr[[0, 2], [1, 2]]     | Fancy indexing                  | [20 90]            |
+# |--------------------------------------------------------------------------------|
+
+# ---------------------------------------
+# Module 5: Array Manipulation in NumPy
+# ---------------------------------------
+
+# In this module we will see how to reshape, flatten, stack, split, and transpose arrays — all crucial when we are preparing data for machine learning, data analysis, or even just structuring complex arrays properly.
+
+arrManipulation = np.array([[1, 2, 3],
+                [4, 5, 6]])
+
+# Reshape – Change Dimensions
+reshaped = arrManipulation.reshape(3, 2)
+
+
+# ------------------------------------------------------------------------------------------
+# | Expression            | Purpose                           | Output                     |
+# ------------------------------------------------------------------------------------------
+# | arr.reshape(3, 2)     | Reshape to 3 rows, 2 cols              | [[1 2], [3 4], [5 6]] |
+# | arr.flatten()         | Flatten to 1D array                    | [1 2 3 4 5 6]         |
+# | arr.T                 | Transpose                              | [[1 4], [2 5], [3 6]] |
+# | np.vstack((a, b))     | Stack arrays vertically (row - wise)   | [[1 2], [3 4]]        |
+# | np.hstack((a, b))     | Stack arrays horizontally (col - wise) | [1 2 3 4]             |
+# | np.hsplit(arr, 3)     | Split into 3 column-wise parts         | 3 arrays              |
+# | np.vsplit(arr, 2)     | Split into 2 row-wise parts            | 2 arrays              |
+# ------------------------------------------------------------------------------------------
+
+
+# -----------------------------------------------
+# Module 6: Universal Functions (ufuncs) in NumPy
+# -----------------------------------------------
+
+# Q. What are ufuncs?
+# Ufuncs (Universal Functions) are functions that operate element-wise on ndarrays. They're fast, optimized C-implemented functions for performing vectorized operations in NumPy.
+
+import numpy as np
+
+a = np.array([1, 2, 3, 4])
+
+# Arithmetic ufuncs
+np.add(a, 5)         # [6 7 8 9]
+np.multiply(a, 2)    # [2 4 6 8]
+np.power(a, 2)       # [1 4 9 16]
+
+# Trigonometric ufunc
+np.sin(a)            # [0.84 0.91 0.14 -0.76]
+
+# Exponential & log
+np.exp(a)            # [2.71 7.39 20.08 54.59]
+np.log(a)            # [0.   0.69 1.09 1.38]
+
+# Comparison
+np.greater(a, 2)     # [False False  True  True]
+
+# Rounding
+np.round(np.sin(a), 2)  # [0.84 0.91 0.14 -0.76]
+
+# -------------------------------------------------------------------------------------------
+# | Expression              | Purpose                          | Output (for a = [1,2,3,4]) |
+# -------------------------------------------------------------------------------------------
+# | np.add(a, 5)            | Add 5 to each element            | [6 7 8 9]                  |
+# | np.multiply(a, 2)       | Multiply each element by 2       | [2 4 6 8]                  |
+# | np.power(a, 2)          | Square each element              | [1 4 9 16]                 |
+# | np.sin(a)               | Sine of elements (in radians)    | [0.84 0.91 0.14 -0.76]     |
+# | np.exp(a)               | Exponential                      | [2.71 7.39 20.08 54.59]    |
+# | np.log(a)               | Natural log                      | [0. 0.69 1.09 1.38]        |
+# | np.greater(a, 2)        | Check a > 2                      | [False False True True]    |
+# | np.round(np.sin(a), 2)  | Round sine to 2 decimals         | [0.84 0.91 0.14 -0.76]     |
+# -------------------------------------------------------------------------------------------
+
+
+# -----------------------------------------------
+# Module 7: Mathematical Operations in NumPy
+# ----------------------------------------------
+# Think of this as turning your arrays into a mini calculator.
+
+import numpy as np
+
+a = np.array([[1, 2],
+              [3, 4]])
+
+b = np.array([[5, 6],
+              [7, 8]])
+
+# ------------------------------------------------------------------------------------
+# | Expression            | Purpose                         | Output (for a & b)     |
+# ------------------------------------------------------------------------------------
+# | a + b                 | Element-wise addition           | [[6 8], [10 12]]       |
+# | a * b                 | Element-wise multiplication     | [[5 12], [21 32]]      |
+# | a * 2                 | Multiply each element by 2      | [[2 4], [6 8]]         |
+# | np.sqrt(a)            | Square root of elements         | [[1. 1.41], [1.73 2.]] |
+# | np.sum(a)             | Total sum of array              | 10                     |
+# | np.sum(a, axis=0)     | Column-wise sum                 | [4 6]                  |
+# | a @ b                 | Matrix multiplication           | [[19 22], [43 50]]     |
+# ------------------------------------------------------------------------------------
+
+# -----------------------------------------------
+#  Module 8: Linear Algebra in NumPy
+# ----------------------------------------------
+
+# NumPy comes with a numpy.linalg module that supports essential linear algebra operations — like matrix multiplication, inverses, determinants, eigenvalues, and solving linear equations.
+
+import numpy as np
+
+A = np.array([[1, 2],
+              [3, 4]])
+
+B = np.array([[2, 0],
+              [1, 2]])
+
+# ----------------------------------------------------------------------------------------------
+# | Function                | Purpose                               | Example                  |
+# ----------------------------------------------------------------------------------------------
+# | np.dot(A, B)            | Matrix multiplication                 | A @ B                    |
+# | A.T                     | Transpose of matrix                   | A.T                      |
+# | np.linalg.inv(A)        | Inverse of matrix                     | np.linalg.inv(A)         |
+# | np.linalg.det(A)        | Determinant of matrix                 | np.linalg.det(A)         |
+# | np.trace(A)             | Sum of diagonal elements              | np.trace(A)              |
+# | np.linalg.eig(A)        | Eigenvalues and eigenvectors          | np.linalg.eig(A)         |
+# | np.linalg.matrix_rank(A)| Rank of matrix                        | np.linalg.matrix_rank(A) |
+# | np.linalg.solve(A, b)   | Solve Ax = b                          | np.linalg.solve(A, b)    |
+# ----------------------------------------------------------------------------------------------
+
+# ---------------------------------------
+# Module 9: File Input/Output with NumPy
+# ---------------------------------------
+
+import numpy as np
+
+a = np.array([[1, 2, 3], [4, 5, 6]])
+
+# Save and load in binary format
+np.save('my_array.npy', a)
+loaded_a = np.load('my_array.npy')
+
+# Save and load in text format
+np.savetxt('my_array.txt', a)
+loaded_txt = np.loadtxt('my_array.txt')
+
+# Save and load multiple arrays
+b = np.array([10, 20, 30])
+np.savez('both_arrays.npz', first=a, second=b)
+data = np.load('both_arrays.npz')
+first_loaded = data['first']
+second_loaded = data['second']
+
+# ---------------------------------------------------------------------------------------------------------------
+# | Function               | Purpose                                 | Example                                  |
+# ---------------------------------------------------------------------------------------------------------------
+# | np.save()              | Save array in binary .npy format        | np.save('arr.npy', a)                    |
+# | np.load()              | Load array from .npy file               | a = np.load('arr.npy')                   |
+# | np.savetxt()           | Save array to .txt or .csv              | np.savetxt('arr.txt', a)                 |
+# | np.loadtxt()           | Load from .txt or .csv                  | a = np.loadtxt('arr.txt')                |
+# | np.genfromtxt()        | Load with missing values or skip header | np.genfromtxt('data.csv', delimiter=',') |
+# | np.savez()             | Save multiple arrays into .npz file     | np.savez('data.npz', x=a, y=b)           |
+# | np.load('data.npz')    | Load .npz archive                       | data['x']                                |
+# ---------------------------------------------------------------------------------------------------------------
+
+# -------------------------------------------------------------
+# Module 10: NumPy with Pandas & Matplotlib (Interoperability)
+# -------------------------------------------------------------
+
+# Q. Why is this module important?
+# Because Pandas uses NumPy under the hood for performance, and Matplotlib expects NumPy arrays for plotting. Knowing how these libraries work together saves time and bugs.
+
+import numpy as np
+import pandas as pd
+
+arr = np.array([[1, 2], [3, 4], [5, 6]])
+df = pd.DataFrame(arr, columns=["A", "B"])
+
+print(df)
+print(df.to_numpy())  # Convert back to NumPy
+
+import matplotlib.pyplot as plt
+
+x = np.linspace(0, 10, 100)
+y = np.sin(x)
+
+plt.plot(x, y, label='sin(x)')
+plt.title("Sine Curve")
+plt.xlabel("x-axis")
+plt.ylabel("y-axis")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+# -------------------------------------------------------------------------------------------------------------
+# | Operation                   | Purpose                                  | Example                          |
+# -------------------------------------------------------------------------------------------------------------
+# | pd.Series(np_array)         | Create Pandas Series from NumPy array    | pd.Series(np.arange(5))          |
+# | pd.DataFrame(np_array)      | Create DataFrame from 2D array           | pd.DataFrame(np.random.rand(3,2))|
+# | df.to_numpy()               | Convert DataFrame to NumPy array         | df.to_numpy()                    |
+# | plt.plot(np_array)          | Line plot using NumPy array              | plt.plot(np.arange(10))          |
+# | plt.hist(np_array)          | Histogram plot                           | plt.hist(np.random.randn(1000))  |
+# -------------------------------------------------------------------------------------------------------------
+
+
+# NumPy + Matplotlib
+# -----------------------------------------------------------------------------------------------
+# | Operation             | Purpose                            | Example                         |
+# -----------------------------------------------------------------------------------------------
+# | plt.plot(np_array)    | Line plot                           | plt.plot(np.arange(10))         |
+# | plt.scatter(x, y)     | Scatter plot                        | plt.scatter(x, y)               |
+# | plt.hist(np_array)    | Histogram                           | plt.hist(np.random.randn(1000)) |
+# | plt.imshow(np_array)  | Image or heatmap from matrix        | plt.imshow(np.random.rand(5, 5))|
+# | plt.show()            | Display the plot                    | plt.show()                      |
+# -----------------------------------------------------------------------------------------------
+
+# NumPy + Pandas
+# --------------------------------------------------------------------------------------------------------
+# | Operation                | Purpose                                     | Example                          |
+# --------------------------------------------------------------------------------------------------------
+# | pd.Series(np_array)      | Create Pandas Series from NumPy array       | pd.Series(np.arange(5))          |
+# | pd.DataFrame(np_array)   | Create DataFrame from NumPy 2D array        | pd.DataFrame(np.random.rand(3,2))|
+# | .values / .to_numpy()    | Convert Series/DataFrame to NumPy array     | df.to_numpy() or df.values       |
+# | .index, .columns         | NumPy-like properties of DataFrame          | df.index, df.columns             |
+# --------------------------------------------------------------------------------------------------------
+
+

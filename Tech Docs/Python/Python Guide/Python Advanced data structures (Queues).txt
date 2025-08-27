@@ -1,0 +1,90 @@
+# -------------------------------
+# Python Advanced data structures Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Advanced data structures with comments and examples
+# -------------------------------
+---------------------------------------- Queues
+# Queues in Python
+# -----------------
+# A Queue is a linear data structure that follows the First-In-First-Out (FIFO) principle.
+# This means the element added first will be removed first (like a line of people at a ticket counter).
+# 
+# Python does not have a built-in queue data structure, but we can implement queues using:
+# 1. list (basic, not optimal)
+# 2. collections.deque (recommended)
+# 3. queue.Queue (thread-safe for multithreading)
+
+# --- Method 1: Using list ---
+# Inserting elements (enqueue) is easy using append()
+# Removing the first element (dequeue) using pop(0) is inefficient as it requires shifting all elements
+
+print("\n--- Queue using List ---")
+queue_list = []
+queue_list.append('A')  # Enqueue A
+queue_list.append('B')  # Enqueue B
+queue_list.append('C')  # Enqueue C
+print("Queue after enqueuing:", queue_list)
+dequeued_element = queue_list.pop(0)  # Dequeue A
+print("Dequeued element:", dequeued_element)
+print("Queue after dequeuing:", queue_list)
+
+# Limitations:
+# - pop(0) has O(n) time complexity because all other elements are shifted left.
+# - Not recommended for large-scale or performance-critical applications.
+
+# --- Method 2: Using collections.deque ---
+# deque (double-ended queue) allows fast appends and pops from both ends (O(1) complexity)
+from collections import deque
+
+print("\n--- Queue using deque ---")
+queue_deque = deque()
+queue_deque.append('A')  # Enqueue A
+queue_deque.append('B')  # Enqueue B
+queue_deque.append('C')  # Enqueue C
+print("Queue after enqueuing:", queue_deque)
+dequeued_element = queue_deque.popleft()  # Dequeue A
+print("Dequeued element:", dequeued_element)
+print("Queue after dequeuing:", queue_deque)
+
+# Advantages:
+# - Very efficient and ideal for queues
+# - Can also be used for stacks (append + pop)
+
+# --- Method 3: Using queue.Queue ---
+# This is designed for multithreaded programming
+# It is thread-safe, which means multiple threads can access the queue safely
+from queue import Queue
+
+print("\n--- Queue using queue.Queue ---")
+queue_thread = Queue(maxsize=5)  # maxsize is optional, default is infinite
+queue_thread.put('A')  # Enqueue A
+queue_thread.put('B')  # Enqueue B
+queue_thread.put('C')  # Enqueue C
+print("Is the queue full?", queue_thread.full())
+print("Queue size:", queue_thread.qsize())
+dequeued_element = queue_thread.get()  # Dequeue A
+print("Dequeued element:", dequeued_element)
+print("Queue size after dequeuing:", queue_thread.qsize())
+
+# Useful methods:
+# - put(item): Adds item to queue
+# - get(): Removes and returns item from queue
+# - qsize(): Returns current size of the queue
+# - empty(): Checks if queue is empty
+# - full(): Checks if queue is full (only useful if maxsize is set)
+
+# Use case:
+# Use queue.Queue when dealing with producer-consumer problems or multiple threads
+# Example: Thread A puts data in queue, Thread B processes it
+
+# Summary Table:
+print("\n--- Summary of Queue Implementations ---")
+summary = """
+| Method              | Use Case                         | Performance               | Thread-Safe |
+|---------------------|----------------------------------|---------------------------|-------------|
+| list                | Small or demo queues             | O(1) enqueue, O(n) dequeue| No          |
+| collections.deque   | General purpose queues           | O(1) enqueue/dequeue      | No          |
+| queue.Queue         | Multithreading, producer-consumer| O(1) enqueue/dequeue      | Yes         |
+"""
+print(summary)
+

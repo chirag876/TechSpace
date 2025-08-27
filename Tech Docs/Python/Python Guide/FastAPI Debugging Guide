@@ -1,0 +1,121 @@
+=========================================================
+FASTAPI DEBUGGING GUIDE FOR VISUAL STUDIO CODE (WINDOWS)
+=========================================================
+
+PREREQUISITES
+-------------
+1. Visual Studio Code installed
+2. Python extension installed in VS Code
+3. FastAPI and Uvicorn installed via pip:
+   > pip install fastapi uvicorn
+
+4. Ensure your main FastAPI application file (e.g., appfastapi.py) contains the following:
+   
+   if __name__ == "__main__":
+       import uvicorn
+       uvicorn.run("appfastapi:app", host="127.0.0.1", port=8000, reload=False)
+
+
+STEP 1: FREEING PORT 8000 (IF ALREADY OCCUPIED)
+-----------------------------------------------
+If port 8000 is already in use, follow the steps below to identify and terminate the process using it:
+
+1. Open Command Prompt and run:
+   > netstat -ano | findstr :8000
+
+   Example output:
+   TCP    127.0.0.1:8000   0.0.0.0:0   LISTENING   9204
+
+2. Identify the PID (in this case, 9204).
+
+3. Run the following to see which process is using it:
+   > tasklist /FI "PID eq 9204"
+
+4. To terminate the process:
+   > taskkill /PID 9204 /F
+
+
+STEP 2: CONFIGURE LAUNCH.JSON IN VS CODE
+----------------------------------------
+1. Open your FastAPI project in Visual Studio Code.
+2. Go to the Run and Debug panel (Shortcut: Ctrl + Shift + D).
+3. Click on "create a launch.json file".
+4. Select "Python" as the environment.
+5. Replace the content of the launch.json file with the following:
+
+   {
+       "version": "0.2.0",
+       "configurations": [
+           {
+               "name": "Debug FastAPI App",
+               "type": "python",
+               "request": "launch",
+               "module": "uvicorn",
+               "args": [
+                   "appfastapi:app",
+                   "--host", "127.0.0.1",
+                   "--port", "8000",
+                   "--reload"
+               ],
+               "jinja": true
+           }
+       ]
+   }
+
+EXPLANATION:
+- "module": Specifies Uvicorn as a Python module to be run.
+- "args": Command-line arguments passed to Uvicorn.
+- "appfastapi:app": Format is <filename without .py>:<FastAPI instance>.
+- "--reload": Enables live reload. Use this only during development.
+
+
+STEP 3: SET BREAKPOINTS
+------------------------
+1. Open your FastAPI source file (e.g., appfastapi.py).
+2. Click to the left of a line number to set a breakpoint inside a function or route.
+
+Example:
+
+   @app.get("/movies")
+   def get_movies():
+       # Set a breakpoint here
+       return movies
+
+NOTES:
+- Breakpoints must be inside function bodies or logical blocks.
+- Global scope breakpoints are not supported.
+
+
+STEP 4: START DEBUGGING
+-----------------------
+1. In the Run and Debug panel, select "Debug FastAPI App" from the configuration dropdown.
+2. Press F5 to start the debugger.
+
+Once the server is running, open your browser and access:
+http://127.0.0.1:8000/movies
+
+If you access the route where you placed a breakpoint, VS Code will pause execution there.
+
+COMMON ISSUES AND FIXES
+------------------------
+Issue: Breakpoint not being hit
+Solution:
+- Ensure the correct debug configuration is selected (not "Run Python File").
+- Access the route from a browser or API testing tool like Postman.
+- Make sure the `__name__ == "__main__"` block is present in your FastAPI file.
+
+Issue: Port already in use
+Solution:
+- Use the "netstat" and "taskkill" commands as shown in Step 1.
+
+
+CLEANUP TIP
+-----------
+If port 8000 is frequently used by other services, consider using a different port such as 8001.
+
+To change the port:
+- In launch.json, replace "--port", "8000" with "--port", "8001"
+
+FINAL NOTE
+----------
+You are now fully set up to debug FastAPI applications in VS Code with breakpoints and live inspection. This setup enables a clean and controlled development environment for backend debugging.

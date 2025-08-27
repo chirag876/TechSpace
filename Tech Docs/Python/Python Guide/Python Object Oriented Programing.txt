@@ -1,0 +1,206 @@
+# -------------------------------
+# Python Object Oriented Programing Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Object Oriented Programing with comments and examples
+# -------------------------------
+
+# -------------------------------
+# 1. Object-oriented programming
+# -------------------------------
+# Answering these questions step-by-step:
+# A. Basic class and objects
+# B. class method and self
+# C. inheritance
+# D. encapsulation
+# E. Polymorphism
+# F. class variables
+# G. static method
+# H. property decorators
+# I. class inheritance and isinstance() function
+# J. multiple inheritance
+# K. Importance and use of __init__
+
+# ----------------------------------------------------------------
+# K. What is __init__ and Why It Matters
+# ----------------------------------------------------------------
+# __init__ is a special method in Python known as the constructor.
+# It gets automatically called when you create an object of the class.
+# It is used to initialize the object's attributes with user-defined values.
+#
+#  Example of __init__:
+# class Person:
+#     def __init__(self, name, age):
+#         self.name = name
+#         self.age = age
+#
+#     def greet(self):
+#         print(f"Hello, my name is {self.name} and I'm {self.age} years old.")
+#
+# p = Person("Chirag", 23)   # __init__ is called here
+# p.greet()
+#
+#  What happens if __init__ is not used?
+# - Python will still create the object but with no predefined attributes.
+# - You'll have to manually set attributes using dot notation, which can lead to inconsistency.
+#
+# Example:
+# class Car:
+#     pass
+#
+# my_car = Car()
+# my_car.brand = "Maruti"
+# my_car.model = "Swift"
+#
+# When should you use __init__?
+# - When you want to enforce a fixed structure for every object.
+# - To initialize values during object creation.
+# - To ensure encapsulation and clean object-oriented design.
+#
+#  Is it used every time?
+# - No. You can skip it in utility classes or where initialization isn't needed.
+# - But in most practical cases, especially real-world modeling, it is essential.
+
+# ----------------------------------------------------------------
+# A. Basic class and object creation
+# ----------------------------------------------------------------
+# A class is a blueprint for creating objects. It can contain attributes (variables) and methods (functions).
+# An object is an instance of the class.
+class Car:
+    # F. Class variable to track number of cars (shared by all instances)
+    total_cars = 0
+
+    def __init__(self, brand, model):
+        # D. Encapsulation - Private attributes (using double underscores makes them private)
+        self.__brand = brand
+        self.__model = model
+        Car.total_cars += 1  # Access class variable using class name
+
+    # B. Class Method and Self
+    # 'self' is a reference to the current instance. Used to access attributes/methods inside the class
+    def full_name(self):
+        return f"{self.__brand} {self.__model}"
+
+    # D. Getter method for encapsulated brand attribute
+    def get_brand(self):
+        return self.__brand + "!"  # Example of formatting and custom return
+
+    # E. Polymorphism - this method will be overridden in the child class
+    def fuel_type(self):
+        return "Petrol or Diesel"
+
+    # F. Class method to access class variable
+    @classmethod
+    def get_total_cars(cls):
+        # 'cls' is similar to 'self' but refers to the class instead of the instance
+        return cls.total_cars
+
+    # G. Static Method - does not need self or cls, general utility related to class
+    @staticmethod
+    def general_definition():
+        return "Cars are a means of transport."
+
+    # H. Property Decorator to make 'model' attribute read-only
+    @property
+    def model(self):
+        return self.__model
+
+# Creating Car objects
+my_car = Car("Maruti", "Sx4")
+print("Brand:", my_car.get_brand())  # Output: Maruti!
+print("Model:", my_car.model)        # Output: Sx4 (read-only)
+print("Full Name:", my_car.full_name())
+
+my_new_car = Car("BMW", "GT")
+print("Brand:", my_new_car.get_brand())
+print("Fuel Type:", my_new_car.fuel_type())
+print("Total Cars Created:", Car.get_total_cars())  # Accessing class method
+
+my_imported_car = Car("Maruti", "WagonR")
+
+# H. Attempting to modify a read-only property
+# my_imported_car.model = "City"  # This will raise an AttributeError
+# Explanation:
+# We decorated 'model' with @property but didn't define a setter method for it.
+# So it's read-only from outside the class. You can only access (not modify) it.
+# Trying to do so will raise:
+# AttributeError: can't set attribute 'model'
+
+print("Model (Read-only):", my_imported_car.model)
+
+# G. Calling Static Method - can be accessed by class or object
+print("General Definition (obj call):", my_imported_car.general_definition())
+print("General Definition (class call):", Car.general_definition())
+
+# ----------------------------------------------------------------
+# C. Inheritance - Reuse properties/methods from another class
+# ----------------------------------------------------------------
+class ElectricCar(Car):
+    def __init__(self, brand, model, battery_size):
+        # 'super()' calls the parent class's constructor (Car.__init__)
+        # This avoids manually redefining brand/model in the child class
+        super().__init__(brand, model)
+        self.battery_size = battery_size
+
+    # E. Polymorphism - overriding parent method with new behavior
+    def fuel_type(self):
+        return "Electric Charge"
+
+# Creating an instance of child class
+my_tata = ElectricCar("Tata", "Tiago", "450KWh")
+print("Fuel Type (ElectricCar):", my_tata.fuel_type())
+
+# I. isinstance() function checks the object’s class relationship
+print("Is my_tata an instance of Car?", isinstance(my_tata, Car))  # True
+print("Is my_tata an instance of ElectricCar?", isinstance(my_tata, ElectricCar))  # True
+
+# Accessing inherited and overridden methods
+print("ElectricCar Full Name:", my_tata.full_name())
+print("ElectricCar Brand (via getter):", my_tata.get_brand())
+
+# D. Trying to access private attributes directly (will raise error)
+# print(my_tata.__brand)
+# This will raise: AttributeError: 'ElectricCar' object has no attribute '__brand'
+# Explanation:
+# Variables with double underscores are name-mangled (become _ClassName__variableName).
+# Hence, __brand is not directly accessible from outside the class.
+
+# ----------------------------------------------------------------
+# J. Multiple Inheritance - Class inherits from multiple parent classes
+# ----------------------------------------------------------------
+class Battery:
+    def battery_info(self):
+        return "Battery capacity and efficiency info"
+
+class Engine:
+    def engine_info(self):
+        return "Engine type and performance info"
+
+# HybridCar inherits from Battery, Engine, and Car
+class HybridCar(Battery, Engine, Car):
+    def __init__(self, brand, model):
+        # We need to manually call Car's constructor to initialize its part
+        Car.__init__(self, brand, model)
+
+my_hybrid_car = HybridCar("Maruti", "Fronx")
+print("Battery Info:", my_hybrid_car.battery_info())
+print("Engine Info:", my_hybrid_car.engine_info())
+print("HybridCar Full Name:", my_hybrid_car.full_name())
+print("HybridCar Fuel Type:", my_hybrid_car.fuel_type())  # Inherited from Car
+
+# ----------------------------------------------------------------
+# Final Notes (for revision and deeper understanding)
+# ----------------------------------------------------------------
+# - __init__ is the constructor in Python, automatically called when an object is created.
+# - @property makes a method behave like an attribute (read-only if no setter defined).
+# - Variables prefixed with double underscores (__) are private (encapsulation).
+# - Inheritance lets child class reuse and extend functionality of parent class.
+# - Polymorphism enables method overriding - child classes redefine methods.
+# - Static methods are utility functions related to the class but not tied to object instance.
+# - Class methods use @classmethod decorator and operate on class-level data (like class variables).
+# - Use isinstance() to verify class relationships safely in large applications.
+# - Multiple inheritance allows a class to inherit features from multiple classes.
+# - Class variables are shared across all instances. Instance variables are unique per object.
+# - 'super()' is used to call a method from the parent class, commonly used in constructors during inheritance.
+
+# This file explains all key intermediate OOP concepts with detailed comments and examples.
+# operator overloading, abstract classes, or mixins for deeper learning!

@@ -1,0 +1,193 @@
+# -------------------------------
+# Python Decorators Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Decorators with comments and examples
+# -------------------------------
+
+# -------------------------------
+# 1. What are Decorators?
+# -------------------------------
+# Decorators are functions that modify the behavior of another function.
+# They allow us to wrap another function in order to extend its behavior without permanently modifying it.
+
+# Basic Syntax:
+# @decorator_name
+# def function_to_decorate():
+#     pass
+
+# -------------------------------
+# 2. What is a Wrapper Function?
+# -------------------------------
+# A wrapper function is defined inside a decorator and is used to "wrap" the original function.
+# It allows us to execute code *before* and *after* the original function runs.
+# This is the most common way to apply extra behavior to functions using decorators.
+
+# Is it necessary to use a wrapper function?
+# - Yes, in most cases, a wrapper is used to intercept calls to the original function.
+# - But it's not mandatory. If the decorator simply returns the original function (unchanged), a wrapper is not needed.
+# Example of a decorator without a wrapper:
+
+def identity_decorator(func):
+    return func
+
+@identity_decorator
+def do_nothing():
+    print("I am doing nothing!")
+
+do_nothing()
+
+# -------------------------------
+# 3. Basic Decorator Example
+# -------------------------------
+def simple_decorator(func):
+    def wrapper():
+        print("Before function call")
+        func()
+        print("After function call")
+    return wrapper
+
+@simple_decorator
+def say_hello():
+    print("Hello!")
+
+say_hello()
+
+# -------------------------------
+# 4. Timing Function Execution
+# -------------------------------
+import time
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"{func.__name__} ran in {end-start:.4f} seconds")
+        return result
+    return wrapper
+
+@timer
+def example_function(n):
+    time.sleep(n)
+
+example_function(2)
+
+# -------------------------------
+# 5. Debugging Function Calls
+# -------------------------------
+def debug(func):
+    def wrapper(*args, **kwargs):
+        args_value = ', '.join(str(arg) for arg in args)
+        kwargs_value = ', '.join(f"{k}={v}" for k, v in kwargs.items())
+        print(f"Calling: {func.__name__} with args ({args_value}) and kwargs ({kwargs_value})")
+        return func(*args, **kwargs)
+    return wrapper
+
+@debug
+def greet(name, greeting):
+    print(f"{greeting}, {name}")
+
+greet("Chirag", greeting="Hello")
+
+# -------------------------------
+# 6. Caching Results (Memoization)
+# -------------------------------
+def cache(func):
+    cache_value = {}
+    def wrapper(*args):
+        if args in cache_value:
+            print(f"Returning cached result for {args}")
+            return cache_value[args]
+        result = func(*args)
+        cache_value[args] = result
+        print(f"Caching result for {args}")
+        return result
+    return wrapper
+
+@cache
+def long_running_function(a, b):
+    time.sleep(2)
+    return a + b
+
+print(long_running_function(2, 5))
+print(long_running_function(2, 5))
+print(long_running_function(2, 8))
+
+# -------------------------------
+# 7. Preserving Metadata using functools.wraps
+# -------------------------------
+from functools import wraps
+
+def decorator_with_metadata(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print("Function is being decorated")
+        return func(*args, **kwargs)
+    return wrapper
+
+@decorator_with_metadata
+def decorated_func():
+    """This function does something important"""
+    print("Doing something...")
+
+print(decorated_func.__name__)  # retains original function name
+print(decorated_func.__doc__)   # retains original docstring
+
+# -------------------------------
+# 8. Decorators with Arguments
+# -------------------------------
+def repeat(num_times):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            for _ in range(num_times):
+                func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@repeat(3)
+def say_hi():
+    print("Hi!")
+
+say_hi()
+
+# -------------------------------
+# 9. Class-Based Decorators
+# -------------------------------
+class CountCalls:
+    def __init__(self, func):
+        self.func = func
+        self.num_calls = 0
+
+    def __call__(self, *args, **kwargs):
+        self.num_calls += 1
+        print(f"Call {self.num_calls} of {self.func.__name__}")
+        return self.func(*args, **kwargs)
+
+@CountCalls
+def say_hello_class():
+    print("Hello from class decorator!")
+
+say_hello_class()
+say_hello_class()
+
+# -------------------------------
+# 10. Multiple Decorators
+# -------------------------------
+@debug
+@timer
+def process_data():
+    time.sleep(1)
+    print("Processing data...")
+
+process_data()
+
+# -------------------------------
+# 11. Practical Use Cases of Decorators
+# -------------------------------
+# - Logging
+# - Access control and authentication
+# - Memoization (caching)
+# - Performance measurement
+# - Validation
+# - Retry logic

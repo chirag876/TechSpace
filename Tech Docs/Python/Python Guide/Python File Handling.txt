@@ -1,0 +1,153 @@
+# -------------------------------
+# Python File Handling Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for file handling with comments and examples
+# -------------------------------
+
+# -------------------------------
+# FILE HANDLING IN PYTHON
+# -------------------------------
+
+# File handling allows you to read from and write to files in Python. It's useful for storing data permanently,
+# processing large files, or exchanging data between programs.
+# The built-in open() function is used to open files, and files must be closed after use.
+
+# -------------------------------
+# BASIC STEPS FOR FILE HANDLING
+# -------------------------------
+# 1. Opening a file
+# 2. Reading from a file
+# 3. Writing to a file
+# 4. Closing the file
+# 5. Using 'with' for automatic closing
+
+# -------------------------------
+# OPENING A FILE
+# -------------------------------
+# Syntax: file_object = open('filename', 'mode')
+# 'filename': File name or path
+# 'mode': Mode to open file in
+# Common Modes:
+# - 'r': Read (default). Fails if file doesn't exist
+# - 'w': Write. Creates file or overwrites if exists
+# - 'a': Append. Adds content at the end
+# - 'rb', 'wb': Read/Write in binary mode
+
+# Example: Open a file for reading
+file = open('example.txt', 'r')
+file.close()
+
+# -------------------------------
+# READING FROM A FILE
+# -------------------------------
+# Methods:
+# - read(): Reads the entire file
+# - readline(): Reads one line at a time
+# - readlines(): Reads all lines into a list
+
+file = open('example.txt', 'r')
+content = file.read()  # Reads entire content
+print("\nRead full file:", content)
+file.close()
+
+file = open('example.txt', 'r')
+line = file.readline()  # Reads first line
+print("\nRead one line:", line)
+file.close()
+
+file = open('example.txt', 'r')
+lines = file.readlines()  # Reads all lines into list
+print("\nRead all lines as list:", lines)
+file.close()
+
+# -------------------------------
+# WRITING TO A FILE
+# -------------------------------
+# write(): Writes string to file
+# writelines(): Writes list of strings (no newline added automatically)
+
+file = open('example2.txt', 'w')
+file.write("Namaste, kaise ho?")  # Overwrites content
+file.close()
+
+file = open('example2.txt', 'a')
+file.write("\nAgain acha hu.")  # Appends content
+file.close()
+
+# -------------------------------
+# CLOSING A FILE
+# -------------------------------
+# Always close the file using close() to free resources
+# or use 'with' which automatically closes it
+
+# Using 'with' statement (recommended)
+with open('example2.txt', 'r') as file:
+    content = file.readline()
+    print("\nReading with 'with':", content)
+
+# Using try-finally for safe closing
+try:
+    file = open('example2.txt', 'r')
+    content = file.read()
+    print("\nRead with try-finally:", content)
+except FileNotFoundError:
+    print("File not found.")
+except ValueError:
+    print("Value error occurred.")
+finally:
+    if 'file' in locals():
+        file.close()
+
+# -------------------------------
+# HANDLING DIFFERENT FILE FORMATS
+# -------------------------------
+
+# CSV file using csv module
+import csv
+with open('file.csv', mode='r') as file:
+    reader = csv.reader(file)
+    for row in reader:
+        print("CSV Row:", row)
+
+# CSV using pandas (easier for dataframes)
+import pandas as pd
+csv_df = pd.read_csv('file.csv')
+print("\nCSV with pandas:\n", csv_df.head())
+
+# Excel using pandas
+excel_df = pd.read_excel('file.xlsx')
+print("\nExcel with pandas:\n", excel_df.head())
+
+# PDF using PyPDF2 (basic usage)
+import PyPDF2
+with open('file.pdf', 'rb') as file:
+    pdf_reader = PyPDF2.PdfReader(file)
+    if pdf_reader.pages:
+        page = pdf_reader.pages[0]
+        print("\nFirst page content:\n", page.extract_text())
+
+# -------------------------------
+# NOTES:
+# -------------------------------
+# - Always close your files.
+# - Use 'with' to handle files safely.
+# - Catch exceptions like FileNotFoundError, IOError, ValueError.
+# - Use pandas for structured data like CSV/Excel.
+# - Use libraries like PyPDF2 or PyMuPDF for PDFs.
+
+
+# Q: How can you handle multiple exceptions while performing file operations?
+# A: Use try-except blocks. You can handle specific exceptions like:
+try:
+    with open('somefile.txt', 'r') as file:
+        content = file.read()
+except FileNotFoundError:
+    print("The file was not found.")
+except PermissionError:
+     print("You don't have permission to read the file.")
+except ValueError:
+     print("There was a value error while reading the file.")
+except Exception as e:
+     print(f"An unexpected error occurred: {e}")
+
+

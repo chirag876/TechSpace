@@ -1,0 +1,179 @@
+# -------------------------------
+# Python Exception Handling Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Exception Handling with comments and examples
+# -------------------------------
+
+# -------------------------------
+# 1. Types of Errors in Python
+# -------------------------------
+
+# 1. Syntax Error (Compile-time Error)
+# - Occurs when Python cannot interpret the code because it violates the syntax rules.
+# - These are detected before the program is run.
+# - Example: Missing a colon
+#   if True print("Hello")  # SyntaxError: expected ':'
+
+# 2. Logical Error
+# - Program runs without crashing, but gives incorrect output.
+# - These are not raised by Python; they are bugs in logic.
+# - Example:
+#   avg = (10 + 20 + 30) / 4  # Logical mistake, should be / 3
+
+# 3. Runtime Error (Exceptions)
+# - Errors that occur during the execution of the program.
+# - Python throws exceptions when it encounters these.
+# - Examples: ZeroDivisionError, FileNotFoundError, IndexError
+
+# -------------------------------
+# 2. What is Exception Handling?
+# -------------------------------
+
+# Exception handling is a mechanism in Python to manage runtime errors gracefully
+# instead of crashing the program. It ensures the program can recover or exit properly.
+
+# Keywords:
+# - try: Code that may raise an exception is placed here.
+# - except: Code to handle the exception goes here.
+# - else: Executes if no exceptions occur in the try block.
+# - finally: Executes no matter what — exception or not (used for cleanup tasks).
+
+# Syntax:
+# try:
+#     # risky code
+# except ExceptionType:
+#     # handling code
+# else:
+#     # executes if no exception
+# finally:
+#     # always executes
+
+# Example:
+try:
+    a = int(input("Enter value for a: "))
+    b = int(input("Enter value for b: "))
+    c = a / b
+except ZeroDivisionError:
+    print("Error: Division by zero is not allowed.")
+except ValueError:
+    print("Error: Invalid input. Please enter only integers.")
+else:
+    print("Result:", c)
+finally:
+    print("This block always executes, used for cleanup.")
+
+# -------------------------------
+# 3. Catching Generic Exceptions using Exception class
+# -------------------------------
+
+# You can catch all exceptions using the base class 'Exception'.
+# Not recommended unless you're logging/debugging or unsure about exception types.
+
+try:
+    a = int(input("Enter value for a: "))
+    b = int(input("Enter value for b: "))
+    l = [10, 20, 30, 40, 50]
+    c = a / b
+    print("Division Result:", c)
+    print("List Element:", l[5])  # IndexError
+except Exception as e:
+    print("Caught Exception:", e)
+
+# -------------------------------
+# 4. Using Specific Exception Types
+# -------------------------------
+
+# Always prefer catching specific exceptions. Python stops at the first match.
+
+try:
+    a = int(input("Enter value for a: "))
+    b = int(input("Enter value for b: "))
+    l = [10, 20, 30, 40, 50]
+    c = a / b
+    print("Division Result:", c)
+    print("List Element:", l[5])
+except ZeroDivisionError:
+    print("Caught ZeroDivisionError: You tried to divide by zero.")
+except IndexError:
+    print("Caught IndexError: List index out of range.")
+
+# -------------------------------
+# 5. Handling Multiple Exceptions in a Single except Block
+# -------------------------------
+
+# Python allows grouping multiple exceptions in a single block by using a tuple.
+# This is useful when the same handling logic applies to multiple exceptions.
+# Note: You must put the exception types inside parentheses.
+
+try:
+    a = int(input("Enter value for a: "))
+    b = int(input("Enter value for b: "))
+    l = [10, 20, 30, 40, 50]
+    c = a / b
+    print("Division Result:", c)
+    print("List Element:", l[5])
+except (ZeroDivisionError, IndexError) as e:
+    print("Caught Exception:", e)
+
+# Explanation:
+# - If either a ZeroDivisionError (from a/b) or IndexError (from l[5]) occurs,
+#   this block will catch and handle it.
+# - This approach is concise and useful when multiple exceptions require the same response.
+
+# -------------------------------
+# 6. Using the raise Keyword to Raise Exceptions Manually
+# -------------------------------
+
+# You can manually raise exceptions using the 'raise' keyword.
+# Useful for input validation or enforcing constraints.
+
+try:
+    a = int(input("Enter value for a: "))
+    b = int(input("Enter value for b: "))
+    if b == 0:
+        raise ZeroDivisionError("You cannot divide by zero!")
+    c = a / b
+    print("Division Result:", c)
+except ZeroDivisionError as e:
+    print("Custom Raised Exception:", e)
+
+# -------------------------------
+# 7. Creating and Raising User-Defined Exceptions
+# -------------------------------
+
+# When Python's built-in exceptions are not sufficient, you can define your own.
+# Create a class inheriting from Exception.
+
+class InvalidData(Exception):
+    """Custom Exception for invalid input data."""
+    def __init__(self, message):
+        self.message = message
+        super().__init__(self.message)
+
+try:
+    a = int(input("Enter value between 0 and 100: "))
+    if a < 0 or a > 100:
+        raise InvalidData("Value must be between 0 and 100.")
+    print("Valid input:", a)
+except InvalidData as e:
+    print("User Defined Exception Caught:", e)
+except ValueError:
+    print("Invalid input type. Please enter an integer.")
+
+# -------------------------------
+# 8. Best Practices for Exception Handling
+# -------------------------------
+
+# Catch only those exceptions you expect
+# Use finally blocks for cleanup (like closing files, DB connections)
+# Avoid bare `except:` unless absolutely necessary
+# Log exceptions in real-world applications instead of just printing
+# Create custom exceptions for meaningful error messages
+
+# Example of Logging Exceptions (for production-level apps):
+# import logging
+# logging.basicConfig(level=logging.ERROR)
+# try:
+#     # risky code
+# except Exception as e:
+#     logging.error("Exception occurred", exc_info=True)

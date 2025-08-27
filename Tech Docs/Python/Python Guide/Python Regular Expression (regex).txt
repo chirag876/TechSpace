@@ -1,0 +1,153 @@
+# -------------------------------
+# Python Regular Expression (regex) Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Regular Expression (regex) with comments and examples
+# -------------------------------
+
+# -------------------------------
+# 1. What is Regex?
+# -------------------------------
+# Regular expressions (regex) are powerful tools used for pattern matching and text processing.
+# They help in searching, extracting, modifying, and validating strings using specific patterns.
+
+# Python provides the 're' module for working with regular expressions.
+
+# --------------------------------
+# 2. Importing the regex module
+# --------------------------------
+import re
+
+# -------------------------------
+# 3. Basic Functions in re Module
+# -------------------------------
+
+# 3.1 findall() - Returns a list of all matches found in the string
+text = "I have a dog and a cat"
+pattern = r"dog"
+matches = re.findall(pattern, text)
+print("findall():", matches)  # ['dog']
+
+# 3.2 search() - Searches the string and returns the first match as a match object
+match = re.search(pattern, text)
+if match:
+    print("search(): Match object:", match)
+    print("start():", match.start())      # Returns the starting index of the match
+    print("span():", match.span())        # Returns a tuple (start, end) of the match
+    print("string():", match.string)      # Returns the original string used in search
+    print("group():", match.group())      # Returns the actual matched text
+
+# 3.3 split() - Splits the string into a list using the regex pattern
+pattern = r"and"
+split_result = re.split(pattern, text)
+print("split():", split_result)  # ['I have a dog ', ' a cat']
+
+# 3.4 sub() - Replaces matched substrings with a replacement string
+pattern = r"dog"
+replaced = re.sub(pattern, "cow", text)
+print("sub():", replaced)  # 'I have a cow and a cat'
+
+# -------------------------------
+# 4. Metacharacters
+# -------------------------------
+# Metacharacters are special characters used to define search patterns:
+# .  : Matches any character except newline
+# *  : Matches 0 or more repetitions
+# +  : Matches 1 or more repetitions
+# ?  : Matches 0 or 1 occurrence
+# [] : Matches any one of the characters inside
+# |  : OR operator for multiple patterns
+
+# Examples:
+pattern = r"c.t"     # matches 'cat', 'cut', 'c9t'
+print(re.findall(pattern, text))
+
+pattern = r"d.*g"     # greedy match from 'd' to 'g'
+print(re.findall(pattern, text))
+
+pattern = r"d.+g"     # one or more characters between 'd' and 'g'
+print(re.findall(pattern, text))
+
+pattern = r"d.?g"     # matches 'dog', 'dug', etc. with one optional char in between
+print(re.findall(pattern, text))
+
+pattern = r"[c-d]"    # matches single character 'c' or 'd'
+print(re.findall(pattern, text))
+
+pattern = r"dog|cat"  # matches either 'dog' or 'cat'
+print(re.findall(pattern, text))
+
+# -------------------------------
+# 5. Anchors
+# -------------------------------
+# ^ : Matches the start of the string
+# $ : Matches the end of the string
+
+pattern = r"^I"
+print("Starts with 'I':", re.findall(pattern, text))
+
+pattern = r"cat$"
+print("Ends with 'cat':", re.findall(pattern, text))
+
+# -------------------------------
+# 6. Quantifiers
+# -------------------------------
+# {} : Specifies the exact number of repetitions
+# {m, n} : Matches between m and n repetitions
+
+pattern = r"c.{1}t"   # matches any single character between 'c' and 't'
+print("Quantifier example:", re.findall(pattern, text))
+
+# -------------------------------
+# 7. Special Sequences
+# -------------------------------
+# \d  : Matches any digit (0–9)
+# \D  : Matches any non-digit
+# \s  : Matches any whitespace (space, tab, newline)
+# \S  : Matches any non-whitespace
+# \w  : Matches any word character [a-zA-Z0-9_]
+# \W  : Matches any non-word character
+
+text2 = "I have 2 dogs, 3 cats and 1 cow!"
+
+print("Digits:", re.findall(r"\d", text2))
+print("Non-digits:", re.findall(r"\D", text2))
+print("Whitespace:", re.findall(r"\s", text2))
+print("Word characters:", re.findall(r"\w", text2))
+print("Non-word characters:", re.findall(r"\W", text2))
+
+# -------------------------------
+# 8. Grouping and Capturing
+# -------------------------------
+# () : Groups parts of a pattern. Useful for extracting sub-parts.
+email_text = "My email is chirag.gupta123@example.com"
+pattern = r"(\w+[\._]?\w+)@(\w+\.[a-z]+)"
+match = re.search(pattern, email_text)
+if match:
+    print("Username:", match.group(1))
+    print("Domain:", match.group(2))
+
+# -------------------------------
+# 9. Flags in Regex
+# -------------------------------
+# Flags modify the behavior of regex matching:
+# re.I : Case-insensitive matching
+# re.M : Multi-line matching for ^ and $
+# re.S : Dot matches all characters including newlines
+
+multi_line = "Hello\nworld"
+pattern = r"^world"
+print("Without flag:", re.findall(pattern, multi_line))
+print("With re.M:", re.findall(pattern, multi_line, re.M))
+
+# -------------------------------
+# 10. Real-World Examples
+# -------------------------------
+# Validating an email address
+email = "abc.def@domain.com"
+pattern = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+print("Valid Email:", re.match(pattern, email))
+
+# Extracting all numbers from a string
+sentence = "My bill is 100 rupees and tax is 18."
+numbers = re.findall(r"\d+", sentence)
+print("Extracted Numbers:", numbers)

@@ -1,0 +1,233 @@
+# -------------------------------
+# Python Testing Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Testing with comments and examples
+# -------------------------------
+
+# -------------------------------
+# TESTING IN PYTHON
+# -------------------------------
+
+# install pytest module and pytest-mock module
+
+def get_weather(temp):
+    if temp>20:
+        return "Hot"
+    else:
+        return "Cold"
+    
+def add(a,b):
+    return a+b
+
+def divide(a,b):
+    if b==0:
+        raise ValueError("Cannot divide by 0")
+    return a/b
+
+#-----------------------
+# Example 2
+#-----------------------
+class UserManager:
+    def __init__(self):
+        self.users = {}
+    
+    def add_user(self, username, email):
+        if username in self.users:
+            raise ValueError("User already exists")
+        self.users[username] = email
+        return True
+    
+    def get_user(self, username):
+        return self.users.get(username)
+
+#-----------------------
+# Example 3
+#----------------------- 
+'''stimulating basic user database'''
+class Database:
+    def __init__(self):
+        self.data = {} # stimuating in memory database
+    
+    def add_user(self, user_id, name):
+        if user_id in self.data:
+            raise ValueError("User already exists")
+        self.data[user_id] = name
+        return True
+    
+    def get_user(self, user_id):
+        return self.data.get(user_id, None)
+    
+    def delete_user(self, user_id):
+        if user_id in self.data:
+            del self.data[user_id]
+
+#-----------------------
+# Example 4
+#----------------------- 
+def is_prime(n):
+    if n<2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n%i==0:
+            return False
+    return True
+
+#-----------------------
+# Example 5
+#----------------------- 
+
+import requests
+def get_weather(city):
+    response = requests.get(f"https://api.weather.com/v1/{city}")
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise ValueError("Could not fetch the weather data")
+    
+#---------------------------------------------------------------
+# test_app.py 
+# This file contains unit tests for the functions and classes defined in app.py.
+# The filename starts with `test_` so that pytest can automatically detect and run the tests.
+#---------------------------------------------------------------
+
+#==============================
+# Test Example - 1: Simple Unit Tests for Basic Functions
+#==============================
+
+from app import get_weather, add, divide
+import pytest
+
+# Unit testing: Testing individual functions in isolation to check if they return correct output.
+# 'assert' checks if the result of the function matches the expected output.
+# If true, test passes; if false, test fails.
+
+def test_get_weather():
+    # Testing if the get_weather function returns "cold" for temperature 21
+    assert get_weather(21) == "cold"
+
+def test_add():
+    # Checking various combinations for add function
+    assert add(2, 3) == 5           # 2 + 3 = 5
+    assert add(2, -3) == -1        # 2 + (-3) = -1
+    assert add(-2, 3) == 1         # -2 + 3 = 1
+    # Negative test case intentionally avoided here, but could be added to handle wrong cases
+
+def test_divide():
+    # This test ensures divide() raises ValueError when division by zero is attempted.
+    # pytest.raises is used to test for exceptions.
+    with pytest.raises(ValueError, match="Can divide by 0"):
+        divide(5, 0)
+
+
+#==============================
+# Test Example - 2: Class Testing with Fixture - UserManager
+#==============================
+
+from app import UserManager
+
+# @pytest.fixture is a special function in pytest that allows setting up reusable test resources.
+# It runs before each test that uses it, creating a clean object to avoid cross-test contamination.
+
+@pytest.fixture 
+def user_manager():
+    return UserManager()
+
+def test_add_user(user_manager):
+    # Adding a user and verifying that they are stored correctly in the system
+    assert user_manager.add_user("Chirag", "Chirag@gmail.com") == True
+    assert user_manager.get_user("Chirag") == "Chirag@gmail.com"
+
+def test_add_duplicate_user(user_manager):
+    # Attempting to add the same user twice should raise a ValueError
+    user_manager.add_user("Chirag", "Chirag@gmail.com")
+    with pytest.raises(ValueError):
+        user_manager.add_user("Chirag", "ChiragGupta@gmail.com")
+
+
+#==============================
+# Test Example - 3: Class Testing with Setup and Cleanup - Database
+#==============================
+
+from app import Database
+
+# Fixtures can also yield the object and do cleanup after test execution.
+# This mimics real-world DB test cases where teardown is required.
+
+@pytest.fixture 
+def db():
+    # Setup step: create the database object before test
+    database = Database()
+
+    # yield keyword is used in fixtures to separate setup and teardown.
+    # Everything before 'yield' is the setup phase, and everything after it is the cleanup.
+    # When the test is run, the code before yield runs first (setup), then the test executes,
+    # and finally the code after yield runs (cleanup/teardown).
+
+    yield database  # this value will be passed to the test functions that use the 'db' fixture
+
+    # Cleanup step (executed after test finishes)
+    database.data.clear()  # clears in-memory database (not essential here, but important in real DBs)
+
+def test_add_user(db):
+    # Adding a user and checking if the user is returned correctly
+    db.add_user(1, "Chirag")
+    assert db.get_user(1) == "Chirag"
+
+def test_add_duplicate_user(db):
+    # Duplicate user ID should trigger an error
+    db.add_user(1, "Chirag")
+    with pytest.raises(ValueError, match="User already exist"):
+        db.add_user(1, "Ayushi")
+
+def test_delete_user(db):
+    # Test deleting user and verifying the user no longer exists
+    db.add_user(2, "Raghav")
+    db.delete_user(2)
+    assert db.get_user(2) is None
+
+
+#==============================
+# Test Example - 4: Parameterized Tests - is_prime
+#==============================
+
+from app import is_prime
+
+# @pytest.mark.parametrize allows running the same test logic with different inputs.
+# Helps avoid writing multiple test functions for similar logic.
+
+@pytest.mark.parametrize("num, expected", [
+    (1, False),     # 1 is not prime
+    (2, True),      # 2 is prime
+    (3, True),      # 3 is prime
+    (4, False),     # 4 is not prime
+])
+def test_is_prime(num, expected):
+    # Testing primality check with multiple inputs
+    assert is_prime(num) == expected
+
+
+#==============================
+# Test Example - 5: Mock Testing - External API calls
+#==============================
+
+# External APIs (like weather APIs) should not be called during tests.
+# Instead, we use mocking to simulate the behavior of the external service.
+# This keeps tests fast, consistent, and does not rely on network availability.
+
+from app import get_weather
+def test_get_weather_api_mock(mocker):
+    # mocker.patch replaces the 'requests.get' function in app.py with a mock version.
+    mock_get = mocker.patch("app.requests.get")
+
+    # Setting a fake response for our mocked API call
+    mock_get.return_value.status_code = 200
+    mock_get.return_value.json.return_value = {"temparature": 25, "condition": "sunny"}
+
+    # Call the actual function (which internally uses requests.get)
+    result = get_weather("Jaipur")
+
+    # Asserting the output matches our mocked return
+    assert result == {"temparature": 25, "condition": "sunny"}
+
+    # Confirming that requests.get was called once with the expected URL
+    mock_get.assert_called_once_with("https://api.weather.com/v1/Jaipur")

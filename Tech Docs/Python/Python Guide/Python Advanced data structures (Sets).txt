@@ -1,0 +1,133 @@
+# -------------------------------
+# Python Advanced data structures Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for Advanced data structures with comments and examples
+# -------------------------------
+
+------------------------------------------------- Sets
+
+# ----------------------------- 
+# 1. INTRODUCTION TO SETS
+# -----------------------------
+# A set is an unordered collection of unique items in Python.
+# Sets are defined using curly braces {} or the set() constructor.
+# They are commonly used to remove duplicates, perform mathematical operations, or for fast membership testing.
+
+# Creating sets
+set1 = {1, 2, 3, 4}  # Set with integers
+set2 = set([4, 5, 6])  # Set from a list
+set3 = set()  # Empty set (Note: {} creates an empty dictionary)
+
+print("Set1:", set1)  # Output: {1, 2, 3, 4} (order may vary)
+print("Set2:", set2)  # Output: {4, 5, 6} (order may vary)
+print("Empty Set3:", set3)  # Output: set()
+
+# -----------------------------
+# 2. SET CHARACTERISTICS
+# -----------------------------
+# - Unordered: The elements have no fixed position
+# - Mutable: You can add or remove elements, but elements themselves must be immutable (e.g., no lists or dictionaries inside a set)
+# - Unique: Duplicate items are automatically removed
+
+# Adding elements
+set1.add(5)  # Adds a single element
+print("After adding 5 to set1:", set1)  # Output: {1, 2, 3, 4, 5} (order may vary)
+
+# Removing elements
+set1.remove(2)  # Removes 2 from the set, raises KeyError if not found
+set1.discard(10)  # Tries to remove 10, no error if 10 is not in the set
+print("After removing 2 and discarding 10:", set1)  # Output: {1, 3, 4, 5} (order may vary)
+
+# -----------------------------
+# 3. SET OPERATIONS
+# -----------------------------
+# Sets support mathematical operations like union, intersection, and difference.
+
+A = {1, 2, 3, 4, 5}
+B = {4, 5, 6, 7, 8}
+
+# Union: Combines all elements from both sets (no duplicates)
+print("Union (A | B):", A | B)  # Output: {1, 2, 3, 4, 5, 6, 7, 8}
+print("Union using method:", A.union(B))  # Same output as above
+
+# Intersection: Elements common to both sets
+print("Intersection (A & B):", A & B)  # Output: {4, 5}
+print("Intersection using method:", A.intersection(B))
+
+# Difference: Elements in A but not in B
+print("Difference (A - B):", A - B)  # Output: {1, 2, 3}
+print("Difference using method:", A.difference(B))
+
+# Symmetric Difference: Elements in either A or B, but not both
+print("Symmetric Difference (A ^ B):", A ^ B)  # Output: {1, 2, 3, 6, 7, 8}
+print("Symmetric Difference using method:", A.symmetric_difference(B))
+
+# In-place versions
+A_copy = A.copy()
+A_copy.intersection_update(B)
+print("A after intersection_update with B:", A_copy)  # Output: {4, 5}
+
+# -----------------------------
+# 4. SET COMPREHENSIONS
+# -----------------------------
+# Similar to list comprehensions but use curly braces
+squares = {x**2 for x in range(6)}
+print("Set of squares:", squares)  # Output: {0, 1, 4, 9, 16, 25}
+
+# -----------------------------
+# 5. SET METHODS
+# -----------------------------
+s = {1, 2, 3}
+s.add(4)  # Add a single item
+s.update([5, 6])  # Add multiple items (can pass list, tuple, set)
+print("Updated Set:", s)  # Output: {1, 2, 3, 4, 5, 6}
+
+s.discard(2)  # Remove 2 if present
+s.remove(3)  # Remove 3 (raises error if not found)
+print("After discarding 2 and removing 3:", s)  # Output: {1, 4, 5, 6}
+
+s.clear()  # Empties the set
+print("After clearing set:", s)  # Output: set()
+
+# -----------------------------
+# 6. FROZEN SETS
+# -----------------------------
+# Immutable version of a set. You cannot add or remove items.
+fs = frozenset([1, 2, 3])
+print("Frozen Set:", fs)  # Output: frozenset({1, 2, 3})
+
+# You can perform read-only operations like union, intersection, etc.
+print("Union with Frozen Set:", fs.union([3, 4, 5]))  # Output: frozenset({1, 2, 3, 4, 5})
+print("Intersection with Frozen Set:", fs.intersection([2, 4]))  # Output: frozenset({2})
+
+# -----------------------------
+# 7. ADVANCED USAGE
+# -----------------------------
+# Use sets for fast membership testing (much faster than lists)
+my_list = ["apple", "banana", "orange", "apple"]
+unique_items = set(my_list)
+print("Unique items from list:", unique_items)  # Output: {'apple', 'banana', 'orange'}
+
+# Finding duplicates using sets
+seen = set()
+duplicates = set()
+for item in my_list:
+    if item in seen:
+        duplicates.add(item)
+    seen.add(item)
+print("Duplicate items:", duplicates)  # Output: {'apple'}
+
+# Set as filter for conditions
+data = [10, 15, 20, 25, 30]
+even_set = {x for x in data if x % 2 == 0}
+print("Even numbers set:", even_set)  # Output: {10, 20, 30}
+
+# -----------------------------
+# 8. COMPARISONS AND SUBSETS
+# -----------------------------
+A = {1, 2, 3}
+B = {1, 2, 3, 4, 5}
+
+print("Is A subset of B?", A.issubset(B))  # Output: True
+print("Is B superset of A?", B.issuperset(A))  # Output: True
+print("Are A and B disjoint?", A.isdisjoint({6, 7}))  # Output: True

@@ -1,0 +1,415 @@
+# -------------------------------
+# Python Beginner Cheat Sheet
+# Author: Chirag Gupta
+# Description: All core Python concepts for beginners with comments and examples
+# -------------------------------
+
+# -------------------------------
+# 1. Data Types
+# -------------------------------
+
+# int: Whole numbers (positive or negative)
+num1 = 23444
+num2 = -9
+num3 = -898773
+
+# float: Numbers with decimals
+pi = 34.56
+temp = -9.7
+
+# string: Text, enclosed in single or double quotes
+name1 = 'Chirag'
+name2 = "Chirag"
+str_num = '6.7'  # Note: This is a string, not a float
+
+# bool: Boolean values - True or False
+is_happy = True
+is_sad = False
+
+# -------------------------------
+# 2. Print Statement and End Parameter
+# -------------------------------
+
+# By default, print ends with a newline. You can change this using 'end'
+print('Hello', False, end='\t')  # Output: Hello False	
+print('Chirag')                  # Next line
+
+print('Hello', False, end='\n')  # Output: Hello False\n
+# -------------------------------
+# 3. Variables and Assignment
+# -------------------------------
+
+Variable = "Variableexample"
+Variable2 = "Variableexample2"
+Variable2 = Variable  # Now both are "Variableexample"
+Variable = "No"       # Only Variable changes
+print(Variable, Variable2)  # Output: No Variableexample
+
+# Naming Rules:
+# - Start with letter or underscore (_)
+# - Cannot start with number
+# - No special characters (like @, $, %, etc.)
+# - Case-sensitive (Age != age)
+
+# -------------------------------
+# 4. Taking User Input
+# -------------------------------
+
+name = input('Name: ')  # Takes input as string
+print(name)
+
+# -------------------------------
+# 5. Arithmetic Operators and BEDMAS
+# -------------------------------
+
+x = 9
+y = 3
+result = int(x / y)  # Division then converted to int
+print(result)         # Output: 3
+
+# BEDMAS: Brackets, Exponent, Division/Multiplication, Addition/Subtraction
+num = input('Number: ')
+print(int(num) - 5)
+
+# -------------------------------
+# 6. String Methods
+# -------------------------------
+
+hello = 'chirag'.upper()  # Converts to uppercase
+print(hello.lower())       # Converts to lowercase
+print(hello.capitalize())  # Capitalizes only first character
+print(hello.count('I'))    # Count occurrence of 'I'
+
+# -------------------------------
+# 7. String Multiplication and Addition
+# -------------------------------
+
+x = 'Ci'
+y = 3
+z = 'cheu'
+print(x * y)  # Output: CiCiCi
+print(x + z)  # Output: Cicheu
+
+# -------------------------------
+# 8. Comparison Operators
+# -------------------------------
+
+print('a' > 'z')     # False (based on ASCII)
+print('ab' > 'ad')   # False
+print(ord('a'))      # ASCII value of 'a' => 97
+
+# -------------------------------
+# 9. Logical Operators & Chained Conditions
+# -------------------------------
+
+x = 7
+y = 8
+z = 0
+
+res1 = x == y
+res2 = y > x
+res3 = z < (x + 2)
+
+# Logical operations
+print(not (False or True))  # False
+
+# Order of operation: not > and > or
+res4 = res1 or not res2 or res3
+print(res4)
+
+res5 = res1 and res2
+print(res5)
+
+res6 = res1 or res2
+print(res6)
+
+# Note: Comparison operators have lower precedence than arithmetic
+
+# -------------------------------
+# 10. If-Elif-Else Conditions
+# -------------------------------
+
+x = input('Name: ')
+if x == 'Tim':
+    print('ABc')
+print('Always do this')
+
+if x == 'Tim':
+    print('ABc')
+elif x == 'ANC':
+    print("Chirag")
+else:
+    print("No")
+
+# -------------------------------
+# 11. Collections: List and Tuple
+# -------------------------------
+
+# -------------------------------
+# ✅ List (Mutable - can be changed)
+# -------------------------------
+
+# A list with mixed elements
+data_list = [4, True, 'hi']
+
+# Nested empty collections
+nested_list = [(), [], [[]]]
+
+# Adding elements
+nested_list.append('x')          # Adds 'x' to the end
+nested_list.extend([4, 5])       # Adds multiple elements to the end
+
+# Removing elements
+nested_list.pop()                # Removes the last element
+nested_list.pop(0)               # Removes the first element
+
+# Modifying elements
+nested_list[0] = 'Hello'         # Changes value at index 0
+
+# Accessing elements
+print(nested_list[1])            # Access element at index 1
+print(len(nested_list))          # Prints length of the list
+
+# -------------------------------
+# 🚫 Tuple (Immutable - cannot be changed)
+# -------------------------------
+
+# Tuple with 3 elements
+data_tuple = (0, 0, 2)
+
+# Accessing tuple element
+print(data_tuple[0])             # Access value at index 0
+
+# Modifying tuple (Not allowed)
+# data_tuple[0] = 5              # ❌ This will raise an error (tuples are immutable)
+
+# -------------------------------
+# 12. For Loops
+# -------------------------------
+
+# Using range
+for i in range(10):
+    print(i)
+
+x = [2, 4, 6, 7]
+for i in range(len(x)):
+    print(i)  # Just indices
+
+# enumerate will create the indexes and values for all of the elements in our list
+for i, element in enumerate(x):
+    print(i, element)  # index and value
+
+# -------------------------------
+# 13. While Loop
+# -------------------------------
+
+x = [2, 4, 6, 7]
+i = 0
+while i < 10:
+    print('run')
+    i += 1
+    if i == 10:
+        break
+
+# -------------------------------
+# 14. List Slicing
+# -------------------------------
+
+# Syntax: list[start:stop:step]
+x = [2, 4, 6, 7]
+sliced = x[0:3:2]  # From 0 to 2, step 2
+print(sliced)
+
+sliced = x[::2]    # Every 2nd element
+print(sliced)
+
+# ------------------------- 15. Sets -------------------------
+# Sets are unordered collections of unique elements. They do not allow duplicates.
+# They are useful when you want to store non-repeating items and perform set operations like union, intersection, etc.
+x = set()  # Creates an empty set
+s = {4, 23, 4, 4}  # Duplicate values will be removed automatically
+print("Original set:", s)
+
+# Adding and removing elements
+# s.remove(2)  # This would raise a KeyError as 2 is not in the set
+s.add(3)
+s.add(3)  # Adding duplicate again won't affect the set
+print("Modified set:", s)
+print("Is 4 in the set?", 4 in s)  # Membership test
+
+# --------------------- 16. Dictionaries ---------------------
+# Dictionaries store key-value pairs.
+# Keys must be unique and immutable. Values can be any type.
+x = {'Key': 'Value'}
+x['Key2'] = 5  # Add new key-value pair
+print("Is 'Key' in dictionary?", 'Key' in x)
+print("All values:", x.values())
+print("All keys:", x.keys())
+print("Values as list:", list(x.values()))
+print("Keys as list:", list(x.keys()))
+print("Dictionary content:", x)
+# del x['key']  # Would raise KeyError because 'key' (lowercase) is not the same as 'Key'
+
+# Iterating over key-value pairs
+for key, value in x.items():
+    print(f"Key: {key}, Value: {value}")
+
+# Another way to iterate
+for key in x:
+    print(f"{key}: {x[key]}")
+
+# ----------------- 17. Comprehensions ------------------
+# Pythonic way to create collections in a single line
+x = [x for x in range(5)]  # List comprehension
+print("List comprehension:", x)
+
+x = [x+5 for x in range(5)]
+print("List with +5:", x)
+
+# Nested list: 5 rows, each with 100 zeros
+x = [[0 for _ in range(100)] for _ in range(5)]
+print("Nested list:", x)
+
+x = [i for i in range(100) if i % 5 == 0]
+print("Multiples of 5:", x)
+
+x = {i: 0 for i in range(100) if i % 5 == 0}  # Dictionary comprehension
+print("Dict of multiples of 5:", x)
+
+x = {i for i in range(100) if i % 5 == 0}  # Set comprehension
+print("Set of multiples of 5:", x)
+
+x = tuple(i for i in range(100) if i % 5 == 0)  # Tuple comprehension
+print("Tuple of multiples of 5:", x)
+
+# ------------------- 18. Functions -------------------
+# Functions help reuse code and modularize logic
+def func():
+    print('Run')
+    def func2():
+        print('abc')
+
+func()  # Calls the function
+
+def fun(x, y, z=None):
+    print('abc', x, y, z)
+    return x * y, x / y
+
+r1, r2 = fun(5, 6, 7)
+print("Returned values:", fun(5, 6))
+print(r1, r2)
+
+def func(x):
+    def func2():
+        print(x)
+    return func2
+
+func(3)()  # Immediately calling the returned function
+x = func(3)
+x()  # Call the returned function
+
+# ----------------- 19. Unpack Operator ----------------
+x = [1, 2, 4, 4]
+print("Unpacked list:", *x)  # Unpacks list items into separate arguments
+
+# --------------- 20. *args and **kwargs ---------------
+# *args allows for variable number of positional arguments
+# **kwargs allows for variable number of keyword arguments
+
+def func(x, y):
+    print(x, y)
+
+pairs = [(2, 4), (3, 5)]
+for pair in pairs:
+    func(pair[0], pair[1])
+
+for pair in pairs:
+    func(*pair)  # Cleaner and preferred
+
+for pair in pairs:
+    func(**{'x': 2, 'y': 5})  # Using dictionary as kwargs
+
+def func(*args, **kwargs):
+    print("Positional args:", args)
+    print("Keyword args:", kwargs)
+
+func(1, 3, 4, one=0, three=4)
+
+# --------- 21. Global and Local Scope -----------
+# Global variables are defined outside functions and accessible throughout the file.
+# Local variables are defined inside a function and only accessible within it.
+# Python creates a new local variable when you assign a value inside a function.
+x = 'tim'
+
+def func(name):
+    x = name  # This is a local variable. It does not affect the global x
+    print("Inside function, x:", x)
+
+print("Before calling function, x:", x)
+func('changed name')
+print("After calling function, x:", x)  # Global x remains unchanged
+
+# To modify the global variable, use the 'global' keyword inside the function
+
+def change_global():
+    global x
+    x = 'new global value'
+
+change_global()
+print("After changing global x:", x)
+
+# ----------- 22. Lambda (Anonymous Functions) -----------
+# Lambda is a quick way to define a one-liner function without naming it.
+# Syntax: lambda arguments: expression
+add_five = lambda x: x + 5
+print("Lambda +5:", add_five(2))
+
+add = lambda x, y: x + y
+print("Lambda x+y:", add(2, 4))
+
+# Use lambdas where simple functions are required temporarily, often in map(), filter(), sort(), etc.
+
+# -------------- 23. map() and filter() ---------------
+# map() applies a function to every item of an iterable (like list) and returns a new iterable
+x = [1, 34, 5, 6, 7]
+mp = map(lambda i: i + 2, x)
+print("Mapped list (+2):", list(mp))
+
+# filter() returns items from an iterable for which the function returns True
+mp = filter(lambda i: i % 2 == 0, x)
+print("Filtered even numbers:", list(mp))
+
+# More complex logic with a named function
+def custom_filter(i):
+    i = i * 3
+    return i % 2 == 0
+
+mp = filter(custom_filter, x)
+print("Custom filter (i*3 % 2 == 0):", list(mp))
+
+# ------------------- 24. f-strings -------------------
+# f-strings (formatted string literals) allow embedding expressions inside string literals
+# They are fast and readable
+x = f'hello {6 + 8}'
+print("f-string result:", x)
+
+# ------------------- 25. Exceptions -------------------
+# Exceptions allow handling runtime errors so the program doesn't crash
+# Common exceptions: ZeroDivisionError, ValueError, KeyError, TypeError, etc.
+
+try:
+    x = 7 / 0  # This will raise ZeroDivisionError
+except ZeroDivisionError as e:
+    print("Caught ZeroDivisionError:", e)
+except Exception as e:
+    print("General Exception caught:", e)
+else:
+    print("This runs if no exception occurs.")
+finally:
+    print("This will always run, even if an exception occurs")
+
+# Raising custom exceptions
+# raise Exception('Custom error message')
+# -------------------------------
+# End of Cheat Sheet
+# -------------------------------
