@@ -1,0 +1,19 @@
+[
+  {
+    $set: {
+      relation: {
+        $map: {
+          input: "$relation",
+          as: "item",
+          in: {
+            $cond: [
+              { $eq: ["$$item.entity", "COURSE"] },
+              { $mergeObjects: ["$$item", { version: "v1" }] },
+              "$$item"
+            ]
+          }
+        }
+      }
+    }
+  }
+]
