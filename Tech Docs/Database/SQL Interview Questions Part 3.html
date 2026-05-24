@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topics: Dependency Injection · SOLID Principles · Service Lifetime · static Keyword.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<h1 class="code-line has-line-data" data-line-start="0" data-line-end="1"><a id="SQL_Interview_Questions_Keys_Triggers_Ranking_Functions_0"></a>SQL Interview Questions: Keys, Triggers &amp; Ranking Functions</h1>
+<h3 class="code-line has-line-data" data-line-start="1" data-line-end="2"><a id="From_Basic_to_Advanced_Including_the_Questions_People_Usually_Skip_1"></a>From Basic to Advanced — Including the Questions People Usually Skip</h3>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="5" data-line-end="6"><a id="TABLE_OF_CONTENTS_5"></a>TABLE OF CONTENTS</h2>
+<ol>
+<li class="has-line-data" data-line-start="7" data-line-end="8"><a href="#1-keys-in-sql">Keys in SQL</a></li>
+<li class="has-line-data" data-line-start="8" data-line-end="9"><a href="#2-triggers-in-sql">Triggers in SQL</a></li>
+<li class="has-line-data" data-line-start="9" data-line-end="11"><a href="#3-rank-vs-dense_rank-and-row_number">RANK vs DENSE_RANK (and ROW_NUMBER)</a></li>
+</ol>
+<hr>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="15" data-line-end="16"><a id="1_KEYS_IN_SQL_15"></a>1. KEYS IN SQL</h2>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="19" data-line-end="20"><a id="BASIC_LEVEL_19"></a>BASIC LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="23" data-line-end="24"><strong>Q1. What is a key in SQL?</strong></p>
+<p class="has-line-data" data-line-start="25" data-line-end="26">A key is a single column or combination of columns used to uniquely identify rows in a table, or to establish relationships between tables.</p>
+<hr>
+<p class="has-line-data" data-line-start="29" data-line-end="30"><strong>Q2. What are the different types of keys in SQL?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Key Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary Key</td>
+<td>Uniquely identifies each row in a table</td>
+</tr>
+<tr>
+<td>Foreign Key</td>
+<td>Links two tables by referencing the primary key of another table</td>
+</tr>
+<tr>
+<td>Unique Key</td>
+<td>Ensures all values in a column (or set of columns) are unique</td>
+</tr>
+<tr>
+<td>Candidate Key</td>
+<td>Any column or combination that could serve as a primary key</td>
+</tr>
+<tr>
+<td>Composite Key</td>
+<td>A key made up of more than one column</td>
+</tr>
+<tr>
+<td>Surrogate Key</td>
+<td>An artificial/system-generated key (e.g., auto-increment ID)</td>
+</tr>
+<tr>
+<td>Natural Key</td>
+<td>A key based on real-world data (e.g., Aadhar number, email)</td>
+</tr>
+<tr>
+<td>Super Key</td>
+<td>Any set of columns that can uniquely identify a row (superset of candidate keys)</td>
+</tr>
+<tr>
+<td>Alternate Key</td>
+<td>A candidate key that was not chosen as the primary key</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p class="has-line-data" data-line-start="45" data-line-end="46"><strong>Q3. What is a Primary Key? What are its properties?</strong></p>
+<p class="has-line-data" data-line-start="47" data-line-end="48">A Primary Key uniquely identifies each row in a table.</p>
+<p class="has-line-data" data-line-start="49" data-line-end="50">Properties:</p>
+<ul>
+<li class="has-line-data" data-line-start="50" data-line-end="51">Must be UNIQUE (no two rows can have the same PK value)</li>
+<li class="has-line-data" data-line-start="51" data-line-end="52">Cannot be NULL</li>
+<li class="has-line-data" data-line-start="52" data-line-end="53">A table can have only ONE primary key</li>
+<li class="has-line-data" data-line-start="53" data-line-end="55">Can be a single column or a composite of multiple columns</li>
+</ul>
+<pre><code class="has-line-data language-sql" data-line-start="56" data-line-end="70"><span class="hljs-comment">-- Single column PK</span>
+<span class="hljs-keyword">CREATE TABLE</span> employees (
+    emp_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    name <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">100</span>)
+);
+
+<span class="hljs-comment">-- Composite PK</span>
+<span class="hljs-keyword">CREATE TABLE</span> order_items (
+    order_id <span class="hljs-type">INT</span>,
+    product_id <span class="hljs-type">INT</span>,
+    quantity <span class="hljs-type">INT</span>,
+    <span class="hljs-keyword">PRIMARY KEY</span> (order_id, product_id)
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="73" data-line-end="74"><strong>Q4. What is a Foreign Key?</strong></p>
+<p class="has-line-data" data-line-start="75" data-line-end="76">A Foreign Key is a column (or set of columns) in one table that references the Primary Key of another table. It enforces referential integrity — meaning you can’t insert a value in the FK column that doesn’t exist in the referenced table.</p>
+<pre><code class="has-line-data language-sql" data-line-start="78" data-line-end="84"><span class="hljs-keyword">CREATE TABLE</span> orders (
+    order_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    customer_id <span class="hljs-type">INT</span>,
+    <span class="hljs-keyword">FOREIGN KEY</span> (customer_id) <span class="hljs-keyword">REFERENCES</span> customers(customer_id)
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="87" data-line-end="88"><strong>Q5. What is a Unique Key? How is it different from a Primary Key?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Primary Key</th>
+<th>Unique Key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NULL allowed?</td>
+<td>NO</td>
+<td>YES (one NULL in most DBs)</td>
+</tr>
+<tr>
+<td>Number per table</td>
+<td>Only ONE</td>
+<td>Multiple allowed</td>
+</tr>
+<tr>
+<td>Purpose</td>
+<td>Row identity</td>
+<td>Prevent duplicate values</td>
+</tr>
+<tr>
+<td>Implicit index</td>
+<td>Clustered index (usually)</td>
+<td>Non-clustered index</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="has-line-data language-sql" data-line-start="97" data-line-end="103"><span class="hljs-keyword">CREATE TABLE</span> users (
+    user_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    email <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">255</span>) <span class="hljs-keyword">UNIQUE</span>,
+    phone <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">15</span>) <span class="hljs-keyword">UNIQUE</span>
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="106" data-line-end="107"><strong>Q6. What is a Composite Key?</strong></p>
+<p class="has-line-data" data-line-start="108" data-line-end="109">A key made up of two or more columns together that uniquely identify a row. Neither column alone is unique enough.</p>
+<pre><code class="has-line-data language-sql" data-line-start="111" data-line-end="120"><span class="hljs-comment">-- Neither student_id alone nor course_id alone is unique.</span>
+<span class="hljs-comment">-- Together, they identify one enrollment.</span>
+<span class="hljs-keyword">CREATE TABLE</span> enrollments (
+    student_id <span class="hljs-type">INT</span>,
+    course_id <span class="hljs-type">INT</span>,
+    enrolled_date <span class="hljs-type">DATE</span>,
+    <span class="hljs-keyword">PRIMARY KEY</span> (student_id, course_id)
+);
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="123" data-line-end="124"><a id="INTERMEDIATE_LEVEL_123"></a>INTERMEDIATE LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="127" data-line-end="128"><strong>Q7. What is the difference between a Candidate Key and a Primary Key?</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="129" data-line-end="130">A <strong>Candidate Key</strong> is any column or set of columns that could uniquely identify a row and has no NULL values.</li>
+<li class="has-line-data" data-line-start="130" data-line-end="131">A table can have multiple candidate keys.</li>
+<li class="has-line-data" data-line-start="131" data-line-end="132">The <strong>Primary Key</strong> is the one candidate key that is actually chosen to be the official identifier.</li>
+<li class="has-line-data" data-line-start="132" data-line-end="134">All other candidate keys become <strong>Alternate Keys</strong>.</li>
+</ul>
+<p class="has-line-data" data-line-start="134" data-line-end="135">Example: In an <code>employees</code> table, both <code>emp_id</code> and <code>email</code> could be candidate keys. If <code>emp_id</code> is chosen as the PK, then <code>email</code> becomes an alternate key.</p>
+<hr>
+<p class="has-line-data" data-line-start="138" data-line-end="139"><strong>Q8. What is a Super Key?</strong></p>
+<p class="has-line-data" data-line-start="140" data-line-end="141">A Super Key is any set of one or more columns that can uniquely identify a row. It is a superset of candidate keys.</p>
+<p class="has-line-data" data-line-start="142" data-line-end="143">Example: If <code>emp_id</code> alone uniquely identifies a row, then <code>{emp_id}</code>, <code>{emp_id, name}</code>, <code>{emp_id, name, dept}</code> are all super keys.</p>
+<p class="has-line-data" data-line-start="144" data-line-end="145">A Candidate Key is the minimal super key — no column can be removed from it while still retaining uniqueness.</p>
+<hr>
+<p class="has-line-data" data-line-start="148" data-line-end="149"><strong>Q9. What is a Surrogate Key vs a Natural Key? When do you use each?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th></th>
+<th>Surrogate Key</th>
+<th>Natural Key</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Definition</td>
+<td>System-generated, has no business meaning</td>
+<td>Derived from actual business data</td>
+</tr>
+<tr>
+<td>Example</td>
+<td>AUTO_INCREMENT id, UUID</td>
+<td>Aadhar number, PAN, email</td>
+</tr>
+<tr>
+<td>Pros</td>
+<td>Stable, simple, never changes</td>
+<td>Self-documenting, meaningful</td>
+</tr>
+<tr>
+<td>Cons</td>
+<td>Meaningless outside DB</td>
+<td>Can change in real world, may be long</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="157" data-line-end="159"><strong>When to use Surrogate:</strong> When natural keys are long, composite, or prone to change.<br>
+<strong>When to use Natural:</strong> When the key is truly immutable and simple (rare in practice).</p>
+<hr>
+<p class="has-line-data" data-line-start="162" data-line-end="163"><strong>Q10. Can a table have no Primary Key?</strong></p>
+<p class="has-line-data" data-line-start="164" data-line-end="165">Yes, technically a table can be created without a primary key. However, it is very bad practice because:</p>
+<ul>
+<li class="has-line-data" data-line-start="165" data-line-end="166">You can have duplicate rows with no way to distinguish them.</li>
+<li class="has-line-data" data-line-start="166" data-line-end="167">JOINs and data integrity suffer.</li>
+<li class="has-line-data" data-line-start="167" data-line-end="169">Replication in MySQL requires a PK on each table.</li>
+</ul>
+<p class="has-line-data" data-line-start="169" data-line-end="170">Such tables are called <strong>heap tables</strong> in some databases.</p>
+<hr>
+<p class="has-line-data" data-line-start="173" data-line-end="174"><strong>Q11. Can a Foreign Key reference a Unique Key instead of a Primary Key?</strong></p>
+<p class="has-line-data" data-line-start="175" data-line-end="176">Yes! A Foreign Key can reference any column (or set of columns) in the parent table that has a UNIQUE constraint, not just the Primary Key.</p>
+<pre><code class="has-line-data language-sql" data-line-start="178" data-line-end="190"><span class="hljs-keyword">CREATE TABLE</span> departments (
+    dept_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    dept_code <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">10</span>) <span class="hljs-keyword">UNIQUE</span>   <span class="hljs-comment">-- unique key</span>
+);
+
+<span class="hljs-keyword">CREATE TABLE</span> employees (
+    emp_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    dept_code <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">10</span>),
+    <span class="hljs-keyword">FOREIGN KEY</span> (dept_code) <span class="hljs-keyword">REFERENCES</span> departments(dept_code)
+    <span class="hljs-comment">-- referencing UNIQUE key, not PK</span>
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="193" data-line-end="194"><strong>Q12. What is a self-referencing Foreign Key?</strong></p>
+<p class="has-line-data" data-line-start="195" data-line-end="196">A Foreign Key where a column in a table references the Primary Key of the same table. Commonly used for hierarchical/tree data.</p>
+<pre><code class="has-line-data language-sql" data-line-start="198" data-line-end="206"><span class="hljs-keyword">CREATE TABLE</span> employees (
+    emp_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    name <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">100</span>),
+    manager_id <span class="hljs-type">INT</span>,
+    <span class="hljs-keyword">FOREIGN KEY</span> (manager_id) <span class="hljs-keyword">REFERENCES</span> employees(emp_id)
+    <span class="hljs-comment">-- An employee&#x27;s manager is also an employee</span>
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="209" data-line-end="210"><strong>Q13. What are the ON DELETE and ON UPDATE actions for Foreign Keys?</strong></p>
+<p class="has-line-data" data-line-start="211" data-line-end="212">These control what happens to child rows when a parent row is deleted or updated.</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Action</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CASCADE</td>
+<td>Automatically delete/update child rows</td>
+</tr>
+<tr>
+<td>SET NULL</td>
+<td>Set FK column to NULL in child rows</td>
+</tr>
+<tr>
+<td>SET DEFAULT</td>
+<td>Set FK column to its default value</td>
+</tr>
+<tr>
+<td>RESTRICT</td>
+<td>Prevent deletion/update if child rows exist (default)</td>
+</tr>
+<tr>
+<td>NO ACTION</td>
+<td>Similar to RESTRICT (checked at end of transaction)</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="has-line-data language-sql" data-line-start="222" data-line-end="231"><span class="hljs-keyword">CREATE TABLE</span> orders (
+    order_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    customer_id <span class="hljs-type">INT</span>,
+    <span class="hljs-keyword">FOREIGN KEY</span> (customer_id)
+        <span class="hljs-keyword">REFERENCES</span> customers(customer_id)
+        <span class="hljs-keyword">ON</span> <span class="hljs-keyword">DELETE</span> CASCADE
+        <span class="hljs-keyword">ON</span> <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">SET</span> <span class="hljs-keyword">NULL</span>
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="234" data-line-end="235"><strong>Q14. Can a Foreign Key column have NULL values?</strong></p>
+<p class="has-line-data" data-line-start="236" data-line-end="237">Yes. A NULL FK value means “no relationship” — it doesn’t violate referential integrity. This allows optional relationships.</p>
+<pre><code class="has-line-data language-sql" data-line-start="239" data-line-end="242"><span class="hljs-comment">-- employee may or may not be assigned to a department</span>
+<span class="hljs-keyword">INSERT INTO</span> employees (emp_id, name, dept_id) <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">101</span>, <span class="hljs-string">&#x27;Chirag&#x27;</span>, <span class="hljs-keyword">NULL</span>);
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="245" data-line-end="246"><a id="ADVANCED_LEVEL_245"></a>ADVANCED LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="249" data-line-end="250"><strong>Q15. What is the difference between RESTRICT and NO ACTION for Foreign Key constraints?</strong></p>
+<p class="has-line-data" data-line-start="251" data-line-end="252">Both prevent deletion of a parent row when child rows exist, but the timing differs:</p>
+<ul>
+<li class="has-line-data" data-line-start="252" data-line-end="253"><strong>RESTRICT</strong>: Checked immediately when the statement executes.</li>
+<li class="has-line-data" data-line-start="253" data-line-end="255"><strong>NO ACTION</strong>: Checked at the end of the transaction (deferred check).</li>
+</ul>
+<p class="has-line-data" data-line-start="255" data-line-end="256">This matters in cases where you’re doing multiple operations in one transaction — NO ACTION gives you flexibility to fix the inconsistency before the transaction commits.</p>
+<hr>
+<p class="has-line-data" data-line-start="259" data-line-end="260"><strong>Q16. Can a Composite Primary Key include a NULL column?</strong></p>
+<p class="has-line-data" data-line-start="261" data-line-end="262">No. Every column that is part of a Primary Key must be NOT NULL. This is a SQL standard rule.</p>
+<hr>
+<p class="has-line-data" data-line-start="265" data-line-end="266"><strong>Q17. Can a table have multiple Foreign Keys pointing to the same parent table?</strong></p>
+<p class="has-line-data" data-line-start="267" data-line-end="268">Yes. A table can have multiple FK columns all referencing the same parent table, or even the same column in the parent.</p>
+<pre><code class="has-line-data language-sql" data-line-start="270" data-line-end="278"><span class="hljs-keyword">CREATE TABLE</span> flights (
+    flight_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,
+    origin_city_id <span class="hljs-type">INT</span>,
+    destination_city_id <span class="hljs-type">INT</span>,
+    <span class="hljs-keyword">FOREIGN KEY</span> (origin_city_id) <span class="hljs-keyword">REFERENCES</span> cities(city_id),
+    <span class="hljs-keyword">FOREIGN KEY</span> (destination_city_id) <span class="hljs-keyword">REFERENCES</span> cities(city_id)
+);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="281" data-line-end="282"><strong>Q18. What is a Deferrable Constraint? (PostgreSQL)</strong></p>
+<p class="has-line-data" data-line-start="283" data-line-end="284">In PostgreSQL, constraints can be deferred — meaning their check is postponed until the end of the transaction instead of being enforced immediately.</p>
+<pre><code class="has-line-data language-sql" data-line-start="286" data-line-end="293"><span class="hljs-comment">-- PostgreSQL syntax</span>
+<span class="hljs-keyword">ALTER TABLE</span> orders
+    <span class="hljs-keyword">ADD CONSTRAINT</span> fk_customer
+    <span class="hljs-keyword">FOREIGN KEY</span> (customer_id)
+    <span class="hljs-keyword">REFERENCES</span> customers(customer_id)
+    DEFERRABLE INITIALLY DEFERRED;
+</code></pre>
+<p class="has-line-data" data-line-start="294" data-line-end="295">Useful when you need to insert rows in a circular dependency within one transaction.</p>
+<hr>
+<p class="has-line-data" data-line-start="298" data-line-end="299"><strong>Q19. Commonly Ignored: Can you DROP a Primary Key if a Foreign Key references it?</strong></p>
+<p class="has-line-data" data-line-start="300" data-line-end="301">No. You must first drop the Foreign Key constraint on the child table, and only then can you drop the Primary Key.</p>
+<pre><code class="has-line-data language-sql" data-line-start="303" data-line-end="309"><span class="hljs-comment">-- Step 1: Drop the FK on child</span>
+<span class="hljs-keyword">ALTER TABLE</span> orders <span class="hljs-keyword">DROP</span> <span class="hljs-keyword">FOREIGN KEY</span> fk_customer;
+
+<span class="hljs-comment">-- Step 2: Now drop the PK on parent</span>
+<span class="hljs-keyword">ALTER TABLE</span> customers <span class="hljs-keyword">DROP</span> <span class="hljs-keyword">PRIMARY KEY</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="312" data-line-end="313"><strong>Q20. Commonly Ignored: Does adding a Foreign Key automatically create an index?</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="314" data-line-end="315"><strong>MySQL (InnoDB)</strong>: YES — automatically creates an index on the FK column if one doesn’t exist.</li>
+<li class="has-line-data" data-line-start="315" data-line-end="317"><strong>PostgreSQL / SQL Server</strong>: NO — you must manually create an index on the FK column.</li>
+</ul>
+<p class="has-line-data" data-line-start="317" data-line-end="318">This is a very common performance pitfall. Always index FK columns to speed up JOINs.</p>
+<pre><code class="has-line-data language-sql" data-line-start="320" data-line-end="323"><span class="hljs-comment">-- Best practice: always do this in PostgreSQL/SQL Server</span>
+<span class="hljs-keyword">CREATE</span> INDEX idx_orders_customer_id <span class="hljs-keyword">ON</span> orders(customer_id);
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="326" data-line-end="327"><strong>Q21. Commonly Ignored: What happens to indexes when you add a Primary Key to an existing table?</strong></p>
+<p class="has-line-data" data-line-start="328" data-line-end="329">In most databases (especially MySQL InnoDB), the Primary Key becomes the <strong>clustered index</strong> — meaning the actual table data is physically sorted by the PK. If you change the PK on an existing table, the entire table is physically reorganized. This can be a costly operation on large tables.</p>
+<hr>
+<p class="has-line-data" data-line-start="332" data-line-end="333"><strong>Q22. Tricky: Can a column be both a Primary Key and a Foreign Key?</strong></p>
+<p class="has-line-data" data-line-start="334" data-line-end="335">Yes! This is common in one-to-one relationship tables where the child table’s PK is also a FK referencing the parent.</p>
+<pre><code class="has-line-data language-sql" data-line-start="337" data-line-end="343"><span class="hljs-keyword">CREATE TABLE</span> employee_details (
+    emp_id <span class="hljs-type">INT</span> <span class="hljs-keyword">PRIMARY KEY</span>,            <span class="hljs-comment">-- PK</span>
+    bio TEXT,
+    <span class="hljs-keyword">FOREIGN KEY</span> (emp_id) <span class="hljs-keyword">REFERENCES</span> employees(emp_id)  <span class="hljs-comment">-- also FK</span>
+);
+</code></pre>
+<hr>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="348" data-line-end="349"><a id="2_TRIGGERS_IN_SQL_348"></a>2. TRIGGERS IN SQL</h2>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="352" data-line-end="353"><a id="BASIC_LEVEL_352"></a>BASIC LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="356" data-line-end="357"><strong>Q23. What is a Trigger in SQL?</strong></p>
+<p class="has-line-data" data-line-start="358" data-line-end="359">A Trigger is a special stored procedure that automatically executes (fires) in response to a specific event on a table or view — such as INSERT, UPDATE, or DELETE.</p>
+<p class="has-line-data" data-line-start="360" data-line-end="361">You don’t call triggers manually. The database engine fires them automatically.</p>
+<hr>
+<p class="has-line-data" data-line-start="364" data-line-end="365"><strong>Q24. What are the types of triggers based on timing?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Type</th>
+<th>When it fires</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BEFORE Trigger</td>
+<td>Fires BEFORE the DML operation is executed</td>
+</tr>
+<tr>
+<td>AFTER Trigger</td>
+<td>Fires AFTER the DML operation completes</td>
+</tr>
+<tr>
+<td>INSTEAD OF Trigger</td>
+<td>Fires IN PLACE OF the operation (commonly on views)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p class="has-line-data" data-line-start="374" data-line-end="375"><strong>Q25. What are the types of triggers based on event?</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="376" data-line-end="377"><code>INSERT</code> trigger — fires when a row is inserted</li>
+<li class="has-line-data" data-line-start="377" data-line-end="378"><code>UPDATE</code> trigger — fires when a row is updated</li>
+<li class="has-line-data" data-line-start="378" data-line-end="380"><code>DELETE</code> trigger — fires when a row is deleted</li>
+</ul>
+<p class="has-line-data" data-line-start="380" data-line-end="381">You can combine them: a single trigger can respond to INSERT OR UPDATE OR DELETE.</p>
+<hr>
+<p class="has-line-data" data-line-start="384" data-line-end="385"><strong>Q26. Write a basic trigger that logs every new employee insert.</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="387" data-line-end="404"><span class="hljs-comment">-- Audit table</span>
+<span class="hljs-keyword">CREATE TABLE</span> employee_audit (
+    audit_id <span class="hljs-type">INT</span> AUTO_INCREMENT <span class="hljs-keyword">PRIMARY KEY</span>,
+    emp_id <span class="hljs-type">INT</span>,
+    action_type <span class="hljs-type">VARCHAR</span>(<span class="hljs-number">20</span>),
+    action_time DATETIME
+);
+
+<span class="hljs-comment">-- AFTER INSERT trigger</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_after_employee_insert
+AFTER <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> employees
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">INSERT INTO</span> employee_audit (emp_id, action_type, action_time)
+    <span class="hljs-keyword">VALUES</span> (NEW.emp_id, <span class="hljs-string">&#x27;INSERT&#x27;</span>, NOW());
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="407" data-line-end="408"><strong>Q27. What are NEW and OLD in triggers?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Keyword</th>
+<th>Available In</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NEW</code></td>
+<td>INSERT, UPDATE triggers</td>
+<td>The new row being inserted or the new value after update</td>
+</tr>
+<tr>
+<td><code>OLD</code></td>
+<td>DELETE, UPDATE triggers</td>
+<td>The existing row being deleted or the old value before update</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="has-line-data language-sql" data-line-start="415" data-line-end="426"><span class="hljs-comment">-- BEFORE UPDATE trigger: prevent salary decrease</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_no_salary_decrease
+BEFORE <span class="hljs-keyword">UPDATE</span> <span class="hljs-keyword">ON</span> employees
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    IF NEW.salary <span class="hljs-operator">&lt;</span> OLD.salary <span class="hljs-keyword">THEN</span>
+        SIGNAL <span class="hljs-keyword">SQLSTATE</span> <span class="hljs-string">&#x27;45000&#x27;</span>
+        <span class="hljs-keyword">SET</span> MESSAGE_TEXT <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Salary cannot be decreased.&#x27;</span>;
+    <span class="hljs-keyword">END</span> IF;
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="429" data-line-end="430"><strong>Q28. What is FOR EACH ROW in a trigger?</strong></p>
+<p class="has-line-data" data-line-start="431" data-line-end="432">It means the trigger fires once for each row affected by the DML statement.</p>
+<ul>
+<li class="has-line-data" data-line-start="433" data-line-end="434"><strong>Row-level trigger</strong> (<code>FOR EACH ROW</code>): fires per affected row.</li>
+<li class="has-line-data" data-line-start="434" data-line-end="436"><strong>Statement-level trigger</strong>: fires once per DML statement regardless of how many rows are affected. (Available in PostgreSQL and SQL Server, not MySQL.)</li>
+</ul>
+<p class="has-line-data" data-line-start="436" data-line-end="437">MySQL only supports row-level triggers.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="440" data-line-end="441"><a id="INTERMEDIATE_LEVEL_440"></a>INTERMEDIATE LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="444" data-line-end="445"><strong>Q29. What is an INSTEAD OF trigger? When would you use it?</strong></p>
+<p class="has-line-data" data-line-start="446" data-line-end="447">An INSTEAD OF trigger replaces the actual DML operation. It is most commonly used on <strong>views</strong> that cannot be directly updated (e.g., views based on multiple tables or containing aggregations).</p>
+<pre><code class="has-line-data language-sql" data-line-start="449" data-line-end="459"><span class="hljs-comment">-- PostgreSQL / SQL Server example</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_instead_of_insert_on_view
+INSTEAD <span class="hljs-keyword">OF</span> <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> employee_summary_view
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-comment">-- redirect insert to the actual base tables</span>
+    <span class="hljs-keyword">INSERT INTO</span> employees (emp_id, name) <span class="hljs-keyword">VALUES</span> (NEW.emp_id, NEW.name);
+    <span class="hljs-keyword">INSERT INTO</span> departments (dept_id, dept_name) <span class="hljs-keyword">VALUES</span> (NEW.dept_id, NEW.dept_name);
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="462" data-line-end="463"><strong>Q30. Can a trigger call a stored procedure?</strong></p>
+<p class="has-line-data" data-line-start="464" data-line-end="465">Yes. A trigger body can call a stored procedure.</p>
+<pre><code class="has-line-data language-sql" data-line-start="467" data-line-end="474"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_after_order_insert
+AFTER <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> orders
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">CALL</span> update_customer_stats(NEW.customer_id);
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="477" data-line-end="478"><strong>Q31. Can a trigger fire another trigger? What is a mutating trigger problem?</strong></p>
+<p class="has-line-data" data-line-start="479" data-line-end="480">Yes, a trigger can indirectly fire another trigger — this is called a <strong>cascading trigger</strong>. Most databases let you control the nesting level.</p>
+<p class="has-line-data" data-line-start="481" data-line-end="482">The <strong>mutating table problem</strong> occurs when a row-level trigger tries to query or modify the same table that caused the trigger to fire, which creates a conflict because the table is in a “mid-change” state. This is most commonly seen in Oracle.</p>
+<hr>
+<p class="has-line-data" data-line-start="485" data-line-end="486"><strong>Q32. What is the difference between BEFORE and AFTER triggers? When do you use each?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th></th>
+<th>BEFORE Trigger</th>
+<th>AFTER Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timing</td>
+<td>Before data is written</td>
+<td>After data is written</td>
+</tr>
+<tr>
+<td>Can modify NEW values?</td>
+<td>YES — can change what gets inserted/updated</td>
+<td>NO — data already committed</td>
+</tr>
+<tr>
+<td>Use case</td>
+<td>Validation, data transformation</td>
+<td>Auditing, cascading actions, logging</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="has-line-data language-sql" data-line-start="494" data-line-end="511"><span class="hljs-comment">-- BEFORE: Clean up data before inserting</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_before_insert_user
+BEFORE <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> users
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NEW.email <span class="hljs-operator">=</span> <span class="hljs-built_in">LOWER</span>(<span class="hljs-built_in">TRIM</span>(NEW.email));
+<span class="hljs-keyword">END</span>;
+
+<span class="hljs-comment">-- AFTER: Log what was changed</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_after_delete_user
+AFTER <span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">ON</span> users
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">INSERT INTO</span> deleted_users_log (user_id, deleted_at)
+    <span class="hljs-keyword">VALUES</span> (OLD.user_id, NOW());
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="514" data-line-end="515"><strong>Q33. How do you drop a trigger?</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="517" data-line-end="522"><span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TRIGGER</span> IF <span class="hljs-keyword">EXISTS</span> trg_after_employee_insert;
+
+<span class="hljs-comment">-- In SQL Server: must specify schema</span>
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TRIGGER</span> dbo.trg_after_employee_insert;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="525" data-line-end="526"><strong>Q34. How do you disable/enable a trigger without dropping it? (SQL Server)</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="528" data-line-end="535"><span class="hljs-comment">-- SQL Server</span>
+DISABLE <span class="hljs-keyword">TRIGGER</span> trg_after_employee_insert <span class="hljs-keyword">ON</span> employees;
+ENABLE <span class="hljs-keyword">TRIGGER</span> trg_after_employee_insert <span class="hljs-keyword">ON</span> employees;
+
+<span class="hljs-comment">-- Disable ALL triggers on a table</span>
+DISABLE <span class="hljs-keyword">TRIGGER</span> <span class="hljs-keyword">ALL</span> <span class="hljs-keyword">ON</span> employees;
+</code></pre>
+<p class="has-line-data" data-line-start="536" data-line-end="537">MySQL does not natively support disabling triggers — you’d need to drop and recreate them.</p>
+<hr>
+<p class="has-line-data" data-line-start="540" data-line-end="541"><strong>Q35. Can you have multiple triggers of the same type on the same table?</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="542" data-line-end="543"><strong>MySQL</strong>: Yes, and since MySQL 5.7.2 you can control execution order using <code>FOLLOWS</code> or <code>PRECEDES</code>.</li>
+<li class="has-line-data" data-line-start="543" data-line-end="544"><strong>SQL Server</strong>: Yes, multiple AFTER triggers per event.</li>
+<li class="has-line-data" data-line-start="544" data-line-end="546"><strong>Oracle</strong>: Yes, uses order of creation by default.</li>
+</ul>
+<pre><code class="has-line-data language-sql" data-line-start="547" data-line-end="556"><span class="hljs-comment">-- MySQL: control order</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_second
+AFTER <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> employees
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+FOLLOWS trg_first
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-comment">-- runs after trg_first</span>
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="559" data-line-end="560"><a id="ADVANCED_LEVEL_559"></a>ADVANCED LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="563" data-line-end="564"><strong>Q36. Commonly Ignored: Can a trigger raise an error to abort the DML operation?</strong></p>
+<p class="has-line-data" data-line-start="565" data-line-end="566">Yes. You can use <code>SIGNAL</code> (MySQL/MariaDB) or <code>RAISERROR</code>/<code>THROW</code> (SQL Server) to raise an error and roll back the operation.</p>
+<pre><code class="has-line-data language-sql" data-line-start="568" data-line-end="579"><span class="hljs-comment">-- MySQL: prevent inserting a negative salary</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_validate_salary
+BEFORE <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> employees
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    IF NEW.salary <span class="hljs-operator">&lt;</span> <span class="hljs-number">0</span> <span class="hljs-keyword">THEN</span>
+        SIGNAL <span class="hljs-keyword">SQLSTATE</span> <span class="hljs-string">&#x27;45000&#x27;</span>
+        <span class="hljs-keyword">SET</span> MESSAGE_TEXT <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Salary cannot be negative.&#x27;</span>;
+    <span class="hljs-keyword">END</span> IF;
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="580" data-line-end="581">When a trigger raises an error in a BEFORE trigger, the entire statement is rolled back.</p>
+<hr>
+<p class="has-line-data" data-line-start="584" data-line-end="585"><strong>Q37. Commonly Ignored: Are triggers included in transactions?</strong></p>
+<p class="has-line-data" data-line-start="586" data-line-end="587">Yes. Triggers execute within the same transaction as the DML that fired them. If the trigger raises an error or if a ROLLBACK is executed, both the original DML and the trigger’s actions are rolled back together.</p>
+<hr>
+<p class="has-line-data" data-line-start="590" data-line-end="591"><strong>Q38. What are the performance implications of triggers?</strong></p>
+<ul>
+<li class="has-line-data" data-line-start="592" data-line-end="593">Triggers add overhead to every affected DML operation — even simple INSERTs/UPDATEs slow down.</li>
+<li class="has-line-data" data-line-start="593" data-line-end="594">They execute invisibly — application code doesn’t know they’re running.</li>
+<li class="has-line-data" data-line-start="594" data-line-end="595">Cascading triggers can cause unexpected performance degradation.</li>
+<li class="has-line-data" data-line-start="595" data-line-end="596">Avoid complex logic or heavy queries inside triggers.</li>
+<li class="has-line-data" data-line-start="596" data-line-end="598">Use triggers only for cross-cutting concerns like auditing, not business logic that belongs in the application layer.</li>
+</ul>
+<hr>
+<p class="has-line-data" data-line-start="600" data-line-end="601"><strong>Q39. Commonly Ignored: Can you use SELECT inside a trigger?</strong></p>
+<p class="has-line-data" data-line-start="602" data-line-end="603">Yes, but with caution. You can query other tables.</p>
+<pre><code class="has-line-data language-sql" data-line-start="605" data-line-end="620"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_check_department
+BEFORE <span class="hljs-keyword">INSERT</span> <span class="hljs-keyword">ON</span> employees
+<span class="hljs-keyword">FOR</span> <span class="hljs-keyword">EACH</span> <span class="hljs-type">ROW</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">DECLARE</span> dept_count <span class="hljs-type">INT</span>;
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">INTO</span> dept_count
+    <span class="hljs-keyword">FROM</span> departments
+    <span class="hljs-keyword">WHERE</span> dept_id <span class="hljs-operator">=</span> NEW.dept_id;
+
+    IF dept_count <span class="hljs-operator">=</span> <span class="hljs-number">0</span> <span class="hljs-keyword">THEN</span>
+        SIGNAL <span class="hljs-keyword">SQLSTATE</span> <span class="hljs-string">&#x27;45000&#x27;</span>
+        <span class="hljs-keyword">SET</span> MESSAGE_TEXT <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Department does not exist.&#x27;</span>;
+    <span class="hljs-keyword">END</span> IF;
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="621" data-line-end="622">Avoid SELECTing from the same table that fired the trigger (mutating table issue).</p>
+<hr>
+<p class="has-line-data" data-line-start="625" data-line-end="626"><strong>Q40. Tricky: What is the difference between a trigger and a constraint?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Constraint</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Enforcement</td>
+<td>Declarative, built-in</td>
+<td>Programmatic, custom logic</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>Faster (native)</td>
+<td>Slower (extra code runs)</td>
+</tr>
+<tr>
+<td>Complexity</td>
+<td>Simple rules only</td>
+<td>Complex business logic</td>
+</tr>
+<tr>
+<td>Transparency</td>
+<td>Visible in schema</td>
+<td>Can be hidden/forgotten</td>
+</tr>
+<tr>
+<td>Portability</td>
+<td>Standard SQL</td>
+<td>Syntax varies per DB</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="635" data-line-end="636"><strong>Rule of thumb</strong>: Always prefer a constraint over a trigger for simple validation. Use triggers only for logic that cannot be expressed as a constraint.</p>
+<hr>
+<p class="has-line-data" data-line-start="639" data-line-end="640"><strong>Q41. Tricky: Do triggers fire on TRUNCATE?</strong></p>
+<p class="has-line-data" data-line-start="641" data-line-end="642">No. <code>TRUNCATE</code> does not fire DELETE triggers in MySQL because TRUNCATE is a DDL operation, not DML — it doesn’t process rows one by one.</p>
+<p class="has-line-data" data-line-start="643" data-line-end="644">In <strong>PostgreSQL</strong>, statement-level triggers can be configured to fire on TRUNCATE.</p>
+<hr>
+<p class="has-line-data" data-line-start="647" data-line-end="648"><strong>Q42. What is a DDL trigger? (SQL Server / Oracle)</strong></p>
+<p class="has-line-data" data-line-start="649" data-line-end="650">A DDL trigger fires in response to schema changes (DDL events) like <code>CREATE TABLE</code>, <code>ALTER TABLE</code>, <code>DROP TABLE</code> — not on data changes.</p>
+<pre><code class="has-line-data language-sql" data-line-start="652" data-line-end="662"><span class="hljs-comment">-- SQL Server: prevent table drops in production</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">TRIGGER</span> trg_prevent_drop
+<span class="hljs-keyword">ON</span> DATABASE
+<span class="hljs-keyword">FOR</span> DROP_TABLE
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    PRINT <span class="hljs-string">&#x27;You are not allowed to drop tables!&#x27;</span>;
+    <span class="hljs-keyword">ROLLBACK</span>;
+<span class="hljs-keyword">END</span>;
+</code></pre>
+<hr>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="667" data-line-end="668"><a id="3_RANK_vs_DENSE_RANK_and_ROW_NUMBER_667"></a>3. RANK vs DENSE_RANK (and ROW_NUMBER)</h2>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="671" data-line-end="672"><a id="BASIC_LEVEL_671"></a>BASIC LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="675" data-line-end="676"><strong>Q43. What are Window Functions in SQL?</strong></p>
+<p class="has-line-data" data-line-start="677" data-line-end="678">Window functions perform calculations across a set of rows that are related to the current row — but unlike GROUP BY, they do NOT collapse rows. Each row retains its identity and gets its own computed value.</p>
+<pre><code class="has-line-data language-sql" data-line-start="680" data-line-end="686"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> salary_rank
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="689" data-line-end="690"><strong>Q44. What is RANK()?</strong></p>
+<p class="has-line-data" data-line-start="691" data-line-end="692">RANK() assigns a rank to each row within a partition. If two rows are tied (same value), they get the SAME rank. The next rank SKIPS the number of tied rows.</p>
+<pre><code class="has-line-data language-sql" data-line-start="694" data-line-end="700"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> rnk
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<p class="has-line-data" data-line-start="701" data-line-end="702">Example output:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>name</th>
+<th>salary</th>
+<th>rnk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>90000</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>85000</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Carol</td>
+<td>85000</td>
+<td>2</td>
+</tr>
+<tr>
+<td>David</td>
+<td>70000</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="710" data-line-end="711">Note: rank 3 is skipped because two rows tied at rank 2.</p>
+<hr>
+<p class="has-line-data" data-line-start="714" data-line-end="715"><strong>Q45. What is DENSE_RANK()?</strong></p>
+<p class="has-line-data" data-line-start="716" data-line-end="717">DENSE_RANK() also assigns the same rank to tied rows — but it does NOT skip any ranks. The next rank is always the previous rank + 1.</p>
+<pre><code class="has-line-data language-sql" data-line-start="719" data-line-end="725"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">DENSE_RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> dense_rnk
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<p class="has-line-data" data-line-start="726" data-line-end="727">Example output:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>name</th>
+<th>salary</th>
+<th>dense_rnk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>90000</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>85000</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Carol</td>
+<td>85000</td>
+<td>2</td>
+</tr>
+<tr>
+<td>David</td>
+<td>70000</td>
+<td>3</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="735" data-line-end="736">No gaps — next rank after 2 is simply 3.</p>
+<hr>
+<p class="has-line-data" data-line-start="739" data-line-end="740"><strong>Q46. What is ROW_NUMBER()?</strong></p>
+<p class="has-line-data" data-line-start="741" data-line-end="742">ROW_NUMBER() assigns a unique sequential number to each row. Even if two rows have the same value, they get different numbers. The order of tied rows is arbitrary (unless fully specified by ORDER BY).</p>
+<pre><code class="has-line-data language-sql" data-line-start="744" data-line-end="750"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">ROW_NUMBER</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> row_num
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<p class="has-line-data" data-line-start="751" data-line-end="752">Example output:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>name</th>
+<th>salary</th>
+<th>row_num</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>90000</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>85000</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Carol</td>
+<td>85000</td>
+<td>3</td>
+</tr>
+<tr>
+<td>David</td>
+<td>70000</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p class="has-line-data" data-line-start="762" data-line-end="763"><strong>Q47. Side-by-side comparison of ROW_NUMBER, RANK, and DENSE_RANK</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="765" data-line-end="773"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">ROW_NUMBER</span>()  <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> row_num,
+    <span class="hljs-built_in">RANK</span>()        <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> rnk,
+    <span class="hljs-built_in">DENSE_RANK</span>()  <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> dense_rnk
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>name</th>
+<th>salary</th>
+<th>row_num</th>
+<th>rnk</th>
+<th>dense_rnk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>90000</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>85000</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Carol</td>
+<td>85000</td>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>David</td>
+<td>70000</td>
+<td>4</td>
+<td>4</td>
+<td>3</td>
+</tr>
+<tr>
+<td>Eve</td>
+<td>60000</td>
+<td>5</td>
+<td>5</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="784" data-line-end="785"><a id="INTERMEDIATE_LEVEL_784"></a>INTERMEDIATE LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="788" data-line-end="789"><strong>Q48. What is the PARTITION BY clause in window functions?</strong></p>
+<p class="has-line-data" data-line-start="790" data-line-end="791">PARTITION BY divides the result set into groups (partitions) and the ranking restarts for each partition — similar to GROUP BY but without collapsing rows.</p>
+<pre><code class="has-line-data language-sql" data-line-start="793" data-line-end="801"><span class="hljs-comment">-- Rank employees within each department</span>
+<span class="hljs-keyword">SELECT</span>
+    name,
+    department,
+    salary,
+    <span class="hljs-built_in">RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> department <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> dept_rank
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>name</th>
+<th>department</th>
+<th>salary</th>
+<th>dept_rank</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Alice</td>
+<td>Engineering</td>
+<td>90000</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Bob</td>
+<td>Engineering</td>
+<td>85000</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Carol</td>
+<td>HR</td>
+<td>70000</td>
+<td>1</td>
+</tr>
+<tr>
+<td>David</td>
+<td>HR</td>
+<td>65000</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p class="has-line-data" data-line-start="811" data-line-end="812"><strong>Q49. How do you find the top N employees per department?</strong></p>
+<p class="has-line-data" data-line-start="813" data-line-end="814">A classic interview question. Use ROW_NUMBER or RANK in a subquery/CTE.</p>
+<pre><code class="has-line-data language-sql" data-line-start="816" data-line-end="827"><span class="hljs-comment">-- Top 2 highest-paid employees per department</span>
+<span class="hljs-keyword">WITH</span> ranked <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span>
+        name,
+        department,
+        salary,
+        <span class="hljs-built_in">ROW_NUMBER</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> department <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> rn
+    <span class="hljs-keyword">FROM</span> employees
+)
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> ranked <span class="hljs-keyword">WHERE</span> rn <span class="hljs-operator">&lt;=</span> <span class="hljs-number">2</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="828" data-line-end="829">Use <code>RANK()</code> instead of <code>ROW_NUMBER()</code> if you want to include ties — ties at rank 2 would both be included.</p>
+<hr>
+<p class="has-line-data" data-line-start="832" data-line-end="833"><strong>Q50. When would you choose RANK vs DENSE_RANK vs ROW_NUMBER?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Scenario</th>
+<th>Best Choice</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Need a unique row number (pagination, deduplication)</td>
+<td>ROW_NUMBER</td>
+</tr>
+<tr>
+<td>Medal-style ranking — ties share rank, next rank skips</td>
+<td>RANK</td>
+</tr>
+<tr>
+<td>Leaderboard where gaps in ranks are confusing</td>
+<td>DENSE_RANK</td>
+</tr>
+<tr>
+<td>Finding Nth highest salary</td>
+<td>DENSE_RANK (most reliable)</td>
+</tr>
+<tr>
+<td>Deduplicating rows</td>
+<td>ROW_NUMBER</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p class="has-line-data" data-line-start="844" data-line-end="845"><strong>Q51. How do you find the 3rd highest salary using DENSE_RANK?</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="847" data-line-end="855"><span class="hljs-keyword">WITH</span> ranked <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span>
+        salary,
+        <span class="hljs-built_in">DENSE_RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> dr
+    <span class="hljs-keyword">FROM</span> employees
+)
+<span class="hljs-keyword">SELECT</span> salary <span class="hljs-keyword">FROM</span> ranked <span class="hljs-keyword">WHERE</span> dr <span class="hljs-operator">=</span> <span class="hljs-number">3</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="856" data-line-end="857"><strong>Why DENSE_RANK and not RANK?</strong></p>
+<p class="has-line-data" data-line-start="858" data-line-end="859">Example: salaries are 90k, 85k, 85k, 70k</p>
+<ul>
+<li class="has-line-data" data-line-start="859" data-line-end="860">RANK values: 1, 2, 2, 4 — no rank 3 exists!</li>
+<li class="has-line-data" data-line-start="860" data-line-end="862">DENSE_RANK values: 1, 2, 2, 3 — rank 3 = 70k ✓</li>
+</ul>
+<hr>
+<p class="has-line-data" data-line-start="864" data-line-end="865"><strong>Q52. Commonly Ignored: What happens if ORDER BY has all unique values — do RANK, DENSE_RANK, and ROW_NUMBER differ?</strong></p>
+<p class="has-line-data" data-line-start="866" data-line-end="867">No. If all ORDER BY values are unique (no ties), RANK, DENSE_RANK, and ROW_NUMBER all produce identical output. They only differ when ties exist.</p>
+<hr>
+<p class="has-line-data" data-line-start="870" data-line-end="871"><strong>Q53. Can you use window functions in a WHERE clause?</strong></p>
+<p class="has-line-data" data-line-start="872" data-line-end="873">No! Window functions cannot be used directly in WHERE or HAVING clauses. You must wrap them in a subquery or CTE first.</p>
+<pre><code class="has-line-data language-sql" data-line-start="875" data-line-end="888"><span class="hljs-comment">-- WRONG</span>
+<span class="hljs-keyword">SELECT</span> name, salary
+<span class="hljs-keyword">FROM</span> employees
+<span class="hljs-keyword">WHERE</span> <span class="hljs-built_in">RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+<span class="hljs-comment">-- CORRECT</span>
+<span class="hljs-keyword">WITH</span> ranked <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span> name, salary,
+           <span class="hljs-built_in">RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> rnk
+    <span class="hljs-keyword">FROM</span> employees
+)
+<span class="hljs-keyword">SELECT</span> name, salary <span class="hljs-keyword">FROM</span> ranked <span class="hljs-keyword">WHERE</span> rnk <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="891" data-line-end="892"><strong>Q54. What is the difference between PARTITION BY and GROUP BY?</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Feature</th>
+<th>GROUP BY</th>
+<th>PARTITION BY (Window)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Collapses rows?</td>
+<td>YES — one output row per group</td>
+<td>NO — all rows remain</td>
+</tr>
+<tr>
+<td>Used with</td>
+<td>Aggregate functions (SUM, COUNT, AVG)</td>
+<td>Window functions (RANK, ROW_NUMBER, SUM OVER)</td>
+</tr>
+<tr>
+<td>Can access individual row data?</td>
+<td>Only via aggregation</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p class="has-line-data" data-line-start="901" data-line-end="902"><strong>Q55. What is a named window / WINDOW clause?</strong></p>
+<p class="has-line-data" data-line-start="903" data-line-end="904">SQL standard (and MySQL 8+, PostgreSQL) allows you to name a window definition and reuse it, avoiding repetition.</p>
+<pre><code class="has-line-data language-sql" data-line-start="906" data-line-end="915"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">RANK</span>()       <span class="hljs-keyword">OVER</span> w <span class="hljs-keyword">AS</span> rnk,
+    <span class="hljs-built_in">DENSE_RANK</span>() <span class="hljs-keyword">OVER</span> w <span class="hljs-keyword">AS</span> d_rnk,
+    <span class="hljs-built_in">ROW_NUMBER</span>() <span class="hljs-keyword">OVER</span> w <span class="hljs-keyword">AS</span> rn
+<span class="hljs-keyword">FROM</span> employees
+<span class="hljs-keyword">WINDOW</span> w <span class="hljs-keyword">AS</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> department <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>);
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="918" data-line-end="919"><a id="ADVANCED_LEVEL_918"></a>ADVANCED LEVEL</h3>
+<hr>
+<p class="has-line-data" data-line-start="922" data-line-end="923"><strong>Q56. Commonly Ignored: What is the FRAME clause in window functions?</strong></p>
+<p class="has-line-data" data-line-start="924" data-line-end="925">The frame clause defines which rows around the current row are included in the calculation. Relevant for aggregate window functions like SUM OVER or AVG OVER.</p>
+<pre><code class="has-line-data language-sql" data-line-start="927" data-line-end="937"><span class="hljs-comment">-- Running total of salary</span>
+<span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">SUM</span>(salary) <span class="hljs-keyword">OVER</span> (
+        <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> emp_id
+        <span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">BETWEEN</span> UNBOUNDED PRECEDING <span class="hljs-keyword">AND</span> <span class="hljs-keyword">CURRENT</span> <span class="hljs-type">ROW</span>
+    ) <span class="hljs-keyword">AS</span> running_total
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<p class="has-line-data" data-line-start="938" data-line-end="939">Common frame types:</p>
+<ul>
+<li class="has-line-data" data-line-start="939" data-line-end="940"><code>ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code> — running total</li>
+<li class="has-line-data" data-line-start="940" data-line-end="941"><code>ROWS BETWEEN 1 PRECEDING AND 1 FOLLOWING</code> — 3-row rolling average</li>
+<li class="has-line-data" data-line-start="941" data-line-end="943"><code>ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING</code> — entire partition</li>
+</ul>
+<hr>
+<p class="has-line-data" data-line-start="945" data-line-end="946"><strong>Q57. How do you delete duplicate rows using ROW_NUMBER?</strong></p>
+<p class="has-line-data" data-line-start="947" data-line-end="948">A classic and very commonly asked interview question.</p>
+<pre><code class="has-line-data language-sql" data-line-start="950" data-line-end="958"><span class="hljs-comment">-- Keep only the first occurrence, delete the rest</span>
+<span class="hljs-keyword">WITH</span> cte <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span>,
+           <span class="hljs-built_in">ROW_NUMBER</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> email <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> created_at <span class="hljs-keyword">ASC</span>) <span class="hljs-keyword">AS</span> rn
+    <span class="hljs-keyword">FROM</span> users
+)
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> cte <span class="hljs-keyword">WHERE</span> rn <span class="hljs-operator">&gt;</span> <span class="hljs-number">1</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="959" data-line-end="960">ROW_NUMBER is ideal here because we need exactly one row per group — ties must be broken.</p>
+<hr>
+<p class="has-line-data" data-line-start="963" data-line-end="964"><strong>Q58. Tricky: Can RANK() produce the same result as DENSE_RANK() in some cases?</strong></p>
+<p class="has-line-data" data-line-start="965" data-line-end="966">Yes — when there are no ties in the ORDER BY column within any partition, both produce identical results because there are no gaps to introduce.</p>
+<hr>
+<p class="has-line-data" data-line-start="969" data-line-end="970"><strong>Q59. What are LAG and LEAD functions?</strong></p>
+<p class="has-line-data" data-line-start="971" data-line-end="972">LAG and LEAD are window functions that let you access data from previous or next rows without a self-join.</p>
+<pre><code class="has-line-data language-sql" data-line-start="974" data-line-end="982"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">LAG</span>(salary, <span class="hljs-number">1</span>)  <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> emp_id) <span class="hljs-keyword">AS</span> prev_salary,
+    <span class="hljs-built_in">LEAD</span>(salary, <span class="hljs-number">1</span>) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> emp_id) <span class="hljs-keyword">AS</span> next_salary,
+    salary <span class="hljs-operator">-</span> <span class="hljs-built_in">LAG</span>(salary, <span class="hljs-number">1</span>) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> emp_id) <span class="hljs-keyword">AS</span> salary_diff
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="985" data-line-end="986"><strong>Q60. Commonly Ignored: What is NTILE()?</strong></p>
+<p class="has-line-data" data-line-start="987" data-line-end="988">NTILE(n) divides rows into n equal-sized buckets and assigns a bucket number to each row. Useful for percentile/quartile calculations.</p>
+<pre><code class="has-line-data language-sql" data-line-start="990" data-line-end="997"><span class="hljs-comment">-- Divide employees into 4 salary quartiles</span>
+<span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">NTILE</span>(<span class="hljs-number">4</span>) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> quartile
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<p class="has-line-data" data-line-start="998" data-line-end="999">Quartile 1 = top 25% earners, Quartile 4 = bottom 25%.</p>
+<hr>
+<p class="has-line-data" data-line-start="1002" data-line-end="1003"><strong>Q61. Tricky: What happens with NULLs in ORDER BY within window functions?</strong></p>
+<p class="has-line-data" data-line-start="1004" data-line-end="1005">NULLs in the ORDER BY column are treated as equal to each other. Default ordering varies:</p>
+<ul>
+<li class="has-line-data" data-line-start="1005" data-line-end="1006">PostgreSQL: NULLs appear LAST for ASC, FIRST for DESC.</li>
+<li class="has-line-data" data-line-start="1006" data-line-end="1008">MySQL/SQL Server: NULLs appear FIRST for ASC.</li>
+</ul>
+<p class="has-line-data" data-line-start="1008" data-line-end="1009">Use <code>NULLS FIRST</code> or <code>NULLS LAST</code> in PostgreSQL to control this.</p>
+<pre><code class="has-line-data language-sql" data-line-start="1011" data-line-end="1014"><span class="hljs-comment">-- PostgreSQL</span>
+<span class="hljs-built_in">RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span> <span class="hljs-keyword">NULLS LAST</span>)
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="1017" data-line-end="1018"><strong>Q62. Commonly Ignored: Are window functions evaluated before or after WHERE?</strong></p>
+<p class="has-line-data" data-line-start="1019" data-line-end="1020">Window functions are evaluated AFTER the WHERE clause but BEFORE the outer SELECT or ORDER BY. This means:</p>
+<ul>
+<li class="has-line-data" data-line-start="1020" data-line-end="1021">Rows filtered by WHERE are excluded before the window function runs.</li>
+<li class="has-line-data" data-line-start="1021" data-line-end="1023">You cannot filter by window function result in the same query level — must use CTE or subquery.</li>
+</ul>
+<hr>
+<p class="has-line-data" data-line-start="1025" data-line-end="1026"><strong>Q63. What is PERCENT_RANK() vs CUME_DIST()?</strong></p>
+<p class="has-line-data" data-line-start="1027" data-line-end="1028">Both are window functions for statistical distribution.</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Function</th>
+<th>Formula</th>
+<th>Range</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PERCENT_RANK</td>
+<td>(rank - 1) / (total rows - 1)</td>
+<td>0 to 1</td>
+</tr>
+<tr>
+<td>CUME_DIST</td>
+<td>rows with value &lt;= current / total rows</td>
+<td>&gt; 0 to 1</td>
+</tr>
+</tbody>
+</table>
+<pre><code class="has-line-data language-sql" data-line-start="1035" data-line-end="1042"><span class="hljs-keyword">SELECT</span>
+    name,
+    salary,
+    <span class="hljs-built_in">PERCENT_RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary) <span class="hljs-keyword">AS</span> pct_rank,
+    <span class="hljs-built_in">CUME_DIST</span>()    <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary) <span class="hljs-keyword">AS</span> cume_dist
+<span class="hljs-keyword">FROM</span> employees;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="1045" data-line-end="1046"><strong>Q64. Interview Classic: Find employees earning more than the average salary of their department.</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="1048" data-line-end="1059"><span class="hljs-keyword">SELECT</span> name, department, salary
+<span class="hljs-keyword">FROM</span> (
+    <span class="hljs-keyword">SELECT</span>
+        name,
+        department,
+        salary,
+        <span class="hljs-built_in">AVG</span>(salary) <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">PARTITION</span> <span class="hljs-keyword">BY</span> department) <span class="hljs-keyword">AS</span> dept_avg
+    <span class="hljs-keyword">FROM</span> employees
+) t
+<span class="hljs-keyword">WHERE</span> salary <span class="hljs-operator">&gt;</span> dept_avg;
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="1062" data-line-end="1063"><strong>Q65. Interview Classic: Find the second highest salary without using TOP/LIMIT.</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="1065" data-line-end="1077"><span class="hljs-comment">-- Using DENSE_RANK</span>
+<span class="hljs-keyword">WITH</span> ranked <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span> salary,
+           <span class="hljs-built_in">DENSE_RANK</span>() <span class="hljs-keyword">OVER</span> (<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> salary <span class="hljs-keyword">DESC</span>) <span class="hljs-keyword">AS</span> dr
+    <span class="hljs-keyword">FROM</span> employees
+)
+<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MAX</span>(salary) <span class="hljs-keyword">FROM</span> ranked <span class="hljs-keyword">WHERE</span> dr <span class="hljs-operator">=</span> <span class="hljs-number">2</span>;
+
+<span class="hljs-comment">-- Alternative using subquery</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MAX</span>(salary) <span class="hljs-keyword">FROM</span> employees
+<span class="hljs-keyword">WHERE</span> salary <span class="hljs-operator">&lt;</span> (<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MAX</span>(salary) <span class="hljs-keyword">FROM</span> employees);
+</code></pre>
+<hr>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1082" data-line-end="1083"><a id="QUICK_CHEAT_SHEET_1082"></a>QUICK CHEAT SHEET</h2>
+<h3 class="code-line has-line-data" data-line-start="1084" data-line-end="1085"><a id="Keys_1084"></a>Keys</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Key</th>
+<th>Null Allowed?</th>
+<th>Unique?</th>
+<th>Count per Table</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Primary Key</td>
+<td>No</td>
+<td>Yes</td>
+<td>One</td>
+</tr>
+<tr>
+<td>Unique Key</td>
+<td>Yes (one NULL)</td>
+<td>Yes</td>
+<td>Multiple</td>
+</tr>
+<tr>
+<td>Foreign Key</td>
+<td>Yes</td>
+<td>No</td>
+<td>Multiple</td>
+</tr>
+<tr>
+<td>Candidate Key</td>
+<td>No</td>
+<td>Yes</td>
+<td>Multiple</td>
+</tr>
+<tr>
+<td>Composite Key</td>
+<td>No</td>
+<td>Yes (combined)</td>
+<td>Depends</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1096" data-line-end="1097"><a id="Trigger_Timing_Matrix_1096"></a>Trigger Timing Matrix</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Trigger Type</th>
+<th>NEW available?</th>
+<th>OLD available?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BEFORE INSERT</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>AFTER INSERT</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>BEFORE UPDATE</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>AFTER UPDATE</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>BEFORE DELETE</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>AFTER DELETE</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1109" data-line-end="1110"><a id="RANK_vs_DENSE_RANK_vs_ROW_NUMBER_1109"></a>RANK vs DENSE_RANK vs ROW_NUMBER</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th></th>
+<th>Ties get same value?</th>
+<th>Gaps in sequence?</th>
+<th>Unique per row?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ROW_NUMBER</td>
+<td>No</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>RANK</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>DENSE_RANK</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+<hr>
+
+</body>
+</html>

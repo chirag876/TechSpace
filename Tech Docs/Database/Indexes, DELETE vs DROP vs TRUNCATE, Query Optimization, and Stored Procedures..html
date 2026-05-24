@@ -1,0 +1,1429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indexes, DELETE vs DROP vs TRUNCATE, Query Optimization, and Stored Procedures.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<h1 class="code-line has-line-data" data-line-start="0" data-line-end="1"><a id="SQL_Server_The_Concepts_That_Actually_Make_Sense_0"></a>SQL Server: The Concepts That Actually Make Sense</h1>
+<blockquote>
+<p class="has-line-data" data-line-start="2" data-line-end="4">Indexes, DELETE vs DROP vs TRUNCATE, Query Optimization, and Stored Procedures.<br>
+Read it once. Understand it forever.</p>
+</blockquote>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="7" data-line-end="8"><a id="Table_of_Contents_7"></a>Table of Contents</h2>
+<ol>
+<li class="has-line-data" data-line-start="9" data-line-end="10"><a href="#1-indexes">Indexes</a></li>
+<li class="has-line-data" data-line-start="10" data-line-end="11"><a href="#2-delete-drop-and-truncate">DELETE, DROP, and TRUNCATE</a></li>
+<li class="has-line-data" data-line-start="11" data-line-end="12"><a href="#3-sql-optimization">SQL Optimization</a></li>
+<li class="has-line-data" data-line-start="12" data-line-end="13"><a href="#4-stored-procedures">Stored Procedures</a></li>
+<li class="has-line-data" data-line-start="13" data-line-end="15"><a href="#5-interview-questions-and-answers">Interview Questions and Answers</a></li>
+</ol>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="17" data-line-end="18"><a id="1_Indexes_17"></a>1. Indexes</h2>
+<h3 class="code-line has-line-data" data-line-start="19" data-line-end="20"><a id="What_Is_an_Index_19"></a>What Is an Index?</h3>
+<p class="has-line-data" data-line-start="21" data-line-end="22">Imagine a textbook with 1000 pages. You need to find every mention of “foreign key.” Without an index at the back of the book, you read every single page. With an index, you flip to “F”, find “foreign key — pages 45, 312, 678”, and go directly there.</p>
+<p class="has-line-data" data-line-start="23" data-line-end="24">A database index works exactly the same way. Without an index, SQL Server reads every row in the table (a <strong>full table scan</strong>) to find what you are looking for. With an index, it jumps directly to the relevant rows. On a table with ten million rows, this is the difference between a query that takes 45 seconds and one that takes 2 milliseconds.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="27" data-line-end="28"><a id="How_SQL_Server_Stores_Data_The_Heap_and_the_BTree_27"></a>How SQL Server Stores Data — The Heap and the B-Tree</h3>
+<p class="has-line-data" data-line-start="29" data-line-end="30">Before understanding indexes, you need to know how SQL Server physically stores data.</p>
+<p class="has-line-data" data-line-start="31" data-line-end="32"><strong>Heap:</strong> A table with no clustered index. Data pages are stored in no particular order. Finding rows requires scanning every page — a full table scan every time.</p>
+<p class="has-line-data" data-line-start="33" data-line-end="34"><strong>B-Tree (Balanced Tree):</strong> The data structure used for indexes. It is a tree where:</p>
+<ul>
+<li class="has-line-data" data-line-start="34" data-line-end="35">The root node contains pointers to intermediate nodes</li>
+<li class="has-line-data" data-line-start="35" data-line-end="36">Intermediate nodes contain pointers to leaf nodes</li>
+<li class="has-line-data" data-line-start="36" data-line-end="38">Leaf nodes contain the actual data (or pointers to it)</li>
+</ul>
+<p class="has-line-data" data-line-start="38" data-line-end="39">Every level of the tree has the same height — “balanced.” A search starts at the root and traverses down to the leaf in O(log n) time. A table with 10 million rows needs at most about 24 comparisons to find any row.</p>
+<pre><code class="has-line-data" data-line-start="41" data-line-end="51">B-Tree Structure:
+
+                    [Root: 500]
+                   /            \
+        [250]                   [750]
+       /     \                 /     \
+  [100][200]  [300][400]  [600][700]  [800][900]
+   |    |      |    |      |    |      |    |
+  Rows Rows   Rows Rows   Rows Rows   Rows Rows
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="54" data-line-end="55"><a id="Clustered_Index_54"></a>Clustered Index</h3>
+<p class="has-line-data" data-line-start="56" data-line-end="57">A clustered index determines the <strong>physical order</strong> of data in the table. The table IS the index. The leaf nodes of the B-Tree contain the actual data rows.</p>
+<p class="has-line-data" data-line-start="58" data-line-end="59">There can be only <strong>one clustered index per table</strong> because data can only be physically sorted one way.</p>
+<pre><code class="has-line-data language-sql" data-line-start="61" data-line-end="92"><span class="hljs-comment">-- Creating a clustered index (usually done via PRIMARY KEY automatically)</span>
+<span class="hljs-keyword">CREATE TABLE</span> Orders
+(
+    OrderId     <span class="hljs-type">INT</span>         <span class="hljs-keyword">NOT NULL</span>,
+    CustomerId  <span class="hljs-type">INT</span>         <span class="hljs-keyword">NOT NULL</span>,
+    OrderDate   DATETIME    <span class="hljs-keyword">NOT NULL</span>,
+    TotalAmount <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">18</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">NOT NULL</span>,
+
+    <span class="hljs-keyword">CONSTRAINT</span> PK_Orders <span class="hljs-keyword">PRIMARY KEY</span> CLUSTERED (OrderId)
+    <span class="hljs-comment">-- This creates a clustered index on OrderId automatically</span>
+);
+
+<span class="hljs-comment">-- Explicit clustered index creation</span>
+<span class="hljs-keyword">CREATE</span> CLUSTERED INDEX CIX_Orders_OrderDate
+<span class="hljs-keyword">ON</span> Orders (OrderDate);
+
+<span class="hljs-comment">-- Check existing indexes on a table</span>
+<span class="hljs-keyword">EXEC</span> sp_helpindex <span class="hljs-string">&#x27;Orders&#x27;</span>;
+
+<span class="hljs-comment">-- Or use this view</span>
+<span class="hljs-keyword">SELECT</span>
+    i.name          <span class="hljs-keyword">AS</span> IndexName,
+    i.type_desc     <span class="hljs-keyword">AS</span> IndexType,
+    c.name          <span class="hljs-keyword">AS</span> ColumnName,
+    ic.key_ordinal  <span class="hljs-keyword">AS</span> KeyOrder
+<span class="hljs-keyword">FROM</span> sys.indexes i
+<span class="hljs-keyword">JOIN</span> sys.index_columns ic <span class="hljs-keyword">ON</span> i.object_id <span class="hljs-operator">=</span> ic.object_id <span class="hljs-keyword">AND</span> i.index_id <span class="hljs-operator">=</span> ic.index_id
+<span class="hljs-keyword">JOIN</span> sys.columns c        <span class="hljs-keyword">ON</span> ic.object_id <span class="hljs-operator">=</span> c.object_id <span class="hljs-keyword">AND</span> ic.column_id <span class="hljs-operator">=</span> c.column_id
+<span class="hljs-keyword">WHERE</span> i.object_id <span class="hljs-operator">=</span> OBJECT_ID(<span class="hljs-string">&#x27;Orders&#x27;</span>)
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> i.index_id, ic.key_ordinal;
+</code></pre>
+<p class="has-line-data" data-line-start="93" data-line-end="94"><strong>How SQL Server finds a row with a clustered index:</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="96" data-line-end="105"><span class="hljs-comment">-- SQL Server does a B-Tree traversal on OrderId</span>
+<span class="hljs-comment">-- Root -&gt; Intermediate -&gt; Leaf (the actual data row)</span>
+<span class="hljs-comment">-- Extremely fast</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderId <span class="hljs-operator">=</span> <span class="hljs-number">50000</span>;
+
+<span class="hljs-comment">-- Clustered index range scan — also fast</span>
+<span class="hljs-comment">-- SQL Server finds OrderDate = &#x27;2024-01-01&#x27; and reads forward</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-keyword">BETWEEN</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span> <span class="hljs-keyword">AND</span> <span class="hljs-string">&#x27;2024-01-31&#x27;</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="108" data-line-end="109"><a id="Nonclustered_Index_108"></a>Nonclustered Index</h3>
+<p class="has-line-data" data-line-start="110" data-line-end="111">A nonclustered index is a <strong>separate structure</strong> from the table data. The leaf nodes contain the indexed column values plus a <strong>row locator</strong> — either the clustered index key (if a clustered index exists) or the actual physical row pointer (if no clustered index exists, i.e., a heap).</p>
+<p class="has-line-data" data-line-start="112" data-line-end="113">You can have up to <strong>999 nonclustered indexes</strong> on a table (though having that many is a sign of a design problem).</p>
+<pre><code class="has-line-data language-sql" data-line-start="115" data-line-end="130"><span class="hljs-comment">-- Simple nonclustered index on a single column</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED INDEX IX_Orders_CustomerId
+<span class="hljs-keyword">ON</span> Orders (CustomerId);
+
+<span class="hljs-comment">-- Nonclustered index on multiple columns (composite index)</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED INDEX IX_Orders_CustomerDate
+<span class="hljs-keyword">ON</span> Orders (CustomerId, OrderDate);
+
+<span class="hljs-comment">-- The order of columns in a composite index matters critically</span>
+<span class="hljs-comment">-- This index is useful for:</span>
+<span class="hljs-comment">--   WHERE CustomerId = 5</span>
+<span class="hljs-comment">--   WHERE CustomerId = 5 AND OrderDate &gt; &#x27;2024-01-01&#x27;</span>
+<span class="hljs-comment">-- This index is NOT useful for:</span>
+<span class="hljs-comment">--   WHERE OrderDate &gt; &#x27;2024-01-01&#x27;  (CustomerId is not specified — leading column missing)</span>
+</code></pre>
+<p class="has-line-data" data-line-start="131" data-line-end="132"><strong>How SQL Server uses a nonclustered index:</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="134" data-line-end="141"><span class="hljs-comment">-- Step 1: SQL Server searches the nonclustered index B-Tree for CustomerId = 42</span>
+<span class="hljs-comment">--         This gives it the OrderId (clustered key) for all matching rows</span>
+<span class="hljs-comment">-- Step 2: SQL Server does a Key Lookup — goes back to the clustered index</span>
+<span class="hljs-comment">--         to fetch the remaining columns (OrderDate, TotalAmount, etc.)</span>
+<span class="hljs-comment">-- This two-step process is called a Key Lookup or Bookmark Lookup</span>
+<span class="hljs-keyword">SELECT</span> OrderDate, TotalAmount <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="144" data-line-end="145"><a id="Covering_Index_and_INCLUDE_144"></a>Covering Index and INCLUDE</h3>
+<p class="has-line-data" data-line-start="146" data-line-end="147">The <strong>Key Lookup</strong> (going from the nonclustered index back to the clustered index to fetch more columns) is expensive when done for many rows. A <strong>covering index</strong> eliminates this by including all the columns the query needs directly in the index.</p>
+<pre><code class="has-line-data language-sql" data-line-start="149" data-line-end="165"><span class="hljs-comment">-- Without INCLUDE — requires a Key Lookup for OrderDate and TotalAmount</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED INDEX IX_Orders_CustomerId
+<span class="hljs-keyword">ON</span> Orders (CustomerId);
+
+<span class="hljs-comment">-- With INCLUDE — the query is covered entirely by the index, no Key Lookup needed</span>
+<span class="hljs-comment">-- The INCLUDE columns are stored in the leaf nodes but not part of the sort key</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED INDEX IX_Orders_CustomerId_Covering
+<span class="hljs-keyword">ON</span> Orders (CustomerId)
+INCLUDE (OrderDate, TotalAmount);
+
+<span class="hljs-comment">-- This query can now be answered entirely from the index</span>
+<span class="hljs-comment">-- SQL Server never needs to touch the actual table data</span>
+<span class="hljs-keyword">SELECT</span> OrderDate, TotalAmount
+<span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="166" data-line-end="167"><strong>Key Column vs INCLUDE Column:</strong></p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Key Columns</th>
+<th>INCLUDE Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Part of the B-Tree sort structure</td>
+<td>Only stored at the leaf level</td>
+</tr>
+<tr>
+<td>Support equality and range predicates</td>
+<td>Only for covering — cannot be in WHERE</td>
+</tr>
+<tr>
+<td>Affect index size at all levels</td>
+<td>Only increase leaf-level size</td>
+</tr>
+<tr>
+<td>Max 16 columns, 900 bytes combined</td>
+<td>Up to 1023 non-key columns</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="177" data-line-end="178"><a id="Unique_Index_177"></a>Unique Index</h3>
+<p class="has-line-data" data-line-start="179" data-line-end="180">A unique index enforces uniqueness — no two rows can have the same value(s) in the indexed columns.</p>
+<pre><code class="has-line-data language-sql" data-line-start="182" data-line-end="192"><span class="hljs-comment">-- Unique constraint automatically creates a unique nonclustered index</span>
+<span class="hljs-keyword">ALTER TABLE</span> Users
+<span class="hljs-keyword">ADD CONSTRAINT</span> UQ_Users_Email <span class="hljs-keyword">UNIQUE</span> (Email);
+
+<span class="hljs-comment">-- Explicit unique index</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">UNIQUE</span> NONCLUSTERED INDEX UIX_Users_Email
+<span class="hljs-keyword">ON</span> Users (Email)
+<span class="hljs-keyword">WHERE</span> Email <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NOT NULL</span>; <span class="hljs-comment">-- Filtered unique index — NULL values are excluded</span>
+                          <span class="hljs-comment">-- This allows multiple rows with NULL email</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="195" data-line-end="196"><a id="Filtered_Index_195"></a>Filtered Index</h3>
+<p class="has-line-data" data-line-start="197" data-line-end="198">A filtered index covers only a subset of rows. If your queries consistently filter on a specific condition, a filtered index is smaller and faster than a full index.</p>
+<pre><code class="has-line-data language-sql" data-line-start="200" data-line-end="213"><span class="hljs-comment">-- Only active orders get indexed — queries on active orders are fast</span>
+<span class="hljs-comment">-- The index is far smaller than a full index on Status</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED INDEX IX_Orders_Active
+<span class="hljs-keyword">ON</span> Orders (OrderDate, CustomerId)
+<span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Active&#x27;</span>;
+
+<span class="hljs-comment">-- Useful for sparse data — columns that are NULL most of the time</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED INDEX IX_Orders_HasDiscount
+<span class="hljs-keyword">ON</span> Orders (DiscountCode)
+<span class="hljs-keyword">WHERE</span> DiscountCode <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NOT NULL</span>;
+<span class="hljs-comment">-- Only rows with a discount code are in the index</span>
+<span class="hljs-comment">-- Queries filtering on DiscountCode IS NOT NULL are very fast</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="216" data-line-end="217"><a id="Columnstore_Index_216"></a>Columnstore Index</h3>
+<p class="has-line-data" data-line-start="218" data-line-end="219">Traditional indexes are <strong>rowstore</strong> — data is stored row by row. A <strong>columnstore index</strong> stores data column by column, which is dramatically better for analytical queries that aggregate large datasets.</p>
+<pre><code class="has-line-data language-sql" data-line-start="221" data-line-end="240"><span class="hljs-comment">-- Nonclustered columnstore — the original table data is unchanged</span>
+<span class="hljs-comment">-- Adds a column-oriented copy of the data for analytics</span>
+<span class="hljs-keyword">CREATE</span> NONCLUSTERED COLUMNSTORE INDEX NCCI_Sales_Analytics
+<span class="hljs-keyword">ON</span> Sales (<span class="hljs-keyword">Year</span>, <span class="hljs-keyword">Month</span>, ProductId, Revenue, Quantity);
+
+<span class="hljs-comment">-- Clustered columnstore — the entire table is stored column-by-column</span>
+<span class="hljs-comment">-- Best for pure data warehouse / reporting tables</span>
+<span class="hljs-keyword">CREATE</span> CLUSTERED COLUMNSTORE INDEX CCI_FactSales
+<span class="hljs-keyword">ON</span> FactSales;
+
+<span class="hljs-comment">-- Queries like this become enormously faster with columnstore</span>
+<span class="hljs-keyword">SELECT</span>
+    ProductId,
+    <span class="hljs-built_in">SUM</span>(Revenue) <span class="hljs-keyword">AS</span> TotalRevenue,
+    <span class="hljs-built_in">AVG</span>(Quantity) <span class="hljs-keyword">AS</span> AvgQuantity
+<span class="hljs-keyword">FROM</span> Sales
+<span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">Year</span> <span class="hljs-operator">=</span> <span class="hljs-number">2024</span>
+<span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> ProductId;
+</code></pre>
+<p class="has-line-data" data-line-start="241" data-line-end="242">Columnstore indexes use <strong>batch mode execution</strong> (processing 900 rows at a time instead of one) and achieve compression ratios of 5x to 10x compared to rowstore.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="245" data-line-end="246"><a id="Index_Maintenance_Fragmentation_245"></a>Index Maintenance — Fragmentation</h3>
+<p class="has-line-data" data-line-start="247" data-line-end="248">Over time, as rows are inserted, updated, and deleted, index pages become fragmented. The data in the B-Tree is no longer in contiguous pages on disk. This slows down range scans.</p>
+<pre><code class="has-line-data language-sql" data-line-start="250" data-line-end="274"><span class="hljs-comment">-- Check fragmentation</span>
+<span class="hljs-keyword">SELECT</span>
+    OBJECT_NAME(ips.object_id)      <span class="hljs-keyword">AS</span> TableName,
+    i.name                           <span class="hljs-keyword">AS</span> IndexName,
+    ips.avg_fragmentation_in_percent <span class="hljs-keyword">AS</span> Fragmentation,
+    ips.page_count                   <span class="hljs-keyword">AS</span> PageCount
+<span class="hljs-keyword">FROM</span> sys.dm_db_index_physical_stats(DB_ID(), <span class="hljs-keyword">NULL</span>, <span class="hljs-keyword">NULL</span>, <span class="hljs-keyword">NULL</span>, <span class="hljs-string">&#x27;LIMITED&#x27;</span>) ips
+<span class="hljs-keyword">JOIN</span> sys.indexes i <span class="hljs-keyword">ON</span> ips.object_id <span class="hljs-operator">=</span> i.object_id <span class="hljs-keyword">AND</span> ips.index_id <span class="hljs-operator">=</span> i.index_id
+<span class="hljs-keyword">WHERE</span> ips.avg_fragmentation_in_percent <span class="hljs-operator">&gt;</span> <span class="hljs-number">5</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> ips.avg_fragmentation_in_percent <span class="hljs-keyword">DESC</span>;
+
+<span class="hljs-comment">-- Fix fragmentation</span>
+<span class="hljs-comment">-- Under 30% fragmentation: REORGANIZE (online, low impact)</span>
+<span class="hljs-keyword">ALTER</span> INDEX IX_Orders_CustomerId <span class="hljs-keyword">ON</span> Orders REORGANIZE;
+
+<span class="hljs-comment">-- Over 30% fragmentation: REBUILD (offline by default, resets fragmentation to ~0%)</span>
+<span class="hljs-keyword">ALTER</span> INDEX IX_Orders_CustomerId <span class="hljs-keyword">ON</span> Orders REBUILD;
+
+<span class="hljs-comment">-- Rebuild all indexes on a table</span>
+<span class="hljs-keyword">ALTER</span> INDEX <span class="hljs-keyword">ALL</span> <span class="hljs-keyword">ON</span> Orders REBUILD;
+
+<span class="hljs-comment">-- Online rebuild (Enterprise edition — table remains accessible during rebuild)</span>
+<span class="hljs-keyword">ALTER</span> INDEX <span class="hljs-keyword">ALL</span> <span class="hljs-keyword">ON</span> Orders REBUILD <span class="hljs-keyword">WITH</span> (ONLINE <span class="hljs-operator">=</span> <span class="hljs-keyword">ON</span>);
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="277" data-line-end="278"><a id="The_Cost_of_Too_Many_Indexes_277"></a>The Cost of Too Many Indexes</h3>
+<p class="has-line-data" data-line-start="279" data-line-end="280">Indexes are not free.</p>
+<pre><code class="has-line-data" data-line-start="282" data-line-end="296">INSERT: Every index on the table must be updated. 10 indexes = 10 extra writes.
+UPDATE: If the updated column is indexed, the old index entry is deleted and a new one inserted.
+DELETE: The row must be removed from every index.
+Storage: Every index consumes disk space.
+
+A table with 20 indexes will have:
+    Fast SELECT performance
+    Slow INSERT/UPDATE/DELETE performance
+    High storage usage
+    High maintenance overhead
+
+The sweet spot: index the columns actually used in WHERE, JOIN, and ORDER BY
+in your most frequent and critical queries. No more, no less.
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="299" data-line-end="300"><a id="Finding_Missing_Indexes_299"></a>Finding Missing Indexes</h3>
+<p class="has-line-data" data-line-start="301" data-line-end="302">SQL Server tracks queries and suggests missing indexes based on actual execution patterns.</p>
+<pre><code class="has-line-data language-sql" data-line-start="304" data-line-end="336"><span class="hljs-comment">-- Indexes SQL Server wishes existed (based on query execution history)</span>
+<span class="hljs-keyword">SELECT</span> TOP <span class="hljs-number">10</span>
+    migs.avg_total_user_cost <span class="hljs-operator">*</span> migs.avg_user_impact <span class="hljs-operator">*</span> (migs.user_seeks <span class="hljs-operator">+</span> migs.user_scans) <span class="hljs-keyword">AS</span> ImprovementMeasure,
+    mid.statement                   <span class="hljs-keyword">AS</span> TableName,
+    mid.equality_columns,
+    mid.inequality_columns,
+    mid.included_columns,
+    migs.user_seeks,
+    migs.user_scans,
+    migs.avg_user_impact
+<span class="hljs-keyword">FROM</span> sys.dm_db_missing_index_details mid
+<span class="hljs-keyword">JOIN</span> sys.dm_db_missing_index_groups mig  <span class="hljs-keyword">ON</span> mid.index_handle <span class="hljs-operator">=</span> mig.index_handle
+<span class="hljs-keyword">JOIN</span> sys.dm_db_missing_index_group_stats migs <span class="hljs-keyword">ON</span> mig.index_group_handle <span class="hljs-operator">=</span> migs.group_handle
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> ImprovementMeasure <span class="hljs-keyword">DESC</span>;
+
+<span class="hljs-comment">-- Index usage statistics — find unused indexes (candidates for removal)</span>
+<span class="hljs-keyword">SELECT</span>
+    OBJECT_NAME(i.object_id)    <span class="hljs-keyword">AS</span> TableName,
+    i.name                       <span class="hljs-keyword">AS</span> IndexName,
+    ius.user_seeks,
+    ius.user_scans,
+    ius.user_lookups,
+    ius.user_updates,
+    ius.last_user_seek,
+    ius.last_user_scan
+<span class="hljs-keyword">FROM</span> sys.indexes i
+<span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">JOIN</span> sys.dm_db_index_usage_stats ius
+    <span class="hljs-keyword">ON</span> i.object_id <span class="hljs-operator">=</span> ius.object_id <span class="hljs-keyword">AND</span> i.index_id <span class="hljs-operator">=</span> ius.index_id
+    <span class="hljs-keyword">AND</span> ius.database_id <span class="hljs-operator">=</span> DB_ID()
+<span class="hljs-keyword">WHERE</span> OBJECT_NAME(i.object_id) <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Orders&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> (ISNULL(ius.user_seeks, <span class="hljs-number">0</span>) <span class="hljs-operator">+</span> ISNULL(ius.user_scans, <span class="hljs-number">0</span>)) <span class="hljs-keyword">ASC</span>;
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="339" data-line-end="340"><a id="2_DELETE_DROP_and_TRUNCATE_339"></a>2. DELETE, DROP, and TRUNCATE</h2>
+<p class="has-line-data" data-line-start="341" data-line-end="342">These three words sound similar and all “remove” things, but they operate at completely different levels, have different rollback behaviour, and are appropriate in completely different situations.</p>
+<p class="has-line-data" data-line-start="343" data-line-end="344">The analogy:</p>
+<ul>
+<li class="has-line-data" data-line-start="344" data-line-end="345"><strong>DELETE</strong> is removing specific books from a library shelf. The shelf stays. You can undo it.</li>
+<li class="has-line-data" data-line-start="345" data-line-end="346"><strong>TRUNCATE</strong> is clearing an entire shelf completely and resetting the shelf’s numbering. The shelf stays. Hard to undo.</li>
+<li class="has-line-data" data-line-start="346" data-line-end="348"><strong>DROP</strong> is demolishing the entire shelf, the cabinet, and the blueprints. Everything is gone.</li>
+</ul>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="350" data-line-end="351"><a id="DELETE_Surgical_Removal_350"></a>DELETE — Surgical Removal</h3>
+<p class="has-line-data" data-line-start="352" data-line-end="353"><code>DELETE</code> removes rows from a table. You can specify exactly which rows with a <code>WHERE</code> clause. It is fully logged — every deleted row is written to the transaction log. It fires <code>DELETE</code> triggers. It can be rolled back.</p>
+<pre><code class="has-line-data language-sql" data-line-start="355" data-line-end="386"><span class="hljs-comment">-- Delete specific rows</span>
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Cancelled&#x27;</span> <span class="hljs-keyword">AND</span> OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2022-01-01&#x27;</span>;
+
+<span class="hljs-comment">-- Delete with a JOIN (delete orders belonging to inactive customers)</span>
+<span class="hljs-keyword">DELETE</span> o
+<span class="hljs-keyword">FROM</span> Orders o
+<span class="hljs-keyword">JOIN</span> Customers c <span class="hljs-keyword">ON</span> o.CustomerId <span class="hljs-operator">=</span> c.CustomerId
+<span class="hljs-keyword">WHERE</span> c.IsActive <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+
+<span class="hljs-comment">-- Delete with subquery</span>
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> OrderItems
+<span class="hljs-keyword">WHERE</span> OrderId <span class="hljs-keyword">IN</span> (
+    <span class="hljs-keyword">SELECT</span> OrderId <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Cancelled&#x27;</span>
+);
+
+<span class="hljs-comment">-- Delete all rows (no WHERE — dangerous, but valid)</span>
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> TempData;
+
+<span class="hljs-comment">-- DELETE is transactional — you can roll it back</span>
+<span class="hljs-keyword">BEGIN</span> TRANSACTION;
+
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderId <span class="hljs-operator">=</span> <span class="hljs-number">999</span>;
+
+<span class="hljs-comment">-- Changed your mind</span>
+<span class="hljs-keyword">ROLLBACK</span> TRANSACTION;
+<span class="hljs-comment">-- The row is back</span>
+
+<span class="hljs-comment">-- Or keep it</span>
+<span class="hljs-keyword">COMMIT</span> TRANSACTION;
+</code></pre>
+<p class="has-line-data" data-line-start="387" data-line-end="388"><strong>OUTPUT clause — see what you deleted:</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="390" data-line-end="401"><span class="hljs-comment">-- Capture deleted rows before they are gone</span>
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> Orders
+OUTPUT DELETED.OrderId, DELETED.CustomerId, DELETED.TotalAmount
+<span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Cancelled&#x27;</span>;
+
+<span class="hljs-comment">-- Insert deleted rows into an archive table</span>
+<span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> Orders
+OUTPUT DELETED.<span class="hljs-operator">*</span>
+<span class="hljs-keyword">INTO</span> OrdersArchive
+<span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Cancelled&#x27;</span> <span class="hljs-keyword">AND</span> OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2023-01-01&#x27;</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="404" data-line-end="405"><a id="TRUNCATE_The_Full_Wipe_404"></a>TRUNCATE — The Full Wipe</h3>
+<p class="has-line-data" data-line-start="406" data-line-end="407"><code>TRUNCATE</code> removes all rows from a table. You cannot specify a <code>WHERE</code> clause — it is all or nothing. It is minimally logged (records page deallocations, not individual row deletions). It does not fire <code>DELETE</code> triggers. It resets the identity counter. It is dramatically faster than <code>DELETE</code> for large tables.</p>
+<pre><code class="has-line-data language-sql" data-line-start="409" data-line-end="432"><span class="hljs-comment">-- Remove all rows from the table</span>
+<span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">TABLE</span> TempProcessingData;
+
+<span class="hljs-comment">-- TRUNCATE resets the identity seed</span>
+<span class="hljs-comment">-- After TRUNCATE, the next INSERT gets Id = 1 again</span>
+<span class="hljs-comment">-- After DELETE FROM table, the identity continues from where it was</span>
+
+<span class="hljs-comment">-- TRUNCATE is still transactional — you CAN roll it back</span>
+<span class="hljs-keyword">BEGIN</span> TRANSACTION;
+<span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">TABLE</span> StagingData;
+<span class="hljs-keyword">ROLLBACK</span> TRANSACTION; <span class="hljs-comment">-- The data is back</span>
+
+<span class="hljs-comment">-- TRUNCATE cannot be used if:</span>
+<span class="hljs-comment">-- 1. The table is referenced by a FOREIGN KEY constraint (even if the child table is empty)</span>
+<span class="hljs-comment">-- 2. The table participates in an indexed view</span>
+<span class="hljs-comment">-- 3. The table is published using transactional or merge replication</span>
+
+<span class="hljs-comment">-- If a foreign key references this table, TRUNCATE fails:</span>
+<span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">TABLE</span> Customers;
+<span class="hljs-comment">-- Error: Cannot truncate table &#x27;Customers&#x27; because it is being referenced by a FOREIGN KEY constraint.</span>
+<span class="hljs-comment">-- You must drop the FK, truncate, then recreate the FK</span>
+<span class="hljs-comment">-- OR use DELETE FROM Customers (slower but works)</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="435" data-line-end="436"><a id="DROP_The_Demolition_435"></a>DROP — The Demolition</h3>
+<p class="has-line-data" data-line-start="437" data-line-end="438"><code>DROP</code> removes the database object entirely — the table, its data, its indexes, its constraints, its triggers, its statistics. Everything. The object no longer exists.</p>
+<pre><code class="has-line-data language-sql" data-line-start="440" data-line-end="461"><span class="hljs-comment">-- Drop a table completely</span>
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> Orders;
+<span class="hljs-comment">-- The table, all its rows, all its indexes, all its constraints are gone</span>
+
+<span class="hljs-comment">-- Drop only if it exists (prevents error if run again)</span>
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> TempResults;
+
+<span class="hljs-comment">-- Drop other objects</span>
+<span class="hljs-keyword">DROP</span> INDEX IX_Orders_CustomerId <span class="hljs-keyword">ON</span> Orders;
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">VIEW</span>  vw_ActiveOrders;
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrdersByCustomer;
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">FUNCTION</span> fn_GetOrderTotal;
+<span class="hljs-keyword">DROP</span> DATABASE OldDatabase; <span class="hljs-comment">-- Drops the entire database</span>
+
+<span class="hljs-comment">-- DROP is logged but the effect is immediate and irreversible</span>
+<span class="hljs-comment">-- You cannot ROLLBACK a DROP outside of an explicit transaction</span>
+<span class="hljs-keyword">BEGIN</span> TRANSACTION;
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> Orders;
+<span class="hljs-keyword">ROLLBACK</span> TRANSACTION; <span class="hljs-comment">-- The table comes back ONLY because of the explicit transaction</span>
+<span class="hljs-comment">-- Without the BEGIN TRANSACTION wrapper, DROP is permanent</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="464" data-line-end="465"><a id="SidebySide_Comparison_464"></a>Side-by-Side Comparison</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Feature</th>
+<th>DELETE</th>
+<th>TRUNCATE</th>
+<th>DROP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>What it removes</td>
+<td>Specific rows (or all rows)</td>
+<td>All rows</td>
+<td>The entire object</td>
+</tr>
+<tr>
+<td>WHERE clause</td>
+<td>Yes</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Transaction log</td>
+<td>Fully logged (every row)</td>
+<td>Minimally logged (pages)</td>
+<td>Logged</td>
+</tr>
+<tr>
+<td>Rollback possible</td>
+<td>Yes</td>
+<td>Yes (within transaction)</td>
+<td>Yes (within transaction)</td>
+</tr>
+<tr>
+<td>Triggers fired</td>
+<td>Yes (DELETE triggers)</td>
+<td>No</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Identity reset</td>
+<td>No</td>
+<td>Yes</td>
+<td>Object is gone</td>
+</tr>
+<tr>
+<td>Foreign key constraint</td>
+<td>Not blocked</td>
+<td>Blocked if referenced</td>
+<td>Blocked if referenced</td>
+</tr>
+<tr>
+<td>Speed (large table)</td>
+<td>Slow</td>
+<td>Very fast</td>
+<td>Very fast</td>
+</tr>
+<tr>
+<td>Table still exists after</td>
+<td>Yes</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Permissions needed</td>
+<td>DELETE on table</td>
+<td>ALTER TABLE</td>
+<td>DROP permission</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="481" data-line-end="482"><a id="Which_One_to_Use_When_481"></a>Which One to Use When</h3>
+<pre><code class="has-line-data" data-line-start="484" data-line-end="493">Remove specific rows based on a condition          -&gt; DELETE with WHERE
+Remove all rows but keep the table structure       -&gt; TRUNCATE (if no FK constraints)
+Remove all rows but keep identity counter          -&gt; DELETE FROM table (no WHERE)
+Clear a staging / temp table before reloading      -&gt; TRUNCATE
+Remove a table you no longer need at all           -&gt; DROP
+Remove a table temporarily (will recreate it)      -&gt; DROP TABLE + CREATE TABLE
+                                                      or TRUNCATE (cleaner)
+Archive rows before deleting them                  -&gt; DELETE with OUTPUT INTO
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="496" data-line-end="497"><a id="Practical_Example_ETL_Pipeline_496"></a>Practical Example — ETL Pipeline</h3>
+<pre><code class="has-line-data language-sql" data-line-start="499" data-line-end="521"><span class="hljs-comment">-- Common pattern in ETL (Extract, Transform, Load) pipelines</span>
+
+<span class="hljs-comment">-- Step 1: Clear the staging table for fresh data (fast, resets identity)</span>
+<span class="hljs-keyword">TRUNCATE</span> <span class="hljs-keyword">TABLE</span> Staging_Orders;
+
+<span class="hljs-comment">-- Step 2: Load fresh data into staging</span>
+BULK <span class="hljs-keyword">INSERT</span> Staging_Orders
+<span class="hljs-keyword">FROM</span> <span class="hljs-string">&#x27;C:\data\orders_today.csv&#x27;</span>
+<span class="hljs-keyword">WITH</span> (FIELDTERMINATOR <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;,&#x27;</span>, ROWTERMINATOR <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;\n&#x27;</span>, FIRSTROW <span class="hljs-operator">=</span> <span class="hljs-number">2</span>);
+
+<span class="hljs-comment">-- Step 3: Delete old records from production that match today&#x27;s data</span>
+<span class="hljs-keyword">DELETE</span> p
+<span class="hljs-keyword">FROM</span> Production_Orders p
+<span class="hljs-keyword">JOIN</span> Staging_Orders s <span class="hljs-keyword">ON</span> p.OrderId <span class="hljs-operator">=</span> s.OrderId;
+
+<span class="hljs-comment">-- Step 4: Insert fresh records</span>
+<span class="hljs-keyword">INSERT INTO</span> Production_Orders
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Staging_Orders;
+
+<span class="hljs-comment">-- Step 5: Drop temp tables that were created just for this process</span>
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> IF <span class="hljs-keyword">EXISTS</span> #TempCalculations;
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="524" data-line-end="525"><a id="3_SQL_Optimization_524"></a>3. SQL Optimization</h2>
+<h3 class="code-line has-line-data" data-line-start="526" data-line-end="527"><a id="Why_Queries_Get_Slow_526"></a>Why Queries Get Slow</h3>
+<p class="has-line-data" data-line-start="528" data-line-end="529">A slow query is not bad luck. It has a reason. Understanding the reason is how you fix it.</p>
+<p class="has-line-data" data-line-start="530" data-line-end="531">The most common culprits:</p>
+<pre><code class="has-line-data" data-line-start="533" data-line-end="544">1. Full table scan (no index for the WHERE clause)
+2. Index exists but query cannot use it (non-sargable predicate)
+3. Wrong join order or missing indexes on join columns
+4. SELECT * fetching columns you do not need
+5. N+1 query pattern (query inside a loop)
+6. Parameter sniffing — bad execution plan cached from an unusual parameter value
+7. Implicit type conversion (comparing INT to VARCHAR — kills index usage)
+8. Missing or outdated statistics
+9. Too many rows returned when only a few are needed (missing TOP or pagination)
+10. Locks and blocking (concurrency problems)
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="547" data-line-end="548"><a id="The_Execution_Plan_Your_Best_Friend_547"></a>The Execution Plan — Your Best Friend</h3>
+<p class="has-line-data" data-line-start="549" data-line-end="550">Before optimising anything, look at the execution plan. It shows you exactly what SQL Server is doing — which indexes it is using, where it is doing table scans, what is costing the most.</p>
+<pre><code class="has-line-data language-sql" data-line-start="552" data-line-end="568"><span class="hljs-comment">-- Show actual execution plan (runs the query and captures real stats)</span>
+<span class="hljs-keyword">SET</span> STATISTICS IO <span class="hljs-keyword">ON</span>;
+<span class="hljs-keyword">SET</span> STATISTICS <span class="hljs-type">TIME</span> <span class="hljs-keyword">ON</span>;
+
+<span class="hljs-keyword">SELECT</span> o.OrderId, o.OrderDate, c.Name
+<span class="hljs-keyword">FROM</span> Orders o
+<span class="hljs-keyword">JOIN</span> Customers c <span class="hljs-keyword">ON</span> o.CustomerId <span class="hljs-operator">=</span> c.CustomerId
+<span class="hljs-keyword">WHERE</span> o.OrderDate <span class="hljs-operator">&gt;</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span>;
+
+<span class="hljs-keyword">SET</span> STATISTICS IO OFF;
+<span class="hljs-keyword">SET</span> STATISTICS <span class="hljs-type">TIME</span> OFF;
+
+<span class="hljs-comment">-- Output includes:</span>
+<span class="hljs-comment">-- Table &#x27;Orders&#x27;. Scan count 1, logical reads 8432  &lt;-- 8432 page reads = expensive</span>
+<span class="hljs-comment">-- SQL Server Execution Times: CPU time = 1250 ms, elapsed time = 1843 ms</span>
+</code></pre>
+<p class="has-line-data" data-line-start="569" data-line-end="570">In SSMS: press Ctrl+M (Include Actual Execution Plan) before running the query. Look for:</p>
+<ul>
+<li class="has-line-data" data-line-start="570" data-line-end="571"><strong>Table Scan / Clustered Index Scan</strong> — reading the whole table (often bad for large tables)</li>
+<li class="has-line-data" data-line-start="571" data-line-end="572"><strong>Index Seek</strong> — using an index efficiently (what you want)</li>
+<li class="has-line-data" data-line-start="572" data-line-end="573"><strong>Key Lookup</strong> — going back to the main table after using a nonclustered index (expensive at scale)</li>
+<li class="has-line-data" data-line-start="573" data-line-end="574"><strong>Nested Loops / Hash Match / Merge Join</strong> — different join algorithms SQL Server chose</li>
+<li class="has-line-data" data-line-start="574" data-line-end="575"><strong>Fat arrows</strong> — thick arrows between operators = many rows flowing = potential problem</li>
+<li class="has-line-data" data-line-start="575" data-line-end="577"><strong>Warning triangles</strong> — SQL Server detected something wrong (implicit conversion, missing stats)</li>
+</ul>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="579" data-line-end="580"><a id="SARGable_Predicates_Write_Conditions_That_Use_Indexes_579"></a>SARGable Predicates — Write Conditions That Use Indexes</h3>
+<p class="has-line-data" data-line-start="581" data-line-end="582"><strong>SARG = Search ARGument able.</strong> A predicate is SARGable if SQL Server can use an index seek to evaluate it. If it is not SARGable, SQL Server must scan the entire table.</p>
+<p class="has-line-data" data-line-start="583" data-line-end="584"><strong>The rule:</strong> Do not wrap the indexed column in a function or expression on the left side of the condition. The column must be alone.</p>
+<pre><code class="has-line-data language-sql" data-line-start="586" data-line-end="606"><span class="hljs-comment">-- NON-SARGable — SQL Server cannot use an index on OrderDate</span>
+<span class="hljs-comment">-- It must evaluate YEAR(OrderDate) for every single row (full scan)</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">YEAR</span>(OrderDate) <span class="hljs-operator">=</span> <span class="hljs-number">2024</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">MONTH</span>(OrderDate) <span class="hljs-operator">=</span> <span class="hljs-number">6</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> DATEPART(<span class="hljs-keyword">YEAR</span>, OrderDate) <span class="hljs-operator">=</span> <span class="hljs-number">2024</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">CONVERT</span>(<span class="hljs-type">VARCHAR</span>, OrderDate, <span class="hljs-number">103</span>) <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;01/06/2024&#x27;</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderId <span class="hljs-operator">+</span> <span class="hljs-number">1</span> <span class="hljs-operator">=</span> <span class="hljs-number">500</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">LEFT</span>(CustomerName, <span class="hljs-number">3</span>) <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Ali&#x27;</span>;
+
+<span class="hljs-comment">-- SARGable equivalents — SQL Server can seek in the index</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;=</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span> <span class="hljs-keyword">AND</span> OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2025-01-01&#x27;</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;=</span> <span class="hljs-string">&#x27;2024-06-01&#x27;</span> <span class="hljs-keyword">AND</span> OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2024-07-01&#x27;</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderId <span class="hljs-operator">=</span> <span class="hljs-number">499</span>;
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerName <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;Ali%&#x27;</span>; <span class="hljs-comment">-- Leading wildcard is SARGable</span>
+                                                      <span class="hljs-comment">-- &#x27;%Ali%&#x27; is NOT SARGable</span>
+
+<span class="hljs-comment">-- The pattern: move any transformation to the right side (the value), not the column</span>
+<span class="hljs-comment">-- BAD:  WHERE UPPER(Email) = &#x27;USER@EMAIL.COM&#x27;</span>
+<span class="hljs-comment">-- GOOD: WHERE Email = &#x27;user@email.com&#x27;  (store emails lowercase, or use a case-insensitive collation)</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="609" data-line-end="610"><a id="Implicit_Type_Conversion_609"></a>Implicit Type Conversion</h3>
+<p class="has-line-data" data-line-start="611" data-line-end="612">When comparing columns of different data types, SQL Server silently converts one to match the other. This conversion prevents index usage.</p>
+<pre><code class="has-line-data language-sql" data-line-start="614" data-line-end="629"><span class="hljs-comment">-- The CustomerId column is INT. You pass a VARCHAR.</span>
+<span class="hljs-comment">-- SQL Server converts every CustomerId in the table to VARCHAR to compare</span>
+<span class="hljs-comment">-- Full table scan. Index is ignored.</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;42&#x27;</span>;  <span class="hljs-comment">-- String vs INT</span>
+
+<span class="hljs-comment">-- Correct — use matching types</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+
+<span class="hljs-comment">-- This happens in application code too</span>
+<span class="hljs-comment">-- C#: command.Parameters.AddWithValue(&quot;@Id&quot;, &quot;42&quot;)  -- string!</span>
+<span class="hljs-comment">-- Should be: command.Parameters.Add(&quot;@Id&quot;, SqlDbType.Int).Value = 42</span>
+
+<span class="hljs-comment">-- Check for implicit conversions in execution plan:</span>
+<span class="hljs-comment">-- Look for CONVERT_IMPLICIT warnings (yellow triangle in SSMS)</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="632" data-line-end="633"><a id="SELECT_The_Lazy_Killer_632"></a>SELECT * — The Lazy Killer</h3>
+<pre><code class="has-line-data language-sql" data-line-start="635" data-line-end="649"><span class="hljs-comment">-- BAD — fetches every column, including columns you never use</span>
+<span class="hljs-comment">-- Prevents covering indexes from working (always requires table access)</span>
+<span class="hljs-comment">-- Breaks code if columns are added or reordered</span>
+<span class="hljs-comment">-- Transfers unnecessary data over the network</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+
+<span class="hljs-comment">-- GOOD — fetch only what you need</span>
+<span class="hljs-keyword">SELECT</span> OrderId, OrderDate, TotalAmount
+<span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+
+<span class="hljs-comment">-- With a covering index on (CustomerId) INCLUDE (OrderDate, TotalAmount)</span>
+<span class="hljs-comment">-- This query never touches the table data — answered entirely from the index</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="652" data-line-end="653"><a id="JOIN_Optimisation_652"></a>JOIN Optimisation</h3>
+<pre><code class="has-line-data language-sql" data-line-start="655" data-line-end="681"><span class="hljs-comment">-- Always join on indexed columns</span>
+<span class="hljs-comment">-- The join columns should have indexes on BOTH tables</span>
+
+<span class="hljs-comment">-- Make sure data types match on join columns (implicit conversion kills performance)</span>
+<span class="hljs-comment">-- BAD: joining Orders.CustomerId (INT) to Customers.Id (BIGINT) — implicit conversion</span>
+<span class="hljs-comment">-- GOOD: same data types on both sides</span>
+
+<span class="hljs-comment">-- Avoid functions on join columns</span>
+<span class="hljs-comment">-- BAD</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders o
+<span class="hljs-keyword">JOIN</span> Customers c <span class="hljs-keyword">ON</span> <span class="hljs-built_in">LOWER</span>(o.CustomerEmail) <span class="hljs-operator">=</span> <span class="hljs-built_in">LOWER</span>(c.Email);
+
+<span class="hljs-comment">-- GOOD — store emails consistently, or fix at insert time</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders o
+<span class="hljs-keyword">JOIN</span> Customers c <span class="hljs-keyword">ON</span> o.CustomerEmail <span class="hljs-operator">=</span> c.Email;  <span class="hljs-comment">-- With case-insensitive collation</span>
+
+<span class="hljs-comment">-- Filter early — put WHERE conditions before the join reduces rows joined</span>
+<span class="hljs-comment">-- SQL Server&#x27;s optimizer usually handles this, but explicit subquery helps in complex cases</span>
+<span class="hljs-keyword">SELECT</span> o.OrderId, o.TotalAmount, c.Name
+<span class="hljs-keyword">FROM</span> (
+    <span class="hljs-keyword">SELECT</span> OrderId, CustomerId, TotalAmount
+    <span class="hljs-keyword">FROM</span> Orders
+    <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span>  <span class="hljs-comment">-- Filter first, then join</span>
+) o
+<span class="hljs-keyword">JOIN</span> Customers c <span class="hljs-keyword">ON</span> o.CustomerId <span class="hljs-operator">=</span> c.CustomerId;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="684" data-line-end="685"><a id="EXISTS_vs_IN_vs_JOIN_Which_to_Use_684"></a>EXISTS vs IN vs JOIN — Which to Use</h3>
+<pre><code class="has-line-data language-sql" data-line-start="687" data-line-end="719"><span class="hljs-comment">-- Checking if related rows exist — use EXISTS</span>
+<span class="hljs-comment">-- EXISTS stops as soon as it finds one match (short-circuits)</span>
+<span class="hljs-keyword">SELECT</span> CustomerId, Name
+<span class="hljs-keyword">FROM</span> Customers c
+<span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">EXISTS</span> (
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-number">1</span> <span class="hljs-keyword">FROM</span> Orders o <span class="hljs-keyword">WHERE</span> o.CustomerId <span class="hljs-operator">=</span> c.CustomerId
+);
+
+<span class="hljs-comment">-- IN with a subquery — works but can be slow for large subquery results</span>
+<span class="hljs-comment">-- If the subquery returns NULLs, IN behaves unexpectedly</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-keyword">IN</span> (<span class="hljs-keyword">SELECT</span> CustomerId <span class="hljs-keyword">FROM</span> Customers <span class="hljs-keyword">WHERE</span> Country <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;India&#x27;</span>);
+
+<span class="hljs-comment">-- JOIN — typically the most efficient for large datasets, gives you access to both tables</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">DISTINCT</span> c.CustomerId, c.Name
+<span class="hljs-keyword">FROM</span> Customers c
+<span class="hljs-keyword">JOIN</span> Orders o <span class="hljs-keyword">ON</span> c.CustomerId <span class="hljs-operator">=</span> o.CustomerId
+<span class="hljs-keyword">WHERE</span> c.Country <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;India&#x27;</span>;
+
+<span class="hljs-comment">-- NOT EXISTS is almost always faster than NOT IN</span>
+<span class="hljs-comment">-- NOT IN with a subquery that returns NULL values excludes ALL rows (logical trap)</span>
+<span class="hljs-comment">-- BAD</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Customers
+<span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">IN</span> (<span class="hljs-keyword">SELECT</span> CustomerId <span class="hljs-keyword">FROM</span> Orders);
+<span class="hljs-comment">-- If any Order has NULL CustomerId, this returns zero rows — a hidden bug</span>
+
+<span class="hljs-comment">-- GOOD</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Customers c
+<span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> (
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-number">1</span> <span class="hljs-keyword">FROM</span> Orders o <span class="hljs-keyword">WHERE</span> o.CustomerId <span class="hljs-operator">=</span> c.CustomerId
+);
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="722" data-line-end="723"><a id="TOP_and_Pagination_722"></a>TOP and Pagination</h3>
+<pre><code class="has-line-data language-sql" data-line-start="725" data-line-end="749"><span class="hljs-comment">-- Get the first N rows — stops scanning once N rows are found</span>
+<span class="hljs-keyword">SELECT</span> TOP <span class="hljs-number">10</span> OrderId, OrderDate, TotalAmount
+<span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Pending&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> OrderDate <span class="hljs-keyword">DESC</span>;
+
+<span class="hljs-comment">-- Pagination with OFFSET/FETCH (SQL Server 2012+)</span>
+<span class="hljs-comment">-- Page 3, 20 rows per page</span>
+<span class="hljs-keyword">SELECT</span> OrderId, OrderDate, TotalAmount
+<span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> OrderDate <span class="hljs-keyword">DESC</span>
+<span class="hljs-keyword">OFFSET</span> <span class="hljs-number">40</span> <span class="hljs-keyword">ROWS</span>        <span class="hljs-comment">-- Skip the first 40 rows (pages 1 and 2)</span>
+<span class="hljs-keyword">FETCH</span> NEXT <span class="hljs-number">20</span> <span class="hljs-keyword">ROWS</span> <span class="hljs-keyword">ONLY</span>; <span class="hljs-comment">-- Return the next 20 rows</span>
+
+<span class="hljs-comment">-- Keyset pagination (faster for large offsets)</span>
+<span class="hljs-comment">-- Instead of skipping rows, continue from where you left off</span>
+<span class="hljs-comment">-- Last row on previous page had OrderDate = &#x27;2024-05-10&#x27;, OrderId = 12345</span>
+<span class="hljs-keyword">SELECT</span> TOP <span class="hljs-number">20</span> OrderId, OrderDate, TotalAmount
+<span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2024-05-10&#x27;</span>
+   <span class="hljs-keyword">OR</span> (OrderDate <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;2024-05-10&#x27;</span> <span class="hljs-keyword">AND</span> OrderId <span class="hljs-operator">&lt;</span> <span class="hljs-number">12345</span>)
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> OrderDate <span class="hljs-keyword">DESC</span>, OrderId <span class="hljs-keyword">DESC</span>;
+<span class="hljs-comment">-- This uses an index seek instead of scanning and skipping rows</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="752" data-line-end="753"><a id="CTEs_and_Avoiding_Repeated_Subqueries_752"></a>CTEs and Avoiding Repeated Subqueries</h3>
+<pre><code class="has-line-data language-sql" data-line-start="755" data-line-end="777"><span class="hljs-comment">-- Repeated subquery — evaluated multiple times (SQL Server may or may not cache it)</span>
+<span class="hljs-keyword">SELECT</span>
+    OrderId,
+    TotalAmount,
+    TotalAmount <span class="hljs-operator">/</span> (<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(TotalAmount) <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">YEAR</span>(OrderDate) <span class="hljs-operator">=</span> <span class="hljs-number">2024</span>) <span class="hljs-keyword">AS</span> PctOfTotal
+<span class="hljs-keyword">FROM</span> Orders
+<span class="hljs-keyword">WHERE</span> <span class="hljs-keyword">YEAR</span>(OrderDate) <span class="hljs-operator">=</span> <span class="hljs-number">2024</span>;
+
+<span class="hljs-comment">-- CTE — defined once, referenced multiple times</span>
+<span class="hljs-keyword">WITH</span> YearlyTotal <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(TotalAmount) <span class="hljs-keyword">AS</span> Total
+    <span class="hljs-keyword">FROM</span> Orders
+    <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;=</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span> <span class="hljs-keyword">AND</span> OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2025-01-01&#x27;</span>
+)
+<span class="hljs-keyword">SELECT</span>
+    o.OrderId,
+    o.TotalAmount,
+    o.TotalAmount <span class="hljs-operator">/</span> yt.Total <span class="hljs-keyword">AS</span> PctOfTotal
+<span class="hljs-keyword">FROM</span> Orders o
+<span class="hljs-keyword">CROSS</span> <span class="hljs-keyword">JOIN</span> YearlyTotal yt
+<span class="hljs-keyword">WHERE</span> o.OrderDate <span class="hljs-operator">&gt;=</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span> <span class="hljs-keyword">AND</span> o.OrderDate <span class="hljs-operator">&lt;</span> <span class="hljs-string">&#x27;2025-01-01&#x27;</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="780" data-line-end="781"><a id="Avoiding_Cursors_SetBased_Operations_780"></a>Avoiding Cursors — Set-Based Operations</h3>
+<p class="has-line-data" data-line-start="782" data-line-end="783">SQL Server is designed to operate on sets of rows at once. Cursors process one row at a time in a loop. On large datasets, cursors can be 100x slower than equivalent set-based operations.</p>
+<pre><code class="has-line-data language-sql" data-line-start="785" data-line-end="814"><span class="hljs-comment">-- CURSOR approach — processes one row at a time (slow)</span>
+<span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@OrderId</span> <span class="hljs-type">INT</span>, <span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>;
+<span class="hljs-keyword">DECLARE</span> order_cursor <span class="hljs-keyword">CURSOR</span> <span class="hljs-keyword">FOR</span>
+    <span class="hljs-keyword">SELECT</span> OrderId, CustomerId <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Pending&#x27;</span>;
+
+<span class="hljs-keyword">OPEN</span> order_cursor;
+<span class="hljs-keyword">FETCH</span> NEXT <span class="hljs-keyword">FROM</span> order_cursor <span class="hljs-keyword">INTO</span> <span class="hljs-variable">@OrderId</span>, <span class="hljs-variable">@CustomerId</span>;
+
+WHILE @<span class="hljs-variable">@FETCH_STATUS</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">UPDATE</span> Orders <span class="hljs-keyword">SET</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Processing&#x27;</span> <span class="hljs-keyword">WHERE</span> OrderId <span class="hljs-operator">=</span> <span class="hljs-variable">@OrderId</span>;
+    <span class="hljs-comment">-- Some per-row logic...</span>
+    <span class="hljs-keyword">FETCH</span> NEXT <span class="hljs-keyword">FROM</span> order_cursor <span class="hljs-keyword">INTO</span> <span class="hljs-variable">@OrderId</span>, <span class="hljs-variable">@CustomerId</span>;
+<span class="hljs-keyword">END</span>
+
+<span class="hljs-keyword">CLOSE</span> order_cursor;
+<span class="hljs-keyword">DEALLOCATE</span> order_cursor;
+
+<span class="hljs-comment">-- SET-BASED equivalent — processes all rows at once (fast)</span>
+<span class="hljs-keyword">UPDATE</span> Orders
+<span class="hljs-keyword">SET</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Processing&#x27;</span>
+<span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Pending&#x27;</span>;
+
+<span class="hljs-comment">-- When you think you need a cursor, ask:</span>
+<span class="hljs-comment">-- Can this be done with UPDATE ... FROM?</span>
+<span class="hljs-comment">-- Can this be done with a CTE and ROW_NUMBER()?</span>
+<span class="hljs-comment">-- Can this be done with CASE expressions?</span>
+<span class="hljs-comment">-- 90% of the time, the answer is yes.</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="817" data-line-end="818"><a id="Temp_Tables_vs_Table_Variables_vs_CTEs_817"></a>Temp Tables vs Table Variables vs CTEs</h3>
+<pre><code class="has-line-data language-sql" data-line-start="820" data-line-end="849"><span class="hljs-comment">-- CTE — defined inline, no physical storage, used once in a query</span>
+<span class="hljs-comment">-- Good for readability and simple one-time transformations</span>
+<span class="hljs-keyword">WITH</span> RecentOrders <span class="hljs-keyword">AS</span> (
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span>
+)
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> RecentOrders <span class="hljs-keyword">WHERE</span> TotalAmount <span class="hljs-operator">&gt;</span> <span class="hljs-number">1000</span>;
+
+<span class="hljs-comment">-- Table Variable — stored in memory (and tempdb if large), scoped to batch</span>
+<span class="hljs-comment">-- No statistics — optimizer assumes 1 row regardless of actual count</span>
+<span class="hljs-comment">-- Good for small datasets (&lt; a few thousand rows)</span>
+<span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@RecentOrders</span> <span class="hljs-keyword">TABLE</span> (OrderId <span class="hljs-type">INT</span>, TotalAmount <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">18</span>,<span class="hljs-number">2</span>));
+<span class="hljs-keyword">INSERT INTO</span> <span class="hljs-variable">@RecentOrders</span>
+<span class="hljs-keyword">SELECT</span> OrderId, TotalAmount <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span>;
+
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> <span class="hljs-variable">@RecentOrders</span> <span class="hljs-keyword">WHERE</span> TotalAmount <span class="hljs-operator">&gt;</span> <span class="hljs-number">1000</span>;
+
+<span class="hljs-comment">-- Temp Table — stored in tempdb, can have indexes and statistics</span>
+<span class="hljs-comment">-- SQL Server can build an accurate execution plan for queries against them</span>
+<span class="hljs-comment">-- Good for large datasets or when you need to query the data multiple times</span>
+<span class="hljs-keyword">CREATE TABLE</span> #RecentOrders (OrderId <span class="hljs-type">INT</span>, TotalAmount <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">18</span>,<span class="hljs-number">2</span>));
+<span class="hljs-keyword">CREATE</span> INDEX IX_Temp_TotalAmount <span class="hljs-keyword">ON</span> #RecentOrders (TotalAmount);
+
+<span class="hljs-keyword">INSERT INTO</span> #RecentOrders
+<span class="hljs-keyword">SELECT</span> OrderId, TotalAmount <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> OrderDate <span class="hljs-operator">&gt;</span> <span class="hljs-string">&#x27;2024-01-01&#x27;</span>;
+
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> #RecentOrders <span class="hljs-keyword">WHERE</span> TotalAmount <span class="hljs-operator">&gt;</span> <span class="hljs-number">1000</span>;
+
+<span class="hljs-keyword">DROP</span> <span class="hljs-keyword">TABLE</span> #RecentOrders; <span class="hljs-comment">-- Clean up (dropped automatically when session ends)</span>
+</code></pre>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Feature</th>
+<th>CTE</th>
+<th>Table Variable</th>
+<th>Temp Table</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Physical storage</td>
+<td>No</td>
+<td>Memory/tempdb</td>
+<td>tempdb</td>
+</tr>
+<tr>
+<td>Can have indexes</td>
+<td>No</td>
+<td>Limited</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Statistics</td>
+<td>No</td>
+<td>No (always 1 row estimate)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Scope</td>
+<td>Single statement</td>
+<td>Batch / stored procedure</td>
+<td>Session</td>
+</tr>
+<tr>
+<td>Good for</td>
+<td>Readability, one-time use</td>
+<td>Small datasets</td>
+<td>Large datasets, multiple uses</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="860" data-line-end="861"><a id="Statistics_What_SQL_Server_Uses_to_Make_Decisions_860"></a>Statistics — What SQL Server Uses to Make Decisions</h3>
+<p class="has-line-data" data-line-start="862" data-line-end="863">SQL Server keeps statistics on columns — histograms of data distribution. These statistics are used by the Query Optimizer to estimate how many rows a condition will return and choose the best execution plan.</p>
+<pre><code class="has-line-data language-sql" data-line-start="865" data-line-end="885"><span class="hljs-comment">-- View statistics for a table</span>
+DBCC SHOW_STATISTICS (<span class="hljs-string">&#x27;Orders&#x27;</span>, <span class="hljs-string">&#x27;IX_Orders_CustomerId&#x27;</span>);
+
+<span class="hljs-comment">-- Update statistics manually (when auto-update is too infrequent for your workload)</span>
+<span class="hljs-keyword">UPDATE</span> STATISTICS Orders;            <span class="hljs-comment">-- All statistics on the table</span>
+<span class="hljs-keyword">UPDATE</span> STATISTICS Orders IX_Orders_CustomerId; <span class="hljs-comment">-- Specific index statistics</span>
+<span class="hljs-keyword">UPDATE</span> STATISTICS Orders <span class="hljs-keyword">WITH</span> FULLSCAN; <span class="hljs-comment">-- Scan entire table (slower but most accurate)</span>
+
+<span class="hljs-comment">-- Check when statistics were last updated</span>
+<span class="hljs-keyword">SELECT</span>
+    OBJECT_NAME(s.object_id)  <span class="hljs-keyword">AS</span> TableName,
+    s.name                     <span class="hljs-keyword">AS</span> StatName,
+    sp.last_updated,
+    sp.rows,
+    sp.rows_sampled
+<span class="hljs-keyword">FROM</span> sys.stats s
+<span class="hljs-keyword">CROSS</span> APPLY sys.dm_db_stats_properties(s.object_id, s.stats_id) sp
+<span class="hljs-keyword">WHERE</span> OBJECT_NAME(s.object_id) <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Orders&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> sp.last_updated <span class="hljs-keyword">DESC</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="888" data-line-end="889"><a id="Query_Hints_Use_Sparingly_888"></a>Query Hints — Use Sparingly</h3>
+<p class="has-line-data" data-line-start="890" data-line-end="891">Query hints override the optimizer’s decisions. They are a last resort — usually you should fix the underlying data model, statistics, or query structure.</p>
+<pre><code class="has-line-data language-sql" data-line-start="893" data-line-end="915"><span class="hljs-comment">-- Force an index (when you know the optimizer is making a bad choice)</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WITH</span> (INDEX(IX_Orders_CustomerId))
+<span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+
+<span class="hljs-comment">-- NOLOCK hint — reads uncommitted data (dirty reads), avoids locking</span>
+<span class="hljs-comment">-- Fast but can return inconsistent data</span>
+<span class="hljs-comment">-- Use only for approximate reporting queries where accuracy is not critical</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WITH</span> (NOLOCK);
+
+<span class="hljs-comment">-- Recompile hint — forces a new execution plan every time (avoids parameter sniffing)</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>
+OPTION (RECOMPILE);
+
+<span class="hljs-comment">-- Force a specific join algorithm</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders o
+<span class="hljs-keyword">JOIN</span> Customers c <span class="hljs-keyword">ON</span> o.CustomerId <span class="hljs-operator">=</span> c.CustomerId
+OPTION (HASH <span class="hljs-keyword">JOIN</span>); <span class="hljs-comment">-- or LOOP JOIN, MERGE JOIN</span>
+
+<span class="hljs-comment">-- Maxdop — limit parallelism for a specific query</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(TotalAmount) <span class="hljs-keyword">FROM</span> Orders
+OPTION (MAXDOP <span class="hljs-number">1</span>); <span class="hljs-comment">-- Single-threaded execution</span>
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="918" data-line-end="919"><a id="4_Stored_Procedures_918"></a>4. Stored Procedures</h2>
+<h3 class="code-line has-line-data" data-line-start="920" data-line-end="921"><a id="What_Is_a_Stored_Procedure_920"></a>What Is a Stored Procedure?</h3>
+<p class="has-line-data" data-line-start="922" data-line-end="923">A stored procedure is a named, precompiled batch of SQL statements stored in the database. You call it by name, optionally passing parameters, and it executes.</p>
+<p class="has-line-data" data-line-start="924" data-line-end="925">Think of it as a function in your database. Instead of sending a full SQL query from your application every time, you send <code>EXEC sp_GetOrdersByCustomer @CustomerId = 42</code> — a short, fast call.</p>
+<pre><code class="has-line-data" data-line-start="927" data-line-end="940">Benefits:
+    Precompiled execution plan — faster than ad-hoc SQL on first run
+    Reduced network traffic — only parameter values travel over the wire
+    Security — grant EXECUTE on the procedure without granting SELECT/INSERT/DELETE on tables
+    Centralized logic — business rules enforced at the database level
+    Reduced SQL injection surface — parameterised by nature
+
+Drawbacks:
+    Business logic split between application and database (hard to version control)
+    Harder to unit test than application code
+    Tightly coupled to SQL Server (hard to switch databases)
+    Can become unmaintainable &quot;stored procedure hell&quot; if overused
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="943" data-line-end="944"><a id="Creating_a_Stored_Procedure_943"></a>Creating a Stored Procedure</h3>
+<pre><code class="has-line-data language-sql" data-line-start="946" data-line-end="993"><span class="hljs-comment">-- Basic stored procedure</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrdersByCustomer
+    <span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NOCOUNT <span class="hljs-keyword">ON</span>; <span class="hljs-comment">-- Suppresses &quot;N rows affected&quot; messages (minor performance improvement)</span>
+
+    <span class="hljs-keyword">SELECT</span>
+        o.OrderId,
+        o.OrderDate,
+        o.TotalAmount,
+        o.Status
+    <span class="hljs-keyword">FROM</span> Orders o
+    <span class="hljs-keyword">WHERE</span> o.CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>
+    <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o.OrderDate <span class="hljs-keyword">DESC</span>;
+<span class="hljs-keyword">END</span>;
+GO
+
+<span class="hljs-comment">-- Call it</span>
+<span class="hljs-keyword">EXEC</span> sp_GetOrdersByCustomer <span class="hljs-variable">@CustomerId</span> <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+<span class="hljs-comment">-- or</span>
+<span class="hljs-keyword">EXEC</span> sp_GetOrdersByCustomer <span class="hljs-number">42</span>; <span class="hljs-comment">-- Positional — works but less readable</span>
+
+<span class="hljs-comment">-- Modify it (ALTER preserves permissions; DROP + CREATE loses them)</span>
+<span class="hljs-keyword">ALTER</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrdersByCustomer
+    <span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>,
+    <span class="hljs-variable">@Status</span>     NVARCHAR(<span class="hljs-number">50</span>) <span class="hljs-operator">=</span> <span class="hljs-keyword">NULL</span> <span class="hljs-comment">-- Optional parameter with default value</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NOCOUNT <span class="hljs-keyword">ON</span>;
+
+    <span class="hljs-keyword">SELECT</span>
+        o.OrderId,
+        o.OrderDate,
+        o.TotalAmount,
+        o.Status
+    <span class="hljs-keyword">FROM</span> Orders o
+    <span class="hljs-keyword">WHERE</span> o.CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>
+      <span class="hljs-keyword">AND</span> (<span class="hljs-variable">@Status</span> <span class="hljs-keyword">IS</span> <span class="hljs-keyword">NULL</span> <span class="hljs-keyword">OR</span> o.Status <span class="hljs-operator">=</span> <span class="hljs-variable">@Status</span>) <span class="hljs-comment">-- NULL means &quot;ignore this filter&quot;</span>
+    <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> o.OrderDate <span class="hljs-keyword">DESC</span>;
+<span class="hljs-keyword">END</span>;
+GO
+
+<span class="hljs-comment">-- Call with optional parameter</span>
+<span class="hljs-keyword">EXEC</span> sp_GetOrdersByCustomer <span class="hljs-variable">@CustomerId</span> <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;                         <span class="hljs-comment">-- All statuses</span>
+<span class="hljs-keyword">EXEC</span> sp_GetOrdersByCustomer <span class="hljs-variable">@CustomerId</span> <span class="hljs-operator">=</span> <span class="hljs-number">42</span>, <span class="hljs-variable">@Status</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Confirmed&#x27;</span>;  <span class="hljs-comment">-- Only Confirmed</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="996" data-line-end="997"><a id="Input_Output_and_Return_Values_996"></a>Input, Output, and Return Values</h3>
+<pre><code class="has-line-data language-sql" data-line-start="999" data-line-end="1043"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_PlaceOrder
+    <span class="hljs-variable">@CustomerId</span>     <span class="hljs-type">INT</span>,
+    <span class="hljs-variable">@TotalAmount</span>    <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">18</span>, <span class="hljs-number">2</span>),
+    <span class="hljs-variable">@NewOrderId</span>     <span class="hljs-type">INT</span> OUTPUT,       <span class="hljs-comment">-- OUTPUT parameter — value set inside the procedure</span>
+    <span class="hljs-variable">@ErrorMessage</span>   NVARCHAR(<span class="hljs-number">500</span>) OUTPUT
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NOCOUNT <span class="hljs-keyword">ON</span>;
+
+    <span class="hljs-comment">-- Validate</span>
+    IF <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">EXISTS</span> (<span class="hljs-keyword">SELECT</span> <span class="hljs-number">1</span> <span class="hljs-keyword">FROM</span> Customers <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>)
+    <span class="hljs-keyword">BEGIN</span>
+        <span class="hljs-keyword">SET</span> <span class="hljs-variable">@ErrorMessage</span> <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Customer does not exist.&#x27;</span>;
+        <span class="hljs-keyword">RETURN</span> <span class="hljs-number">-1</span>; <span class="hljs-comment">-- Return code: non-zero means failure (convention)</span>
+    <span class="hljs-keyword">END</span>
+
+    <span class="hljs-comment">-- Insert the order</span>
+    <span class="hljs-keyword">INSERT INTO</span> Orders (CustomerId, TotalAmount, OrderDate, Status)
+    <span class="hljs-keyword">VALUES</span> (<span class="hljs-variable">@CustomerId</span>, <span class="hljs-variable">@TotalAmount</span>, GETDATE(), <span class="hljs-string">&#x27;Pending&#x27;</span>);
+
+    <span class="hljs-comment">-- Set the output parameter to the new ID</span>
+    <span class="hljs-keyword">SET</span> <span class="hljs-variable">@NewOrderId</span> <span class="hljs-operator">=</span> SCOPE_IDENTITY();
+    <span class="hljs-keyword">SET</span> <span class="hljs-variable">@ErrorMessage</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">NULL</span>;
+
+    <span class="hljs-keyword">RETURN</span> <span class="hljs-number">0</span>; <span class="hljs-comment">-- Return code: 0 means success (convention)</span>
+<span class="hljs-keyword">END</span>;
+GO
+
+<span class="hljs-comment">-- Calling and capturing output parameters</span>
+<span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@NewId</span> <span class="hljs-type">INT</span>;
+<span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@ErrMsg</span> NVARCHAR(<span class="hljs-number">500</span>);
+<span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@ReturnCode</span> <span class="hljs-type">INT</span>;
+
+<span class="hljs-keyword">EXEC</span> <span class="hljs-variable">@ReturnCode</span> <span class="hljs-operator">=</span> sp_PlaceOrder
+    <span class="hljs-variable">@CustomerId</span>  <span class="hljs-operator">=</span> <span class="hljs-number">42</span>,
+    <span class="hljs-variable">@TotalAmount</span> <span class="hljs-operator">=</span> <span class="hljs-number">1500.00</span>,
+    <span class="hljs-variable">@NewOrderId</span>  <span class="hljs-operator">=</span> <span class="hljs-variable">@NewId</span> OUTPUT,
+    <span class="hljs-variable">@ErrorMessage</span> <span class="hljs-operator">=</span> <span class="hljs-variable">@ErrMsg</span> OUTPUT;
+
+IF <span class="hljs-variable">@ReturnCode</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
+    PRINT <span class="hljs-string">&#x27;Order created with ID: &#x27;</span> <span class="hljs-operator">+</span> <span class="hljs-built_in">CAST</span>(<span class="hljs-variable">@NewId</span> <span class="hljs-keyword">AS</span> <span class="hljs-type">VARCHAR</span>);
+<span class="hljs-keyword">ELSE</span>
+    PRINT <span class="hljs-string">&#x27;Error: &#x27;</span> <span class="hljs-operator">+</span> <span class="hljs-variable">@ErrMsg</span>;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1046" data-line-end="1047"><a id="Error_Handling_in_Stored_Procedures_1046"></a>Error Handling in Stored Procedures</h3>
+<pre><code class="has-line-data language-sql" data-line-start="1049" data-line-end="1106"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_TransferFunds
+    <span class="hljs-variable">@FromAccountId</span>  <span class="hljs-type">INT</span>,
+    <span class="hljs-variable">@ToAccountId</span>    <span class="hljs-type">INT</span>,
+    <span class="hljs-variable">@Amount</span>         <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">18</span>, <span class="hljs-number">2</span>)
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NOCOUNT <span class="hljs-keyword">ON</span>;
+
+    <span class="hljs-comment">-- Input validation</span>
+    IF <span class="hljs-variable">@Amount</span> <span class="hljs-operator">&lt;=</span> <span class="hljs-number">0</span>
+        THROW <span class="hljs-number">50001</span>, <span class="hljs-string">&#x27;Transfer amount must be positive.&#x27;</span>, <span class="hljs-number">1</span>;
+
+    IF <span class="hljs-variable">@FromAccountId</span> <span class="hljs-operator">=</span> <span class="hljs-variable">@ToAccountId</span>
+        THROW <span class="hljs-number">50002</span>, <span class="hljs-string">&#x27;Source and destination accounts cannot be the same.&#x27;</span>, <span class="hljs-number">1</span>;
+
+    <span class="hljs-keyword">BEGIN</span> TRANSACTION;
+
+    <span class="hljs-keyword">BEGIN</span> TRY
+        <span class="hljs-comment">-- Debit</span>
+        <span class="hljs-keyword">UPDATE</span> Accounts
+        <span class="hljs-keyword">SET</span> Balance <span class="hljs-operator">=</span> Balance <span class="hljs-operator">-</span> <span class="hljs-variable">@Amount</span>
+        <span class="hljs-keyword">WHERE</span> AccountId <span class="hljs-operator">=</span> <span class="hljs-variable">@FromAccountId</span> <span class="hljs-keyword">AND</span> Balance <span class="hljs-operator">&gt;=</span> <span class="hljs-variable">@Amount</span>;
+
+        IF @<span class="hljs-variable">@ROWCOUNT</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
+            THROW <span class="hljs-number">50003</span>, <span class="hljs-string">&#x27;Insufficient funds or account not found.&#x27;</span>, <span class="hljs-number">1</span>;
+
+        <span class="hljs-comment">-- Credit</span>
+        <span class="hljs-keyword">UPDATE</span> Accounts
+        <span class="hljs-keyword">SET</span> Balance <span class="hljs-operator">=</span> Balance <span class="hljs-operator">+</span> <span class="hljs-variable">@Amount</span>
+        <span class="hljs-keyword">WHERE</span> AccountId <span class="hljs-operator">=</span> <span class="hljs-variable">@ToAccountId</span>;
+
+        IF @<span class="hljs-variable">@ROWCOUNT</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
+            THROW <span class="hljs-number">50004</span>, <span class="hljs-string">&#x27;Destination account not found.&#x27;</span>, <span class="hljs-number">1</span>;
+
+        <span class="hljs-comment">-- Log the transfer</span>
+        <span class="hljs-keyword">INSERT INTO</span> TransferLog (FromAccountId, ToAccountId, Amount, TransferDate)
+        <span class="hljs-keyword">VALUES</span> (<span class="hljs-variable">@FromAccountId</span>, <span class="hljs-variable">@ToAccountId</span>, <span class="hljs-variable">@Amount</span>, GETDATE());
+
+        <span class="hljs-keyword">COMMIT</span> TRANSACTION;
+
+    <span class="hljs-keyword">END</span> TRY
+    <span class="hljs-keyword">BEGIN</span> CATCH
+        IF @<span class="hljs-variable">@TRANCOUNT</span> <span class="hljs-operator">&gt;</span> <span class="hljs-number">0</span>
+            <span class="hljs-keyword">ROLLBACK</span> TRANSACTION;
+
+        <span class="hljs-comment">-- Re-throw the error with context</span>
+        <span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@ErrorMessage</span> NVARCHAR(<span class="hljs-number">4000</span>) <span class="hljs-operator">=</span> ERROR_MESSAGE();
+        <span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@ErrorSeverity</span> <span class="hljs-type">INT</span> <span class="hljs-operator">=</span> ERROR_SEVERITY();
+        <span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@ErrorState</span> <span class="hljs-type">INT</span> <span class="hljs-operator">=</span> ERROR_STATE();
+
+        RAISERROR(<span class="hljs-variable">@ErrorMessage</span>, <span class="hljs-variable">@ErrorSeverity</span>, <span class="hljs-variable">@ErrorState</span>);
+        <span class="hljs-comment">-- Or in SQL Server 2012+:</span>
+        <span class="hljs-comment">-- THROW;</span>
+    <span class="hljs-keyword">END</span> CATCH;
+<span class="hljs-keyword">END</span>;
+GO
+</code></pre>
+<p class="has-line-data" data-line-start="1107" data-line-end="1108"><strong>Error functions inside CATCH:</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="1110" data-line-end="1120"><span class="hljs-keyword">BEGIN</span> CATCH
+    <span class="hljs-keyword">SELECT</span>
+        ERROR_NUMBER()    <span class="hljs-keyword">AS</span> ErrorNumber,    <span class="hljs-comment">-- The error code (e.g., 50003)</span>
+        ERROR_SEVERITY()  <span class="hljs-keyword">AS</span> ErrorSeverity,  <span class="hljs-comment">-- 1-25 (16 = general user errors)</span>
+        ERROR_STATE()     <span class="hljs-keyword">AS</span> ErrorState,     <span class="hljs-comment">-- State within the error (for Microsoft support)</span>
+        ERROR_PROCEDURE() <span class="hljs-keyword">AS</span> ErrorProcedure, <span class="hljs-comment">-- Which stored procedure threw the error</span>
+        ERROR_LINE()      <span class="hljs-keyword">AS</span> ErrorLine,      <span class="hljs-comment">-- Line number where the error occurred</span>
+        ERROR_MESSAGE()   <span class="hljs-keyword">AS</span> ErrorMessage;   <span class="hljs-comment">-- The human-readable message</span>
+<span class="hljs-keyword">END</span> CATCH;
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1123" data-line-end="1124"><a id="Stored_Procedures_with_TableValued_Parameters_1123"></a>Stored Procedures with Table-Valued Parameters</h3>
+<p class="has-line-data" data-line-start="1125" data-line-end="1126">When you need to pass a list of values into a stored procedure:</p>
+<pre><code class="has-line-data language-sql" data-line-start="1128" data-line-end="1158"><span class="hljs-comment">-- Step 1: Create a user-defined table type</span>
+<span class="hljs-keyword">CREATE</span> TYPE OrderIdList <span class="hljs-keyword">AS</span> <span class="hljs-keyword">TABLE</span>
+(
+    OrderId <span class="hljs-type">INT</span> <span class="hljs-keyword">NOT NULL</span>
+);
+GO
+
+<span class="hljs-comment">-- Step 2: Use it in a stored procedure</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_BulkCancelOrders
+    <span class="hljs-variable">@OrderIds</span> OrderIdList READONLY <span class="hljs-comment">-- READONLY is required for TVP parameters</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NOCOUNT <span class="hljs-keyword">ON</span>;
+
+    <span class="hljs-keyword">UPDATE</span> o
+    <span class="hljs-keyword">SET</span> o.Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Cancelled&#x27;</span>
+    <span class="hljs-keyword">FROM</span> Orders o
+    <span class="hljs-keyword">JOIN</span> <span class="hljs-variable">@OrderIds</span> ids <span class="hljs-keyword">ON</span> o.OrderId <span class="hljs-operator">=</span> ids.OrderId
+    <span class="hljs-keyword">WHERE</span> o.Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Pending&#x27;</span>;
+
+    <span class="hljs-keyword">SELECT</span> @<span class="hljs-variable">@ROWCOUNT</span> <span class="hljs-keyword">AS</span> CancelledCount;
+<span class="hljs-keyword">END</span>;
+GO
+
+<span class="hljs-comment">-- Calling from T-SQL</span>
+<span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@Ids</span> OrderIdList;
+<span class="hljs-keyword">INSERT INTO</span> <span class="hljs-variable">@Ids</span> <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">101</span>), (<span class="hljs-number">102</span>), (<span class="hljs-number">103</span>), (<span class="hljs-number">104</span>);
+
+<span class="hljs-keyword">EXEC</span> sp_BulkCancelOrders <span class="hljs-variable">@OrderIds</span> <span class="hljs-operator">=</span> <span class="hljs-variable">@Ids</span>;
+</code></pre>
+<pre><code class="has-line-data language-csharp" data-line-start="1160" data-line-end="1179"><span class="hljs-comment">// Calling from C# with ADO.NET</span>
+<span class="hljs-keyword">var</span> dt = <span class="hljs-keyword">new</span> DataTable();
+dt.Columns.Add(<span class="hljs-string">&quot;OrderId&quot;</span>, <span class="hljs-keyword">typeof</span>(<span class="hljs-built_in">int</span>));
+dt.Rows.Add(<span class="hljs-number">101</span>);
+dt.Rows.Add(<span class="hljs-number">102</span>);
+dt.Rows.Add(<span class="hljs-number">103</span>);
+
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(connectionString);
+<span class="hljs-keyword">await</span> connection.OpenAsync();
+
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(<span class="hljs-string">&quot;sp_BulkCancelOrders&quot;</span>, connection);
+command.CommandType = CommandType.StoredProcedure;
+
+<span class="hljs-keyword">var</span> param = command.Parameters.AddWithValue(<span class="hljs-string">&quot;@OrderIds&quot;</span>, dt);
+param.SqlDbType = SqlDbType.Structured;
+param.TypeName = <span class="hljs-string">&quot;OrderIdList&quot;</span>; <span class="hljs-comment">// Must match the user-defined table type name</span>
+
+<span class="hljs-keyword">await</span> command.ExecuteNonQueryAsync();
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1182" data-line-end="1183"><a id="Parameter_Sniffing_The_Hidden_Performance_Problem_1182"></a>Parameter Sniffing — The Hidden Performance Problem</h3>
+<p class="has-line-data" data-line-start="1184" data-line-end="1185">When a stored procedure is first executed, SQL Server compiles it and caches the execution plan based on the parameter values used in that first call. If the first call uses unusual values, the cached plan may be terrible for subsequent typical calls.</p>
+<pre><code class="has-line-data language-sql" data-line-start="1187" data-line-end="1195"><span class="hljs-comment">-- First call: CustomerId = 1 (a VIP with 50,000 orders — table scan is fine)</span>
+<span class="hljs-comment">-- SQL Server caches a plan with a table scan</span>
+<span class="hljs-keyword">EXEC</span> sp_GetOrdersByCustomer <span class="hljs-variable">@CustomerId</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>;
+
+<span class="hljs-comment">-- All subsequent calls use the same table scan plan</span>
+<span class="hljs-comment">-- Even for CustomerId = 99999 (a new customer with 2 orders — should use an index seek)</span>
+<span class="hljs-keyword">EXEC</span> sp_GetOrdersByCustomer <span class="hljs-variable">@CustomerId</span> <span class="hljs-operator">=</span> <span class="hljs-number">99999</span>; <span class="hljs-comment">-- Slow! Wrong plan.</span>
+</code></pre>
+<p class="has-line-data" data-line-start="1196" data-line-end="1197"><strong>Solutions:</strong></p>
+<pre><code class="has-line-data language-sql" data-line-start="1199" data-line-end="1232"><span class="hljs-comment">-- Option 1: OPTION (RECOMPILE) — recompile every execution (eliminates sniffing, adds CPU)</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrdersByCustomer
+    <span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>
+    OPTION (RECOMPILE);
+<span class="hljs-keyword">END</span>;
+
+<span class="hljs-comment">-- Option 2: Local variables — sniff the parameter into a local variable</span>
+<span class="hljs-comment">-- The optimizer sees a local variable with unknown value and uses a generic plan</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrdersByCustomer
+    <span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">DECLARE</span> <span class="hljs-variable">@LocalCustomerId</span> <span class="hljs-type">INT</span> <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>; <span class="hljs-comment">-- Optimizer cannot sniff the local variable</span>
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@LocalCustomerId</span>;
+<span class="hljs-keyword">END</span>;
+
+<span class="hljs-comment">-- Option 3: WITH RECOMPILE on the procedure — recompile entire procedure each time</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrdersByCustomer
+    <span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>
+<span class="hljs-keyword">WITH</span> RECOMPILE
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>;
+<span class="hljs-keyword">END</span>;
+
+<span class="hljs-comment">-- Option 4: Optimize for a specific value or unknown</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>
+OPTION (OPTIMIZE <span class="hljs-keyword">FOR</span> (<span class="hljs-variable">@CustomerId</span> <span class="hljs-operator">=</span> <span class="hljs-number">42</span>));     <span class="hljs-comment">-- Optimize for a specific typical value</span>
+OPTION (OPTIMIZE <span class="hljs-keyword">FOR</span> (<span class="hljs-variable">@CustomerId</span> <span class="hljs-literal">UNKNOWN</span>));  <span class="hljs-comment">-- Optimize based on average statistics</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1235" data-line-end="1236"><a id="Stored_Procedure_vs_View_vs_Function_1235"></a>Stored Procedure vs View vs Function</h3>
+<pre><code class="has-line-data language-sql" data-line-start="1238" data-line-end="1279"><span class="hljs-comment">-- VIEW — a stored SELECT query, treated like a table</span>
+<span class="hljs-comment">-- Cannot take parameters, cannot perform DML (usually), no execution plan caching benefit</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">VIEW</span> vw_ActiveOrders <span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">SELECT</span> OrderId, CustomerId, TotalAmount
+<span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> Status <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Active&#x27;</span>;
+
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> vw_ActiveOrders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-number">42</span>;
+
+<span class="hljs-comment">-- SCALAR FUNCTION — returns a single value, can be used inline in SELECT</span>
+<span class="hljs-comment">-- WARNING: scalar functions called per-row in a query execute row-by-row</span>
+<span class="hljs-comment">-- They can devastate query performance on large result sets</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">FUNCTION</span> fn_GetCustomerTotalSpend(<span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>)
+<span class="hljs-keyword">RETURNS</span> <span class="hljs-type">DECIMAL</span>(<span class="hljs-number">18</span>, <span class="hljs-number">2</span>)
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">RETURN</span> (<span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(TotalAmount) <span class="hljs-keyword">FROM</span> Orders <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span>);
+<span class="hljs-keyword">END</span>;
+
+<span class="hljs-comment">-- This runs fn_GetCustomerTotalSpend once for EVERY row in Customers</span>
+<span class="hljs-comment">-- 100,000 customers = 100,000 function calls = very slow</span>
+<span class="hljs-keyword">SELECT</span> CustomerId, dbo.fn_GetCustomerTotalSpend(CustomerId) <span class="hljs-keyword">AS</span> TotalSpend
+<span class="hljs-keyword">FROM</span> Customers; <span class="hljs-comment">-- AVOID scalar UDFs in SELECT lists on large tables</span>
+
+<span class="hljs-comment">-- TABLE-VALUED FUNCTION (INLINE) — returns a table, optimizer can merge it into the query plan</span>
+<span class="hljs-comment">-- Much better performance than scalar UDFs</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">FUNCTION</span> fn_GetCustomerOrders(<span class="hljs-variable">@CustomerId</span> <span class="hljs-type">INT</span>, <span class="hljs-variable">@StartDate</span> <span class="hljs-type">DATE</span>)
+<span class="hljs-keyword">RETURNS</span> <span class="hljs-keyword">TABLE</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">RETURN</span>
+(
+    <span class="hljs-keyword">SELECT</span> OrderId, OrderDate, TotalAmount
+    <span class="hljs-keyword">FROM</span> Orders
+    <span class="hljs-keyword">WHERE</span> CustomerId <span class="hljs-operator">=</span> <span class="hljs-variable">@CustomerId</span> <span class="hljs-keyword">AND</span> OrderDate <span class="hljs-operator">&gt;=</span> <span class="hljs-variable">@StartDate</span>
+);
+
+<span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> dbo.fn_GetCustomerOrders(<span class="hljs-number">42</span>, <span class="hljs-string">&#x27;2024-01-01&#x27;</span>);
+
+<span class="hljs-comment">-- STORED PROCEDURE — can do everything: DML, transactions, output parameters, error handling</span>
+<span class="hljs-comment">-- Cannot be used inline in SELECT like functions</span>
+<span class="hljs-comment">-- Cannot be used in views or other functions</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1282" data-line-end="1283"><a id="Naming_Conventions_1282"></a>Naming Conventions</h3>
+<pre><code class="has-line-data language-sql" data-line-start="1285" data-line-end="1296"><span class="hljs-comment">-- Avoid the sp_ prefix for your own procedures</span>
+<span class="hljs-comment">-- sp_ is reserved by Microsoft for system procedures</span>
+<span class="hljs-comment">-- SQL Server checks the master database first for sp_ procedures — performance hit</span>
+
+<span class="hljs-comment">-- BAD</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> sp_GetOrders ...
+<span class="hljs-comment">-- GOOD</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> usp_GetOrders ...   <span class="hljs-comment">-- usp = user stored procedure</span>
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> Orders_GetByCustomer ...
+<span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> GetOrdersByCustomer ...
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1299" data-line-end="1300"><a id="Useful_System_Stored_Procedures_1299"></a>Useful System Stored Procedures</h3>
+<pre><code class="has-line-data language-sql" data-line-start="1302" data-line-end="1330"><span class="hljs-comment">-- View stored procedure definition</span>
+<span class="hljs-keyword">EXEC</span> sp_helptext <span class="hljs-string">&#x27;sp_GetOrdersByCustomer&#x27;</span>;
+
+<span class="hljs-comment">-- View all stored procedures in the database</span>
+<span class="hljs-keyword">SELECT</span> name, create_date, modify_date
+<span class="hljs-keyword">FROM</span> sys.procedures
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> name;
+
+<span class="hljs-comment">-- Find stored procedures that reference a specific table</span>
+<span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">DISTINCT</span> p.name <span class="hljs-keyword">AS</span> ProcedureName
+<span class="hljs-keyword">FROM</span> sys.procedures p
+<span class="hljs-keyword">JOIN</span> sys.sql_expression_dependencies d <span class="hljs-keyword">ON</span> p.object_id <span class="hljs-operator">=</span> d.referencing_id
+<span class="hljs-keyword">JOIN</span> sys.objects o <span class="hljs-keyword">ON</span> d.referenced_id <span class="hljs-operator">=</span> o.object_id
+<span class="hljs-keyword">WHERE</span> o.name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Orders&#x27;</span>;
+
+<span class="hljs-comment">-- Recompile a stored procedure (force new execution plan next time it runs)</span>
+<span class="hljs-keyword">EXEC</span> sp_recompile <span class="hljs-string">&#x27;sp_GetOrdersByCustomer&#x27;</span>;
+
+<span class="hljs-comment">-- View execution stats for stored procedures</span>
+<span class="hljs-keyword">SELECT</span> TOP <span class="hljs-number">20</span>
+    OBJECT_NAME(ps.object_id)   <span class="hljs-keyword">AS</span> ProcedureName,
+    ps.execution_count,
+    ps.total_elapsed_time <span class="hljs-operator">/</span> ps.execution_count <span class="hljs-keyword">AS</span> AvgElapsedTimeMicros,
+    ps.total_logical_reads <span class="hljs-operator">/</span> ps.execution_count <span class="hljs-keyword">AS</span> AvgLogicalReads,
+    ps.last_execution_time
+<span class="hljs-keyword">FROM</span> sys.dm_exec_procedure_stats ps
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> ps.total_elapsed_time <span class="hljs-keyword">DESC</span>;
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1333" data-line-end="1334"><a id="5_Interview_Questions_and_Answers_1333"></a>5. Interview Questions and Answers</h2>
+<h3 class="code-line has-line-data" data-line-start="1335" data-line-end="1336"><a id="Indexes_1335"></a>Indexes</h3>
+<p class="has-line-data" data-line-start="1337" data-line-end="1338"><strong>Q: What is the difference between a clustered and a nonclustered index?</strong></p>
+<p class="has-line-data" data-line-start="1339" data-line-end="1340">A clustered index determines the physical storage order of data in the table. The leaf nodes of the clustered index B-Tree are the actual data rows. There can be only one clustered index per table because data can only be physically sorted one way. A nonclustered index is a separate B-Tree structure. Its leaf nodes contain the indexed column values and a row locator (the clustered index key or a physical pointer to the heap row). A table can have up to 999 nonclustered indexes.</p>
+<hr>
+<p class="has-line-data" data-line-start="1343" data-line-end="1344"><strong>Q: What is a covering index?</strong></p>
+<p class="has-line-data" data-line-start="1345" data-line-end="1346">A covering index is a nonclustered index that includes all the columns needed to satisfy a query — both the filter columns (key columns) and the columns in the SELECT list (added via INCLUDE). When a query is covered by an index, SQL Server can answer it entirely from the index without doing a Key Lookup back to the main table. This eliminates the most expensive part of nonclustered index usage for queries that return many rows.</p>
+<hr>
+<p class="has-line-data" data-line-start="1349" data-line-end="1350"><strong>Q: What is index fragmentation and how do you fix it?</strong></p>
+<p class="has-line-data" data-line-start="1351" data-line-end="1352">Fragmentation occurs as rows are inserted, updated, and deleted over time. Index pages become out of order or partially empty, causing SQL Server to read more pages than necessary for range scans. Under 30% fragmentation, use <code>ALTER INDEX ... REORGANIZE</code> — it is an online, low-impact operation that compacts and reorders pages. Over 30% fragmentation, use <code>ALTER INDEX ... REBUILD</code> — it recreates the index from scratch, resets fragmentation to near zero, and updates statistics. Rebuild is more disruptive but more thorough.</p>
+<hr>
+<p class="has-line-data" data-line-start="1355" data-line-end="1356"><strong>Q: Why can a table have only one clustered index?</strong></p>
+<p class="has-line-data" data-line-start="1357" data-line-end="1358">Because a clustered index determines the physical order of rows on disk. Data can only be sorted one way. When you define a clustered index on a column, the actual data pages are rearranged to match that sort order. You cannot simultaneously have the rows sorted by OrderDate and by CustomerId — you have to choose one physical arrangement.</p>
+<hr>
+<p class="has-line-data" data-line-start="1361" data-line-end="1362"><strong>Q: What is a filtered index and when would you use one?</strong></p>
+<p class="has-line-data" data-line-start="1363" data-line-end="1364">A filtered index covers only a subset of rows, defined by a WHERE clause in the index definition. Use it when your queries consistently filter on a specific condition and that condition selects a small fraction of rows — for example, an index on <code>Status</code> only for <code>Status = 'Active'</code> on an orders table where 95% of orders are archived. The index is smaller, faster to maintain, and faster to search than a full index.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1367" data-line-end="1368"><a id="DELETE_DROP_TRUNCATE_1367"></a>DELETE, DROP, TRUNCATE</h3>
+<p class="has-line-data" data-line-start="1369" data-line-end="1370"><strong>Q: What is the difference between DELETE and TRUNCATE?</strong></p>
+<p class="has-line-data" data-line-start="1371" data-line-end="1372">DELETE removes rows one at a time and logs every deleted row in the transaction log. It fires DELETE triggers. It respects foreign key constraints. It does not reset the identity counter. It can include a WHERE clause to delete specific rows. TRUNCATE removes all rows by deallocating data pages with minimal logging. It does not fire triggers. It is blocked by foreign key constraints. It resets the identity counter to the seed value. It is much faster for large tables. Both are transactional and can be rolled back within an explicit transaction.</p>
+<hr>
+<p class="has-line-data" data-line-start="1375" data-line-end="1376"><strong>Q: Why can TRUNCATE fail when DELETE works?</strong></p>
+<p class="has-line-data" data-line-start="1377" data-line-end="1378">TRUNCATE fails if the table is referenced by a foreign key constraint in another table, even if the referencing table is empty. This is because TRUNCATE operates at the page level and SQL Server does not check for referencing rows during a page deallocation. DELETE checks foreign key constraints row by row, so it works correctly (and fails with a constraint violation if referencing rows exist). To truncate a table with foreign key references, you must disable or drop the foreign keys first.</p>
+<hr>
+<p class="has-line-data" data-line-start="1381" data-line-end="1382"><strong>Q: Can you roll back a TRUNCATE or DROP statement?</strong></p>
+<p class="has-line-data" data-line-start="1383" data-line-end="1384">Yes, if the statement is inside an explicit transaction. Both TRUNCATE and DROP are logged operations. If you execute them inside a <code>BEGIN TRANSACTION</code> block and then call <code>ROLLBACK</code>, the operation is undone. Outside of an explicit transaction, both operations are committed immediately and cannot be undone through normal SQL means.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1387" data-line-end="1388"><a id="SQL_Optimization_1387"></a>SQL Optimization</h3>
+<p class="has-line-data" data-line-start="1389" data-line-end="1390"><strong>Q: What is a SARGable predicate?</strong></p>
+<p class="has-line-data" data-line-start="1391" data-line-end="1392">A SARGable (Search ARGument able) predicate is a WHERE condition that SQL Server can use an index seek to evaluate. The indexed column must appear alone on one side of the comparison. Wrapping the column in a function (YEAR(OrderDate), UPPER(Name), LEFT(Code, 3)), applying arithmetic to it, or comparing it to a value of a different data type (implicit conversion) makes the predicate non-SARGable — SQL Server must evaluate it for every row with a full table scan. The fix is to rewrite the condition so the transformation is applied to the value, not the column.</p>
+<hr>
+<p class="has-line-data" data-line-start="1395" data-line-end="1396"><strong>Q: What is parameter sniffing?</strong></p>
+<p class="has-line-data" data-line-start="1397" data-line-end="1398">Parameter sniffing occurs when SQL Server compiles a stored procedure and caches the execution plan based on the parameter values used in the very first execution. If the first execution uses atypical values (a customer with 50,000 orders when most customers have 5), the cached plan is optimised for that unusual case and performs poorly for typical executions. Solutions include OPTION (RECOMPILE) to recompile on every execution, using local variables to prevent the optimizer from seeing the parameter value, or OPTIMIZE FOR UNKNOWN to base the plan on average statistics.</p>
+<hr>
+<p class="has-line-data" data-line-start="1401" data-line-end="1402"><strong>Q: What is the difference between a table scan and an index seek?</strong></p>
+<p class="has-line-data" data-line-start="1403" data-line-end="1404">A table scan (or clustered index scan) reads every data page in the table from start to finish. The cost is proportional to the table size. An index seek traverses the B-Tree of an index to locate exactly the rows that match the predicate. The cost is proportional to the logarithm of the index size — effectively constant for most practical purposes. For a table with ten million rows, a table scan reads millions of rows. An index seek reads perhaps 30 pages.</p>
+<hr>
+<p class="has-line-data" data-line-start="1407" data-line-end="1408"><strong>Q: When would a full table scan be faster than an index seek?</strong></p>
+<p class="has-line-data" data-line-start="1409" data-line-end="1410">When the query needs to return a large percentage of the rows. Reading an index and then doing Key Lookups to fetch the actual row data involves two reads per row. If you need 80% of the rows, it is faster to just read the table sequentially. The SQL Server optimizer uses statistics to estimate how many rows a predicate will return and chooses accordingly. The tipping point is typically somewhere between 5% and 30% of rows, depending on the data distribution.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1413" data-line-end="1414"><a id="Stored_Procedures_1413"></a>Stored Procedures</h3>
+<p class="has-line-data" data-line-start="1415" data-line-end="1416"><strong>Q: What is SET NOCOUNT ON and why do you use it?</strong></p>
+<p class="has-line-data" data-line-start="1417" data-line-end="1418">By default, SQL Server sends a message for every statement that affects rows (the “N rows affected” message). In a stored procedure with many statements, these messages add up to unnecessary network traffic and interfere with some client applications that check for row counts. <code>SET NOCOUNT ON</code> suppresses these messages. It is standard practice to include it at the top of every stored procedure.</p>
+<hr>
+<p class="has-line-data" data-line-start="1421" data-line-end="1422"><strong>Q: What is the difference between RAISERROR and THROW?</strong></p>
+<p class="has-line-data" data-line-start="1423" data-line-end="1424">Both signal an error condition. <code>THROW</code> (SQL Server 2012+) is simpler — it re-raises the current exception in a CATCH block with the original error number and preserves the stack trace. <code>RAISERROR</code> is the older syntax, more flexible (can format messages with arguments), but re-raised errors get a new error number. In modern SQL Server, prefer <code>THROW</code> for re-raising caught exceptions, and <code>THROW</code> with an error number for raising new errors.</p>
+<hr>
+<p class="has-line-data" data-line-start="1427" data-line-end="1428"><strong>Q: What is SCOPE_IDENTITY() and how is it different from @@IDENTITY?</strong></p>
+<p class="has-line-data" data-line-start="1429" data-line-end="1430">Both return the last identity value generated. <code>@@IDENTITY</code> returns the last identity generated in the current session, regardless of scope — including values generated by triggers. <code>SCOPE_IDENTITY()</code> returns the last identity generated in the current scope (the current stored procedure or batch), excluding identity values generated by triggers. Always use <code>SCOPE_IDENTITY()</code> in stored procedures. Using <code>@@IDENTITY</code> after an INSERT can return an unexpected value if the table has a trigger that also inserts into a table with an identity column.</p>
+<hr>
+<p class="has-line-data" data-line-start="1433" data-line-end="1434"><strong>Q: Why should you avoid the sp_ prefix for user stored procedures?</strong></p>
+<p class="has-line-data" data-line-start="1435" data-line-end="1436">SQL Server resolves sp_ procedures by checking the master database first, then the current database. This means every call to your <code>sp_YourProcedure</code> pays the overhead of a failed lookup in the master database before finding the correct procedure in your database. Additionally, if Microsoft ever creates a system procedure with the same name, it will silently take precedence over yours. Use <code>usp_</code> or a schema-based naming convention instead.</p>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1439" data-line-end="1440"><a id="Quick_Reference_Cheat_Sheet_1439"></a>Quick Reference Cheat Sheet</h2>
+<h3 class="code-line has-line-data" data-line-start="1441" data-line-end="1442"><a id="Index_Types_at_a_Glance_1441"></a>Index Types at a Glance</h3>
+<pre><code class="has-line-data" data-line-start="1444" data-line-end="1451">Clustered        One per table. Data IS the index. Choose wisely — usually the PK.
+Nonclustered     Separate structure. Up to 999 per table. Use for WHERE, JOIN, ORDER BY.
+Unique           Enforces uniqueness. Can be clustered or nonclustered.
+Filtered         Partial index on a subset of rows. Smaller, faster for specific queries.
+Covering         Nonclustered + INCLUDE columns. Eliminates Key Lookups.
+Columnstore      Column-oriented. Massively faster for aggregation and analytics.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1452" data-line-end="1453"><a id="DELETE_vs_TRUNCATE_vs_DROP_1452"></a>DELETE vs TRUNCATE vs DROP</h3>
+<pre><code class="has-line-data" data-line-start="1455" data-line-end="1460">Operation    Removes           WHERE?  Logged?    Triggers?  Identity  Table Exists
+DELETE       Specific rows     Yes     Full       Yes        Unchanged  Yes
+TRUNCATE     All rows          No      Minimal    No         Reset      Yes
+DROP         Entire object     No      Yes        No         Gone       No
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1461" data-line-end="1462"><a id="Optimization_Quick_Checks_1461"></a>Optimization Quick Checks</h3>
+<pre><code class="has-line-data" data-line-start="1464" data-line-end="1476">Slow query?
+    1. Run with actual execution plan (Ctrl+M in SSMS)
+    2. Look for Table Scan / Clustered Index Scan on large tables
+    3. Look for Key Lookup — consider INCLUDE columns
+    4. Check for implicit type conversions (yellow triangles)
+    5. Check SET STATISTICS IO ON — high logical reads = missing index
+    6. Is the WHERE predicate SARGable? (no function wrapping the column)
+    7. Is SELECT * used? (replace with specific columns)
+    8. Is there a cursor that could be a set-based operation?
+    9. Are statistics up to date? (UPDATE STATISTICS)
+   10. Parameter sniffing? (add OPTION RECOMPILE or use local variables)
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1477" data-line-end="1478"><a id="Stored_Procedure_Template_1477"></a>Stored Procedure Template</h3>
+<pre><code class="has-line-data language-sql" data-line-start="1480" data-line-end="1503"><span class="hljs-keyword">CREATE</span> <span class="hljs-keyword">PROCEDURE</span> usp_ProcedureName
+    <span class="hljs-variable">@Param1</span>  DataType,
+    <span class="hljs-variable">@Param2</span>  DataType <span class="hljs-operator">=</span> DefaultValue  <span class="hljs-comment">-- Optional parameter</span>
+<span class="hljs-keyword">AS</span>
+<span class="hljs-keyword">BEGIN</span>
+    <span class="hljs-keyword">SET</span> NOCOUNT <span class="hljs-keyword">ON</span>;
+
+    <span class="hljs-keyword">BEGIN</span> TRY
+        <span class="hljs-keyword">BEGIN</span> TRANSACTION;
+
+        <span class="hljs-comment">-- Your logic here</span>
+
+        <span class="hljs-keyword">COMMIT</span> TRANSACTION;
+    <span class="hljs-keyword">END</span> TRY
+    <span class="hljs-keyword">BEGIN</span> CATCH
+        IF @<span class="hljs-variable">@TRANCOUNT</span> <span class="hljs-operator">&gt;</span> <span class="hljs-number">0</span>
+            <span class="hljs-keyword">ROLLBACK</span> TRANSACTION;
+
+        THROW; <span class="hljs-comment">-- Re-raise the error to the caller</span>
+    <span class="hljs-keyword">END</span> CATCH;
+<span class="hljs-keyword">END</span>;
+GO
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="1506" data-line-end="1507"><em>Indexes are the single highest-impact thing you can do for query performance. Understanding DELETE vs TRUNCATE vs DROP prevents irreversible mistakes. Optimization is a mindset, not a one-time fix. Stored procedures are the right tool for complex, reusable database logic. Master these and you will handle SQL Server with confidence in any interview or production situation.</em></p>
+
+</body>
+</html>
