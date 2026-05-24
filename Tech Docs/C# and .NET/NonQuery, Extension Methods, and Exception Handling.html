@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NonQuery, Extension Methods, and Exception Handling.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<h1 class="code-line has-line-data" data-line-start="0" data-line-end="1"><a id="C_and_NET_NonQuery_Extension_Methods_and_Exception_Handling_0"></a>C# and .NET: NonQuery, Extension Methods, and Exception Handling</h1>
+<blockquote>
+<p class="has-line-data" data-line-start="2" data-line-end="4">Three concepts that show up in every real project and every serious interview.<br>
+Read it once. Understand it forever.</p>
+</blockquote>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="7" data-line-end="8"><a id="Table_of_Contents_7"></a>Table of Contents</h2>
+<ol>
+<li class="has-line-data" data-line-start="9" data-line-end="10"><a href="#1-nonquery--executenonquery-and-database-operations">NonQuery — ExecuteNonQuery and Database Operations</a></li>
+<li class="has-line-data" data-line-start="10" data-line-end="11"><a href="#2-extension-methods">Extension Methods</a></li>
+<li class="has-line-data" data-line-start="11" data-line-end="12"><a href="#3-exception-handling">Exception Handling</a></li>
+<li class="has-line-data" data-line-start="12" data-line-end="14"><a href="#4-interview-questions-and-answers">Interview Questions and Answers</a></li>
+</ol>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="16" data-line-end="17"><a id="1_NonQuery_ExecuteNonQuery_and_Database_Operations_16"></a>1. NonQuery — ExecuteNonQuery and Database Operations</h2>
+<h3 class="code-line has-line-data" data-line-start="18" data-line-end="19"><a id="The_Core_Idea_18"></a>The Core Idea</h3>
+<p class="has-line-data" data-line-start="20" data-line-end="21">When you talk to a database, your operation falls into one of two categories:</p>
+<ul>
+<li class="has-line-data" data-line-start="22" data-line-end="23">You want <strong>data back</strong> (a result set) — SELECT queries</li>
+<li class="has-line-data" data-line-start="23" data-line-end="25">You want to <strong>change something</strong> and just need to know it worked — INSERT, UPDATE, DELETE, DDL</li>
+</ul>
+<p class="has-line-data" data-line-start="25" data-line-end="26">The second category is what <code>ExecuteNonQuery</code> handles. The name is literal: it executes a command that is <strong>not a query</strong>. It does not return rows. It returns one integer: how many rows were affected.</p>
+<pre><code class="has-line-data" data-line-start="28" data-line-end="34">ExecuteNonQuery returns:
+    -1  -&gt; DDL statements (CREATE TABLE, DROP TABLE) or stored procedures that don't set ROWCOUNT
+     0  -&gt; The command ran but affected zero rows (UPDATE where nothing matched)
+     1  -&gt; One row was inserted, updated, or deleted
+     N  -&gt; N rows were affected
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="37" data-line-end="38"><a id="ADONET_The_Foundation_37"></a><a href="http://ADO.NET">ADO.NET</a> — The Foundation</h3>
+<p class="has-line-data" data-line-start="39" data-line-end="40">Before ORMs like Entity Framework existed, <a href="http://ADO.NET">ADO.NET</a> was how .NET talked to databases. It is still worth understanding because EF Core uses it underneath, and you will encounter it in legacy systems, high-performance code, and raw SQL scenarios.</p>
+<p class="has-line-data" data-line-start="41" data-line-end="42">The key objects:</p>
+<pre><code class="has-line-data" data-line-start="44" data-line-end="52">SqlConnection  -&gt; the connection to the database
+SqlCommand     -&gt; the SQL statement you want to run
+SqlParameter   -&gt; a parameter value passed safely to the command
+SqlDataReader  -&gt; reads rows from a SELECT result
+ExecuteNonQuery -&gt; runs INSERT/UPDATE/DELETE, returns rows affected
+ExecuteScalar  -&gt; runs a query that returns a single value (COUNT, MAX, etc.)
+ExecuteReader  -&gt; runs a SELECT and returns a SqlDataReader
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="55" data-line-end="56"><a id="ExecuteNonQuery_in_Action_55"></a>ExecuteNonQuery in Action</h3>
+<p class="has-line-data" data-line-start="57" data-line-end="58"><strong>Setting up a connection and running an INSERT:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="60" data-line-end="90"><span class="hljs-keyword">using</span> System.Data.SqlClient; <span class="hljs-comment">// or Microsoft.Data.SqlClient (modern)</span>
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ProductRepository</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">string</span> _connectionString;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ProductRepository</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> connectionString</span>)</span>
+    {
+        _connectionString = connectionString;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">int</span> <span class="hljs-title">AddProduct</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> name, <span class="hljs-built_in">decimal</span> price, <span class="hljs-built_in">int</span> stock</span>)</span>
+    {
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+        connection.Open();
+
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+            <span class="hljs-string">&quot;INSERT INTO Products (Name, Price, Stock) VALUES (@Name, @Price, @Stock)&quot;</span>,
+            connection);
+
+        <span class="hljs-comment">// Always use parameters. Never concatenate user input into SQL.</span>
+        command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Name&quot;</span>, name);
+        command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Price&quot;</span>, price);
+        command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Stock&quot;</span>, stock);
+
+        <span class="hljs-built_in">int</span> rowsAffected = command.ExecuteNonQuery();
+        <span class="hljs-keyword">return</span> rowsAffected; <span class="hljs-comment">// 1 if successful</span>
+    }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="91" data-line-end="92"><strong>UPDATE with ExecuteNonQuery:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="94" data-line-end="114"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">int</span> <span class="hljs-title">UpdateProductPrice</span>(<span class="hljs-params"><span class="hljs-built_in">int</span> productId, <span class="hljs-built_in">decimal</span> newPrice</span>)</span>
+{
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    connection.Open();
+
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+        <span class="hljs-string">&quot;UPDATE Products SET Price = @Price WHERE Id = @Id&quot;</span>,
+        connection);
+
+    command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Price&quot;</span>, newPrice);
+    command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Id&quot;</span>, productId);
+
+    <span class="hljs-built_in">int</span> rowsAffected = command.ExecuteNonQuery();
+
+    <span class="hljs-keyword">if</span> (rowsAffected == <span class="hljs-number">0</span>)
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidOperationException(<span class="hljs-string">$&quot;Product <span class="hljs-subst">{productId}</span> not found.&quot;</span>);
+
+    <span class="hljs-keyword">return</span> rowsAffected;
+}
+</code></pre>
+<p class="has-line-data" data-line-start="115" data-line-end="116"><strong>DELETE with ExecuteNonQuery:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="118" data-line-end="133"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">DeleteProduct</span>(<span class="hljs-params"><span class="hljs-built_in">int</span> productId</span>)</span>
+{
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    connection.Open();
+
+    <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+        <span class="hljs-string">&quot;DELETE FROM Products WHERE Id = @Id&quot;</span>,
+        connection);
+
+    command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Id&quot;</span>, productId);
+
+    <span class="hljs-built_in">int</span> rowsAffected = command.ExecuteNonQuery();
+    <span class="hljs-keyword">return</span> rowsAffected &gt; <span class="hljs-number">0</span>; <span class="hljs-comment">// true if the product existed and was deleted</span>
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="136" data-line-end="137"><a id="The_Async_Version_136"></a>The Async Version</h3>
+<p class="has-line-data" data-line-start="138" data-line-end="139">In modern .NET, always use the async version. Database calls are I/O operations — blocking the thread while waiting for the database is wasteful.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="141" data-line-end="156"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">int</span>&gt; <span class="hljs-title">AddProductAsync</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> name, <span class="hljs-built_in">decimal</span> price, CancellationToken ct = <span class="hljs-literal">default</span></span>)</span>
+{
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    <span class="hljs-keyword">await</span> connection.OpenAsync(ct);
+
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+        <span class="hljs-string">&quot;INSERT INTO Products (Name, Price) VALUES (@Name, @Price)&quot;</span>,
+        connection);
+
+    command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Name&quot;</span>, name);
+    command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Price&quot;</span>, price);
+
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> command.ExecuteNonQueryAsync(ct);
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="159" data-line-end="160"><a id="Transactions_All_or_Nothing_159"></a>Transactions — All or Nothing</h3>
+<p class="has-line-data" data-line-start="161" data-line-end="162">The real power of ExecuteNonQuery shines in transactions. A transaction groups multiple operations so that either all succeed or none do.</p>
+<p class="has-line-data" data-line-start="163" data-line-end="164">Think of it like transferring money: debit one account, credit another. If the credit fails after the debit, you have a problem. A transaction ensures both happen together or neither happens.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="166" data-line-end="216"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">TransferFundsAsync</span>(<span class="hljs-params">
+    <span class="hljs-built_in">int</span> fromAccountId,
+    <span class="hljs-built_in">int</span> toAccountId,
+    <span class="hljs-built_in">decimal</span> amount,
+    CancellationToken ct = <span class="hljs-literal">default</span></span>)</span>
+{
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    <span class="hljs-keyword">await</span> connection.OpenAsync(ct);
+
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> transaction = connection.BeginTransaction();
+
+    <span class="hljs-keyword">try</span>
+    {
+        <span class="hljs-comment">// Step 1: Debit</span>
+        <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> debitCmd = <span class="hljs-keyword">new</span> SqlCommand(
+            <span class="hljs-string">&quot;UPDATE Accounts SET Balance = Balance - @Amount WHERE Id = @Id AND Balance &gt;= @Amount&quot;</span>,
+            connection, transaction);
+
+        debitCmd.Parameters.AddWithValue(<span class="hljs-string">&quot;@Amount&quot;</span>, amount);
+        debitCmd.Parameters.AddWithValue(<span class="hljs-string">&quot;@Id&quot;</span>, fromAccountId);
+
+        <span class="hljs-built_in">int</span> debitRows = <span class="hljs-keyword">await</span> debitCmd.ExecuteNonQueryAsync(ct);
+
+        <span class="hljs-keyword">if</span> (debitRows == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidOperationException(<span class="hljs-string">&quot;Insufficient funds or account not found.&quot;</span>);
+
+        <span class="hljs-comment">// Step 2: Credit</span>
+        <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> creditCmd = <span class="hljs-keyword">new</span> SqlCommand(
+            <span class="hljs-string">&quot;UPDATE Accounts SET Balance = Balance + @Amount WHERE Id = @Id&quot;</span>,
+            connection, transaction);
+
+        creditCmd.Parameters.AddWithValue(<span class="hljs-string">&quot;@Amount&quot;</span>, amount);
+        creditCmd.Parameters.AddWithValue(<span class="hljs-string">&quot;@Id&quot;</span>, toAccountId);
+
+        <span class="hljs-built_in">int</span> creditRows = <span class="hljs-keyword">await</span> creditCmd.ExecuteNonQueryAsync(ct);
+
+        <span class="hljs-keyword">if</span> (creditRows == <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidOperationException(<span class="hljs-string">&quot;Recipient account not found.&quot;</span>);
+
+        <span class="hljs-comment">// Both succeeded — commit</span>
+        <span class="hljs-keyword">await</span> transaction.CommitAsync(ct);
+    }
+    <span class="hljs-keyword">catch</span>
+    {
+        <span class="hljs-comment">// Something failed — undo everything</span>
+        <span class="hljs-keyword">await</span> transaction.RollbackAsync(ct);
+        <span class="hljs-keyword">throw</span>; <span class="hljs-comment">// Re-throw so the caller knows it failed</span>
+    }
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="219" data-line-end="220"><a id="ExecuteScalar_Single_Value_Queries_219"></a>ExecuteScalar — Single Value Queries</h3>
+<p class="has-line-data" data-line-start="221" data-line-end="222">When you need one value back (not a result set), use <code>ExecuteScalar</code>. It returns the first column of the first row as an <code>object</code>.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="224" data-line-end="252"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">int</span>&gt; <span class="hljs-title">GetProductCountAsync</span>(<span class="hljs-params">CancellationToken ct = <span class="hljs-literal">default</span></span>)</span>
+{
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    <span class="hljs-keyword">await</span> connection.OpenAsync(ct);
+
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+        <span class="hljs-string">&quot;SELECT COUNT(*) FROM Products WHERE IsActive = 1&quot;</span>,
+        connection);
+
+    <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">await</span> command.ExecuteScalarAsync(ct);
+    <span class="hljs-keyword">return</span> Convert.ToInt32(result);
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">decimal</span>?&gt; GetMaxPriceAsync(CancellationToken ct = <span class="hljs-literal">default</span>)
+{
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    <span class="hljs-keyword">await</span> connection.OpenAsync(ct);
+
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+        <span class="hljs-string">&quot;SELECT MAX(Price) FROM Products&quot;</span>,
+        connection);
+
+    <span class="hljs-keyword">var</span> result = <span class="hljs-keyword">await</span> command.ExecuteScalarAsync(ct);
+
+    <span class="hljs-comment">// If table is empty, result is DBNull.Value, not null</span>
+    <span class="hljs-keyword">return</span> result == DBNull.Value ? <span class="hljs-literal">null</span> : Convert.ToDecimal(result);
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="255" data-line-end="256"><a id="Stored_Procedures_with_ExecuteNonQuery_255"></a>Stored Procedures with ExecuteNonQuery</h3>
+<pre><code class="has-line-data language-csharp" data-line-start="258" data-line-end="280"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">int</span>&gt; <span class="hljs-title">ArchiveOldOrdersAsync</span>(<span class="hljs-params">DateTime cutoffDate, CancellationToken ct = <span class="hljs-literal">default</span></span>)</span>
+{
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+    <span class="hljs-keyword">await</span> connection.OpenAsync(ct);
+
+    <span class="hljs-keyword">await</span> <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(<span class="hljs-string">&quot;sp_ArchiveOrders&quot;</span>, connection);
+    command.CommandType = CommandType.StoredProcedure; <span class="hljs-comment">// Tell ADO.NET it&#x27;s a stored proc</span>
+
+    command.Parameters.AddWithValue(<span class="hljs-string">&quot;@CutoffDate&quot;</span>, cutoffDate);
+
+    <span class="hljs-comment">// Output parameter — the stored procedure sets this value</span>
+    <span class="hljs-keyword">var</span> outputParam = <span class="hljs-keyword">new</span> SqlParameter(<span class="hljs-string">&quot;@ArchivedCount&quot;</span>, SqlDbType.Int)
+    {
+        Direction = ParameterDirection.Output
+    };
+    command.Parameters.Add(outputParam);
+
+    <span class="hljs-keyword">await</span> command.ExecuteNonQueryAsync(ct);
+
+    <span class="hljs-keyword">return</span> (<span class="hljs-built_in">int</span>)outputParam.Value; <span class="hljs-comment">// Read the output parameter after execution</span>
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="283" data-line-end="284"><a id="Using_Dapper_The_Sweet_Spot_283"></a>Using Dapper — The Sweet Spot</h3>
+<p class="has-line-data" data-line-start="285" data-line-end="286">Writing raw <a href="http://ADO.NET">ADO.NET</a> is verbose. Entity Framework Core is powerful but sometimes too heavy. <strong>Dapper</strong> is a micro-ORM that sits right in the middle — you write SQL, it handles mapping.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="288" data-line-end="336"><span class="hljs-comment">// Install: dotnet add package Dapper</span>
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ProductRepository</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">string</span> _connectionString;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ProductRepository</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> connectionString</span>)</span>
+    {
+        _connectionString = connectionString;
+    }
+
+    <span class="hljs-comment">// ExecuteNonQuery equivalent in Dapper</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">int</span>&gt; <span class="hljs-title">AddProductAsync</span>(<span class="hljs-params">Product product</span>)</span>
+    {
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> connection.ExecuteAsync(
+            <span class="hljs-string">&quot;INSERT INTO Products (Name, Price, Stock) VALUES (@Name, @Price, @Stock)&quot;</span>,
+            product); <span class="hljs-comment">// Dapper maps properties automatically</span>
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">int</span>&gt; <span class="hljs-title">UpdateStockAsync</span>(<span class="hljs-params"><span class="hljs-built_in">int</span> productId, <span class="hljs-built_in">int</span> newStock</span>)</span>
+    {
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> connection.ExecuteAsync(
+            <span class="hljs-string">&quot;UPDATE Products SET Stock = @Stock WHERE Id = @Id&quot;</span>,
+            <span class="hljs-keyword">new</span> { Stock = newStock, Id = productId });
+    }
+
+    <span class="hljs-comment">// ExecuteScalar equivalent in Dapper</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">decimal</span>&gt; <span class="hljs-title">GetTotalInventoryValueAsync</span>()</span>
+    {
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> connection.ExecuteScalarAsync&lt;<span class="hljs-built_in">decimal</span>&gt;(
+            <span class="hljs-string">&quot;SELECT SUM(Price * Stock) FROM Products&quot;</span>);
+    }
+
+    <span class="hljs-comment">// SELECT — returns objects (not nonquery, but shown for completeness)</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;IEnumerable&lt;Product&gt;&gt; GetAllAsync()
+    {
+        <span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(_connectionString);
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> connection.QueryAsync&lt;Product&gt;(<span class="hljs-string">&quot;SELECT * FROM Products&quot;</span>);
+    }
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="339" data-line-end="340"><a id="SQL_Injection_Why_Parameters_Are_NonNegotiable_339"></a>SQL Injection — Why Parameters Are Non-Negotiable</h3>
+<pre><code class="has-line-data language-csharp" data-line-start="342" data-line-end="357"><span class="hljs-comment">// THIS IS DANGEROUS. NEVER DO THIS.</span>
+<span class="hljs-built_in">string</span> name = userInput; <span class="hljs-comment">// Imagine userInput = &quot;&#x27;; DROP TABLE Products; --&quot;</span>
+<span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+    <span class="hljs-string">$&quot;SELECT * FROM Products WHERE Name = &#x27;<span class="hljs-subst">{name}</span>&#x27;&quot;</span>, connection);
+
+<span class="hljs-comment">// The resulting SQL becomes:</span>
+<span class="hljs-comment">// SELECT * FROM Products WHERE Name = &#x27;&#x27;; DROP TABLE Products; --&#x27;</span>
+<span class="hljs-comment">// Your table is gone.</span>
+
+<span class="hljs-comment">// THIS IS SAFE. ALWAYS DO THIS.</span>
+<span class="hljs-keyword">var</span> command = <span class="hljs-keyword">new</span> SqlCommand(
+    <span class="hljs-string">&quot;SELECT * FROM Products WHERE Name = @Name&quot;</span>, connection);
+command.Parameters.AddWithValue(<span class="hljs-string">&quot;@Name&quot;</span>, userInput);
+<span class="hljs-comment">// ADO.NET escapes the value. The SQL remains a parameterised query.</span>
+</code></pre>
+<p class="has-line-data" data-line-start="358" data-line-end="359">Parameters are not optional safety hygiene. They are the minimum standard.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="362" data-line-end="363"><a id="ExecuteNonQuery_vs_ExecuteReader_vs_ExecuteScalar_362"></a>ExecuteNonQuery vs ExecuteReader vs ExecuteScalar</h3>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Use When</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ExecuteNonQuery</code></td>
+<td>int (rows affected)</td>
+<td>INSERT, UPDATE, DELETE</td>
+</tr>
+<tr>
+<td><code>ExecuteScalar</code></td>
+<td>object (first col, first row)</td>
+<td>COUNT, SUM, MAX, single value</td>
+</tr>
+<tr>
+<td><code>ExecuteReader</code></td>
+<td>SqlDataReader</td>
+<td>SELECT returning multiple rows</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="372" data-line-end="373"><a id="2_Extension_Methods_372"></a>2. Extension Methods</h2>
+<h3 class="code-line has-line-data" data-line-start="374" data-line-end="375"><a id="The_Problem_They_Solve_374"></a>The Problem They Solve</h3>
+<p class="has-line-data" data-line-start="376" data-line-end="377">You are working with <code>string</code> and you keep writing this logic across five files:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="379" data-line-end="385"><span class="hljs-keyword">if</span> (!<span class="hljs-built_in">string</span>.IsNullOrWhiteSpace(<span class="hljs-keyword">value</span>) &amp;&amp; <span class="hljs-keyword">value</span>.Length &gt; <span class="hljs-number">3</span>)
+{
+    <span class="hljs-keyword">var</span> trimmed = <span class="hljs-keyword">value</span>.Trim().ToLower();
+    <span class="hljs-comment">// ...</span>
+}
+</code></pre>
+<p class="has-line-data" data-line-start="386" data-line-end="387">You cannot add a method to <code>string</code> because you do not own the <code>string</code> class. Extension methods let you add methods to existing types without touching the original class, without inheritance, and without wrapping the object.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="390" data-line-end="391"><a id="How_Extension_Methods_Work_390"></a>How Extension Methods Work</h3>
+<p class="has-line-data" data-line-start="392" data-line-end="393">An extension method is a <code>static</code> method in a <code>static</code> class whose first parameter is prefixed with <code>this</code>. That prefix is the magic — it tells the compiler to make this method appear as if it belongs to the type of the first parameter.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="395" data-line-end="414"><span class="hljs-comment">// Definition</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">StringExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">string</span> <span class="hljs-title">ToTitleCase</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">value</span></span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.IsNullOrEmpty(<span class="hljs-keyword">value</span>)) <span class="hljs-keyword">return</span> <span class="hljs-keyword">value</span>;
+
+        <span class="hljs-keyword">return</span> System.Globalization.CultureInfo.CurrentCulture
+                     .TextInfo.ToTitleCase(<span class="hljs-keyword">value</span>.ToLower());
+    }
+}
+
+<span class="hljs-comment">// Usage — called AS IF it is a string method</span>
+<span class="hljs-built_in">string</span> name = <span class="hljs-string">&quot;john doe&quot;</span>;
+<span class="hljs-built_in">string</span> titled = name.ToTitleCase(); <span class="hljs-comment">// &quot;John Doe&quot;</span>
+
+<span class="hljs-comment">// What the compiler actually does (equivalent):</span>
+<span class="hljs-built_in">string</span> titled = StringExtensions.ToTitleCase(name);
+</code></pre>
+<p class="has-line-data" data-line-start="415" data-line-end="416">The compiler transforms the dot-notation call into a static method call. Extension methods are purely a compile-time convenience. There is no runtime magic.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="419" data-line-end="420"><a id="Extension_Methods_with_Parameters_419"></a>Extension Methods with Parameters</h3>
+<p class="has-line-data" data-line-start="421" data-line-end="422">The <code>this</code> parameter is always the first one. You can have more parameters after it.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="424" data-line-end="450"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">StringExtensions</span>
+{
+    <span class="hljs-comment">// No extra parameters — acts on the string alone</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsNullOrEmpty</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">value</span></span>)</span>
+        =&gt; <span class="hljs-built_in">string</span>.IsNullOrEmpty(<span class="hljs-keyword">value</span>);
+
+    <span class="hljs-comment">// One extra parameter</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">HasMinLength</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">int</span> minLength</span>)</span>
+        =&gt; !<span class="hljs-built_in">string</span>.IsNullOrEmpty(<span class="hljs-keyword">value</span>) &amp;&amp; <span class="hljs-keyword">value</span>.Length &gt;= minLength;
+
+    <span class="hljs-comment">// Multiple extra parameters</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">string</span> <span class="hljs-title">Truncate</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">int</span> maxLength, <span class="hljs-built_in">string</span> suffix = <span class="hljs-string">&quot;...&quot;</span></span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.IsNullOrEmpty(<span class="hljs-keyword">value</span>) || <span class="hljs-keyword">value</span>.Length &lt;= maxLength)
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">value</span>;
+
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">value</span>[..maxLength] + suffix;
+    }
+}
+
+<span class="hljs-comment">// Usage</span>
+<span class="hljs-built_in">string</span> bio = <span class="hljs-string">&quot;This is a very long biography that should be truncated.&quot;</span>;
+<span class="hljs-built_in">string</span> preview = bio.Truncate(<span class="hljs-number">20</span>);           <span class="hljs-comment">// &quot;This is a very long ...&quot;</span>
+<span class="hljs-built_in">string</span> preview2 = bio.Truncate(<span class="hljs-number">20</span>, <span class="hljs-string">&quot; [more]&quot;</span>); <span class="hljs-comment">// &quot;This is a very long  [more]&quot;</span>
+<span class="hljs-built_in">bool</span> valid = <span class="hljs-string">&quot;hello&quot;</span>.HasMinLength(<span class="hljs-number">3</span>);        <span class="hljs-comment">// true</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="453" data-line-end="454"><a id="Extending_Any_Type_453"></a>Extending Any Type</h3>
+<p class="has-line-data" data-line-start="455" data-line-end="456">You can extend any type — including your own classes, interfaces, enums, and even value types like <code>int</code> and <code>DateTime</code>.</p>
+<p class="has-line-data" data-line-start="457" data-line-end="458"><strong>Extending int:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="460" data-line-end="472"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">IntExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsEven</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">value</span></span>)</span> =&gt; <span class="hljs-keyword">value</span> % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsBetween</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">int</span> min, <span class="hljs-built_in">int</span> max</span>)</span> =&gt; <span class="hljs-keyword">value</span> &gt;= min &amp;&amp; <span class="hljs-keyword">value</span> &lt;= max;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">int</span> <span class="hljs-title">Clamp</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">int</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">int</span> min, <span class="hljs-built_in">int</span> max</span>)</span> =&gt; Math.Max(min, Math.Min(max, <span class="hljs-keyword">value</span>));
+}
+
+<span class="hljs-built_in">int</span> x = <span class="hljs-number">7</span>;
+<span class="hljs-built_in">bool</span> even = x.IsEven();         <span class="hljs-comment">// false</span>
+<span class="hljs-built_in">bool</span> inRange = x.IsBetween(<span class="hljs-number">1</span>, <span class="hljs-number">10</span>); <span class="hljs-comment">// true</span>
+<span class="hljs-built_in">int</span> clamped = <span class="hljs-number">150.</span>Clamp(<span class="hljs-number">0</span>, <span class="hljs-number">100</span>);   <span class="hljs-comment">// 100</span>
+</code></pre>
+<p class="has-line-data" data-line-start="473" data-line-end="474"><strong>Extending DateTime:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="476" data-line-end="506"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">DateTimeExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsWeekend</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> DateTime date</span>)</span>
+        =&gt; date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsBusinessDay</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> DateTime date</span>)</span>
+        =&gt; !date.IsWeekend();
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> DateTime <span class="hljs-title">StartOfMonth</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> DateTime date</span>)</span>
+        =&gt; <span class="hljs-keyword">new</span> DateTime(date.Year, date.Month, <span class="hljs-number">1</span>);
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> DateTime <span class="hljs-title">EndOfMonth</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> DateTime date</span>)</span>
+        =&gt; <span class="hljs-keyword">new</span> DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">string</span> <span class="hljs-title">ToRelativeTime</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> DateTime date</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> diff = DateTime.UtcNow - date.ToUniversalTime();
+        <span class="hljs-keyword">if</span> (diff.TotalMinutes &lt; <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;just now&quot;</span>;
+        <span class="hljs-keyword">if</span> (diff.TotalHours &lt; <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">$&quot;<span class="hljs-subst">{(<span class="hljs-built_in">int</span>)diff.TotalMinutes}</span> minutes ago&quot;</span>;
+        <span class="hljs-keyword">if</span> (diff.TotalDays &lt; <span class="hljs-number">1</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">$&quot;<span class="hljs-subst">{(<span class="hljs-built_in">int</span>)diff.TotalHours}</span> hours ago&quot;</span>;
+        <span class="hljs-keyword">if</span> (diff.TotalDays &lt; <span class="hljs-number">7</span>) <span class="hljs-keyword">return</span> <span class="hljs-string">$&quot;<span class="hljs-subst">{(<span class="hljs-built_in">int</span>)diff.TotalDays}</span> days ago&quot;</span>;
+        <span class="hljs-keyword">return</span> date.ToString(<span class="hljs-string">&quot;dd MMM yyyy&quot;</span>);
+    }
+}
+
+DateTime orderDate = DateTime.Now.AddHours(<span class="hljs-number">-3</span>);
+Console.WriteLine(orderDate.ToRelativeTime()); <span class="hljs-comment">// &quot;3 hours ago&quot;</span>
+Console.WriteLine(DateTime.Today.IsWeekend());
+Console.WriteLine(DateTime.Today.EndOfMonth());
+</code></pre>
+<p class="has-line-data" data-line-start="507" data-line-end="508"><strong>Extending IEnumerable<T>:</strong></p>
+<p class="has-line-data" data-line-start="509" data-line-end="510">This is extremely useful. LINQ is built entirely on extension methods on <code>IEnumerable&lt;T&gt;</code>.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="512" data-line-end="552"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">EnumerableExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsNullOrEmpty</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params"><span class="hljs-keyword">this</span> IEnumerable&lt;T&gt;? source</span>)</span>
+        =&gt; source == <span class="hljs-literal">null</span> || !source.Any();
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title">IEnumerable</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-title">WhereNotNull</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params"><span class="hljs-keyword">this</span> IEnumerable&lt;T?&gt; source</span>) <span class="hljs-keyword">where</span> T : <span class="hljs-keyword">class</span></span>
+        =&gt; source.Where(x =&gt; x != <span class="hljs-literal">null</span>)!;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title">IEnumerable</span>&lt;<span class="hljs-title">IEnumerable</span>&lt;<span class="hljs-title">T</span>&gt;&gt; <span class="hljs-title">Batch</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params"><span class="hljs-keyword">this</span> IEnumerable&lt;T&gt; source, <span class="hljs-built_in">int</span> size</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> batch = <span class="hljs-keyword">new</span> List&lt;T&gt;(size);
+        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> item <span class="hljs-keyword">in</span> source)
+        {
+            batch.Add(item);
+            <span class="hljs-keyword">if</span> (batch.Count == size)
+            {
+                <span class="hljs-keyword">yield</span> <span class="hljs-keyword">return</span> batch;
+                batch = <span class="hljs-keyword">new</span> List&lt;T&gt;(size);
+            }
+        }
+        <span class="hljs-keyword">if</span> (batch.Any()) <span class="hljs-keyword">yield</span> <span class="hljs-keyword">return</span> batch;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">string</span> <span class="hljs-title">JoinWith</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params"><span class="hljs-keyword">this</span> IEnumerable&lt;T&gt; source, <span class="hljs-built_in">string</span> separator</span>)</span>
+        =&gt; <span class="hljs-built_in">string</span>.Join(separator, source);
+}
+
+<span class="hljs-comment">// Usage</span>
+<span class="hljs-keyword">var</span> numbers = <span class="hljs-keyword">new</span> List&lt;<span class="hljs-built_in">int</span>&gt; { <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>, <span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>, <span class="hljs-number">10</span> };
+
+<span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> batch <span class="hljs-keyword">in</span> numbers.Batch(<span class="hljs-number">3</span>))
+    Console.WriteLine(batch.JoinWith(<span class="hljs-string">&quot;, &quot;</span>));
+<span class="hljs-comment">// 1, 2, 3</span>
+<span class="hljs-comment">// 4, 5, 6</span>
+<span class="hljs-comment">// 7, 8, 9</span>
+<span class="hljs-comment">// 10</span>
+
+List&lt;<span class="hljs-built_in">string</span>?&gt; names = <span class="hljs-keyword">new</span>() { <span class="hljs-string">&quot;Alice&quot;</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">&quot;Bob&quot;</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">&quot;Charlie&quot;</span> };
+<span class="hljs-keyword">var</span> validNames = names.WhereNotNull().JoinWith(<span class="hljs-string">&quot; | &quot;</span>); <span class="hljs-comment">// &quot;Alice | Bob | Charlie&quot;</span>
+</code></pre>
+<p class="has-line-data" data-line-start="553" data-line-end="554"><strong>Extending your own interfaces:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="556" data-line-end="578"><span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IAuditable</span>
+{
+    DateTime CreatedAt { <span class="hljs-keyword">get</span>; }
+    DateTime? UpdatedAt { <span class="hljs-keyword">get</span>; }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">AuditableExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">WasUpdated</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> IAuditable entity</span>)</span>
+        =&gt; entity.UpdatedAt.HasValue;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> TimeSpan <span class="hljs-title">Age</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> IAuditable entity</span>)</span>
+        =&gt; DateTime.UtcNow - entity.CreatedAt;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">IsOlderThan</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> IAuditable entity, TimeSpan duration</span>)</span>
+        =&gt; entity.Age() &gt; duration;
+}
+
+<span class="hljs-comment">// Any class implementing IAuditable gets these methods automatically</span>
+<span class="hljs-keyword">var</span> order = <span class="hljs-keyword">new</span> Order { CreatedAt = DateTime.UtcNow.AddDays(<span class="hljs-number">-5</span>) };
+<span class="hljs-built_in">bool</span> old = order.IsOlderThan(TimeSpan.FromDays(<span class="hljs-number">3</span>)); <span class="hljs-comment">// true</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="581" data-line-end="582"><a id="Extension_Methods_in_Practice_Fluent_Validation_581"></a>Extension Methods in Practice — Fluent Validation</h3>
+<p class="has-line-data" data-line-start="583" data-line-end="584">One of the best uses of extension methods is creating fluent, readable validation chains.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="586" data-line-end="621"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ValidationExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">string</span> <span class="hljs-title">MustNotBeEmpty</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">string</span> fieldName</span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.IsNullOrWhiteSpace(<span class="hljs-keyword">value</span>))
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentException(<span class="hljs-string">$&quot;<span class="hljs-subst">{fieldName}</span> cannot be empty.&quot;</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">value</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">string</span> <span class="hljs-title">MustHaveMaxLength</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">string</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">int</span> maxLength, <span class="hljs-built_in">string</span> fieldName</span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">value</span>.Length &gt; maxLength)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentException(<span class="hljs-string">$&quot;<span class="hljs-subst">{fieldName}</span> cannot exceed <span class="hljs-subst">{maxLength}</span> characters.&quot;</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">value</span>;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-built_in">decimal</span> <span class="hljs-title">MustBePositive</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> <span class="hljs-built_in">decimal</span> <span class="hljs-keyword">value</span>, <span class="hljs-built_in">string</span> fieldName</span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">value</span> &lt;= <span class="hljs-number">0</span>)
+            <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ArgumentException(<span class="hljs-string">$&quot;<span class="hljs-subst">{fieldName}</span> must be positive.&quot;</span>);
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">value</span>;
+    }
+}
+
+<span class="hljs-comment">// Usage — reads almost like English</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title">CreateProduct</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> name, <span class="hljs-built_in">decimal</span> price</span>)</span>
+{
+    name.MustNotBeEmpty(<span class="hljs-keyword">nameof</span>(name))
+        .MustHaveMaxLength(<span class="hljs-number">100</span>, <span class="hljs-keyword">nameof</span>(name));
+
+    price.MustBePositive(<span class="hljs-keyword">nameof</span>(price));
+
+    <span class="hljs-comment">// Proceed with valid data</span>
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="624" data-line-end="625"><a id="Extension_Methods_for_IQueryable_Building_Dynamic_Queries_624"></a>Extension Methods for IQueryable — Building Dynamic Queries</h3>
+<p class="has-line-data" data-line-start="626" data-line-end="627">This is extremely common in real applications with filtering and pagination.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="629" data-line-end="664"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">QueryExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IQueryable&lt;Product&gt; <span class="hljs-title">FilterByCategory</span>(<span class="hljs-params">
+        <span class="hljs-keyword">this</span> IQueryable&lt;Product&gt; query, <span class="hljs-built_in">string</span>? category</span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.IsNullOrEmpty(category)) <span class="hljs-keyword">return</span> query;
+        <span class="hljs-keyword">return</span> query.Where(p =&gt; p.Category == category);
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IQueryable&lt;Product&gt; <span class="hljs-title">FilterByPriceRange</span>(<span class="hljs-params">
+        <span class="hljs-keyword">this</span> IQueryable&lt;Product&gt; query, <span class="hljs-built_in">decimal</span>? min, <span class="hljs-built_in">decimal</span>? max</span>)</span>
+    {
+        <span class="hljs-keyword">if</span> (min.HasValue) query = query.Where(p =&gt; p.Price &gt;= min.Value);
+        <span class="hljs-keyword">if</span> (max.HasValue) query = query.Where(p =&gt; p.Price &lt;= max.Value);
+        <span class="hljs-keyword">return</span> query;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-title">IQueryable</span>&lt;<span class="hljs-title">T</span>&gt; <span class="hljs-title">Paginate</span>&lt;<span class="hljs-title">T</span>&gt;(<span class="hljs-params">
+        <span class="hljs-keyword">this</span> IQueryable&lt;T&gt; query, <span class="hljs-built_in">int</span> page, <span class="hljs-built_in">int</span> pageSize</span>)</span>
+    {
+        <span class="hljs-keyword">return</span> query.Skip((page - <span class="hljs-number">1</span>) * pageSize).Take(pageSize);
+    }
+}
+
+<span class="hljs-comment">// Usage in a service — clean, readable, composable</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;List&lt;Product&gt;&gt; GetProductsAsync(ProductFilter filter)
+{
+    <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _context.Products
+        .FilterByCategory(filter.Category)
+        .FilterByPriceRange(filter.MinPrice, filter.MaxPrice)
+        .OrderBy(p =&gt; p.Name)
+        .Paginate(filter.Page, filter.PageSize)
+        .ToListAsync();
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="667" data-line-end="668"><a id="Rules_and_Limitations_667"></a>Rules and Limitations</h3>
+<pre><code class="has-line-data" data-line-start="670" data-line-end="683">RULES:
+    The class must be static
+    The class must be non-generic at the top level
+    The method must be static
+    The first parameter must have the `this` keyword
+    The namespace of the static class must be imported with `using`
+
+LIMITATIONS:
+    Extension methods cannot access private members of the extended type
+    If a class has an instance method with the same signature, it WINS — extension is ignored
+    You cannot add properties, fields, or events via extension methods
+    They are a compile-time feature — no runtime behaviour change
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="686" data-line-end="687"><a id="When_to_Use_Extension_Methods_686"></a>When to Use Extension Methods</h3>
+<pre><code class="has-line-data" data-line-start="689" data-line-end="701">Good use cases:
+    Adding utility methods to types you do not own (string, int, DateTime, List&lt;T&gt;)
+    Adding methods to interfaces (so all implementors get them for free)
+    Creating fluent APIs and builder patterns
+    LINQ-style chaining on your own collections
+    Keeping your domain classes clean while adding cross-cutting utilities
+
+Bad use cases:
+    Adding core business logic as extension methods (it hides important behaviour)
+    Extending a class you DO own and CAN modify (just add an instance method)
+    Creating extension methods that need access to private state
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="704" data-line-end="705"><a id="3_Exception_Handling_704"></a>3. Exception Handling</h2>
+<h3 class="code-line has-line-data" data-line-start="706" data-line-end="707"><a id="What_Is_an_Exception_706"></a>What Is an Exception?</h3>
+<p class="has-line-data" data-line-start="708" data-line-end="709">An exception is an object that represents something going wrong at runtime — something the normal flow of code cannot handle. When an exception is thrown, the runtime unwinds the call stack looking for a handler. If none is found, the application crashes.</p>
+<p class="has-line-data" data-line-start="710" data-line-end="711">The base type is <code>System.Exception</code>. Everything in the .NET exception hierarchy inherits from it.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="714" data-line-end="715"><a id="The_Exception_Hierarchy_714"></a>The Exception Hierarchy</h3>
+<pre><code class="has-line-data" data-line-start="717" data-line-end="735">System.Exception
+    System.SystemException
+        System.NullReferenceException
+        System.IndexOutOfRangeException
+        System.InvalidCastException
+        System.ArgumentException
+            System.ArgumentNullException
+            System.ArgumentOutOfRangeException
+        System.InvalidOperationException
+        System.NotImplementedException
+        System.NotSupportedException
+        System.OverflowException
+        System.IO.IOException
+            System.IO.FileNotFoundException
+        System.Net.Http.HttpRequestException
+        System.Threading.Tasks.TaskCanceledException
+    System.ApplicationException (historical, mostly avoided now)
+</code></pre>
+<p class="has-line-data" data-line-start="736" data-line-end="737">You can create your own exceptions by inheriting from <code>Exception</code> or any existing exception type.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="740" data-line-end="741"><a id="try_catch_finally_The_Foundation_740"></a>try / catch / finally — The Foundation</h3>
+<pre><code class="has-line-data language-csharp" data-line-start="743" data-line-end="771"><span class="hljs-keyword">try</span>
+{
+    <span class="hljs-comment">// Code that might throw</span>
+    <span class="hljs-built_in">int</span> result = Divide(<span class="hljs-number">10</span>, <span class="hljs-number">0</span>);
+}
+<span class="hljs-keyword">catch</span> (DivideByZeroException ex)
+{
+    <span class="hljs-comment">// Handles specifically DivideByZeroException</span>
+    Console.WriteLine(<span class="hljs-string">$&quot;Cannot divide by zero: <span class="hljs-subst">{ex.Message}</span>&quot;</span>);
+}
+<span class="hljs-keyword">catch</span> (ArgumentException ex)
+{
+    <span class="hljs-comment">// Handles ArgumentException and any subclass (ArgumentNullException, etc.)</span>
+    Console.WriteLine(<span class="hljs-string">$&quot;Bad argument: <span class="hljs-subst">{ex.Message}</span>&quot;</span>);
+}
+<span class="hljs-keyword">catch</span> (Exception ex)
+{
+    <span class="hljs-comment">// Catches anything not caught above — the safety net</span>
+    Console.WriteLine(<span class="hljs-string">$&quot;Unexpected error: <span class="hljs-subst">{ex.Message}</span>&quot;</span>);
+}
+<span class="hljs-keyword">finally</span>
+{
+    <span class="hljs-comment">// ALWAYS runs — whether an exception was thrown or not</span>
+    <span class="hljs-comment">// Even if a catch block throws its own exception</span>
+    <span class="hljs-comment">// Even if there is a return statement in the try block</span>
+    Console.WriteLine(<span class="hljs-string">&quot;This always executes. Use for cleanup.&quot;</span>);
+}
+</code></pre>
+<p class="has-line-data" data-line-start="772" data-line-end="773">The <code>finally</code> block is for cleanup — closing connections, releasing resources, logging “operation ended.” It runs no matter what.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="776" data-line-end="777"><a id="Catch_Order_Matters_776"></a>Catch Order Matters</h3>
+<p class="has-line-data" data-line-start="778" data-line-end="779">Catch blocks are checked top to bottom. The first matching one executes. Put more specific exceptions before less specific ones.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="781" data-line-end="794"><span class="hljs-comment">// CORRECT — specific before general</span>
+<span class="hljs-keyword">try</span> { <span class="hljs-comment">/* ... */</span> }
+<span class="hljs-keyword">catch</span> (FileNotFoundException ex) { <span class="hljs-comment">/* specific */</span> }
+<span class="hljs-keyword">catch</span> (IOException ex) { <span class="hljs-comment">/* less specific */</span> }
+<span class="hljs-keyword">catch</span> (Exception ex) { <span class="hljs-comment">/* catch-all */</span> }
+
+<span class="hljs-comment">// WRONG — this will not compile in C#</span>
+<span class="hljs-comment">// FileNotFoundException is a subclass of IOException</span>
+<span class="hljs-comment">// The FileNotFoundException block is unreachable</span>
+<span class="hljs-keyword">try</span> { <span class="hljs-comment">/* ... */</span> }
+<span class="hljs-keyword">catch</span> (IOException ex) { <span class="hljs-comment">/* catches everything IO-related */</span> }
+<span class="hljs-keyword">catch</span> (FileNotFoundException ex) { <span class="hljs-comment">/* COMPILER ERROR: unreachable code */</span> }
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="797" data-line-end="798"><a id="Exception_Properties_797"></a>Exception Properties</h3>
+<p class="has-line-data" data-line-start="799" data-line-end="800">Every exception object carries information:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="802" data-line-end="816"><span class="hljs-keyword">try</span>
+{
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> InvalidOperationException(<span class="hljs-string">&quot;Order cannot be placed in current state.&quot;</span>);
+}
+<span class="hljs-keyword">catch</span> (Exception ex)
+{
+    Console.WriteLine(ex.Message);        <span class="hljs-comment">// &quot;Order cannot be placed in current state.&quot;</span>
+    Console.WriteLine(ex.StackTrace);     <span class="hljs-comment">// Full call stack at the point of throw</span>
+    Console.WriteLine(ex.GetType().Name); <span class="hljs-comment">// &quot;InvalidOperationException&quot;</span>
+    Console.WriteLine(ex.InnerException); <span class="hljs-comment">// The exception that caused this one (if any)</span>
+    Console.WriteLine(ex.Source);         <span class="hljs-comment">// Assembly or object that caused the exception</span>
+    Console.WriteLine(ex.HResult);        <span class="hljs-comment">// HRESULT error code</span>
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="819" data-line-end="820"><a id="Throw_vs_Throw_ex_The_Critical_Difference_819"></a>Throw vs Throw ex — The Critical Difference</h3>
+<p class="has-line-data" data-line-start="821" data-line-end="822">This is one of the most important things to get right. Getting it wrong silently destroys your stack trace.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="824" data-line-end="850"><span class="hljs-comment">// WRONG — re-throwing with &#x27;throw ex&#x27;</span>
+<span class="hljs-comment">// This RESETS the stack trace to this point</span>
+<span class="hljs-comment">// You lose all information about where the exception originally came from</span>
+<span class="hljs-keyword">try</span>
+{
+    SomeMethod();
+}
+<span class="hljs-keyword">catch</span> (Exception ex)
+{
+    LogError(ex);
+    <span class="hljs-keyword">throw</span> ex; <span class="hljs-comment">// Stack trace now starts HERE. Original source is gone.</span>
+}
+
+<span class="hljs-comment">// CORRECT — re-throwing with just &#x27;throw&#x27;</span>
+<span class="hljs-comment">// This PRESERVES the original stack trace</span>
+<span class="hljs-comment">// The exception continues unwinding as if it was never caught here</span>
+<span class="hljs-keyword">try</span>
+{
+    SomeMethod();
+}
+<span class="hljs-keyword">catch</span> (Exception ex)
+{
+    LogError(ex);
+    <span class="hljs-keyword">throw</span>; <span class="hljs-comment">// Original stack trace is preserved</span>
+}
+</code></pre>
+<p class="has-line-data" data-line-start="851" data-line-end="852"><strong>Rule:</strong> If you catch an exception and want to re-throw it, always use <code>throw</code> (not <code>throw ex</code>). Use <code>throw ex</code> only when you intentionally want to hide the original stack trace (which is almost never).</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="855" data-line-end="856"><a id="Wrapping_Exceptions_with_InnerException_855"></a>Wrapping Exceptions with InnerException</h3>
+<p class="has-line-data" data-line-start="857" data-line-end="858">When you catch a low-level exception and want to throw a more meaningful high-level exception while keeping the original cause:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="860" data-line-end="880"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;User&gt; <span class="hljs-title">GetUserAsync</span>(<span class="hljs-params"><span class="hljs-built_in">int</span> userId</span>)</span>
+{
+    <span class="hljs-keyword">try</span>
+    {
+        <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> _repository.FindByIdAsync(userId);
+    }
+    <span class="hljs-keyword">catch</span> (SqlException ex) <span class="hljs-keyword">when</span> (ex.Number == <span class="hljs-number">1205</span>) <span class="hljs-comment">// SQL Server deadlock error</span>
+    {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ServiceException(
+            <span class="hljs-string">$&quot;Failed to retrieve user <span class="hljs-subst">{userId}</span> due to a database deadlock. Try again.&quot;</span>,
+            ex); <span class="hljs-comment">// ex becomes InnerException — the original cause is preserved</span>
+    }
+    <span class="hljs-keyword">catch</span> (SqlException ex)
+    {
+        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ServiceException(
+            <span class="hljs-string">$&quot;Database error while retrieving user <span class="hljs-subst">{userId}</span>.&quot;</span>,
+            ex);
+    }
+}
+</code></pre>
+<pre><code class="has-line-data language-csharp" data-line-start="882" data-line-end="890"><span class="hljs-comment">// The custom exception</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ServiceException</span> : <span class="hljs-title">Exception</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ServiceException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message</span>) : <span class="hljs-title">base</span>(<span class="hljs-params">message</span>)</span> { }
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ServiceException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message, Exception innerException</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params">message, innerException</span>)</span> { }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="891" data-line-end="892">Now when you log the exception, you can walk <code>InnerException</code> to find the root cause.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="895" data-line-end="896"><a id="Exception_Filters_The_when_Keyword_895"></a>Exception Filters — The <code>when</code> Keyword</h3>
+<p class="has-line-data" data-line-start="897" data-line-end="898"><code>when</code> lets you add a condition to a catch block. The catch only triggers if the exception matches AND the condition is true. This is more precise than catching and re-throwing.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="900" data-line-end="921"><span class="hljs-keyword">try</span>
+{
+    <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> httpClient.GetAsync(url);
+    response.EnsureSuccessStatusCode();
+}
+<span class="hljs-keyword">catch</span> (HttpRequestException ex) <span class="hljs-keyword">when</span> (ex.StatusCode == HttpStatusCode.NotFound)
+{
+    <span class="hljs-comment">// Only handles 404 — the resource does not exist</span>
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+}
+<span class="hljs-keyword">catch</span> (HttpRequestException ex) <span class="hljs-keyword">when</span> (ex.StatusCode == HttpStatusCode.Unauthorized)
+{
+    <span class="hljs-comment">// Only handles 401 — token is invalid or expired</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> AuthenticationException(<span class="hljs-string">&quot;Your session has expired. Please log in again.&quot;</span>, ex);
+}
+<span class="hljs-keyword">catch</span> (HttpRequestException ex)
+{
+    <span class="hljs-comment">// Handles all other HTTP errors</span>
+    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> ServiceException(<span class="hljs-string">&quot;External service is unavailable.&quot;</span>, ex);
+}
+</code></pre>
+<p class="has-line-data" data-line-start="922" data-line-end="923">The key benefit: if the <code>when</code> condition is false, the exception is NOT considered caught — the stack trace is untouched and the runtime keeps looking for another handler. Compare this to catching everything and re-throwing, which resets the stack.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="926" data-line-end="927"><a id="Creating_Custom_Exceptions_926"></a>Creating Custom Exceptions</h3>
+<p class="has-line-data" data-line-start="928" data-line-end="929">Custom exceptions make your code self-documenting and allow callers to handle specific error conditions.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="931" data-line-end="978"><span class="hljs-comment">// Base domain exception</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">DomainException</span> : <span class="hljs-title">Exception</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">DomainException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message</span>) : <span class="hljs-title">base</span>(<span class="hljs-params">message</span>)</span> { }
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">DomainException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message, Exception innerException</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params">message, innerException</span>)</span> { }
+}
+
+<span class="hljs-comment">// Specific domain exceptions</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">OrderNotFoundException</span> : <span class="hljs-title">DomainException</span>
+{
+    <span class="hljs-keyword">public</span> Guid OrderId { <span class="hljs-keyword">get</span>; }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">OrderNotFoundException</span>(<span class="hljs-params">Guid orderId</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params"><span class="hljs-string">$&quot;Order with ID <span class="hljs-subst">{orderId}</span> was not found.&quot;</span></span>)</span>
+    {
+        OrderId = orderId;
+    }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">InsufficientStockException</span> : <span class="hljs-title">DomainException</span>
+{
+    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> ProductId { <span class="hljs-keyword">get</span>; }
+    <span class="hljs-keyword">public</span> <span class="hljs-built_in">int</span> RequestedQuantity { <span class="hljs-keyword">get</span>; }
+    <span class="hljs-keyword">public</span> <span class="hljs-built_in">int</span> AvailableStock { <span class="hljs-keyword">get</span>; }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">InsufficientStockException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> productId, <span class="hljs-built_in">int</span> requested, <span class="hljs-built_in">int</span> available</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params"><span class="hljs-string">$&quot;Insufficient stock for product <span class="hljs-subst">{productId}</span>. &quot;</span> +
+               <span class="hljs-string">$&quot;Requested: <span class="hljs-subst">{requested}</span>, Available: <span class="hljs-subst">{available}</span>&quot;</span></span>)</span>
+    {
+        ProductId = productId;
+        RequestedQuantity = requested;
+        AvailableStock = available;
+    }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ValidationException</span> : <span class="hljs-title">DomainException</span>
+{
+    <span class="hljs-keyword">public</span> IReadOnlyList&lt;<span class="hljs-built_in">string</span>&gt; Errors { <span class="hljs-keyword">get</span>; }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ValidationException</span>(<span class="hljs-params">IEnumerable&lt;<span class="hljs-built_in">string</span>&gt; errors</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params"><span class="hljs-string">&quot;One or more validation errors occurred.&quot;</span></span>)</span>
+    {
+        Errors = errors.ToList().AsReadOnly();
+    }
+}
+</code></pre>
+<pre><code class="has-line-data language-csharp" data-line-start="980" data-line-end="1003"><span class="hljs-comment">// Usage — caller can handle specifically</span>
+<span class="hljs-keyword">try</span>
+{
+    <span class="hljs-keyword">await</span> _orderService.ConfirmOrderAsync(orderId);
+}
+<span class="hljs-keyword">catch</span> (OrderNotFoundException ex)
+{
+    <span class="hljs-keyword">return</span> NotFound(<span class="hljs-keyword">new</span> { error = ex.Message, orderId = ex.OrderId });
+}
+<span class="hljs-keyword">catch</span> (InsufficientStockException ex)
+{
+    <span class="hljs-keyword">return</span> Conflict(<span class="hljs-keyword">new</span>
+    {
+        error = ex.Message,
+        productId = ex.ProductId,
+        available = ex.AvailableStock
+    });
+}
+<span class="hljs-keyword">catch</span> (DomainException ex)
+{
+    <span class="hljs-keyword">return</span> BadRequest(<span class="hljs-keyword">new</span> { error = ex.Message });
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1006" data-line-end="1007"><a id="Global_Exception_Handling_in_ASPNET_Core_1006"></a>Global Exception Handling in <a href="http://ASP.NET">ASP.NET</a> Core</h3>
+<p class="has-line-data" data-line-start="1008" data-line-end="1009">You should not surround every controller action with try-catch. That is repetitive and easy to miss. Instead, handle exceptions globally in one place.</p>
+<p class="has-line-data" data-line-start="1010" data-line-end="1011"><strong>Using Middleware (recommended for APIs):</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="1013" data-line-end="1063"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GlobalExceptionMiddleware</span> : <span class="hljs-title">IMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;GlobalExceptionMiddleware&gt; _logger;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">GlobalExceptionMiddleware</span>(<span class="hljs-params">ILogger&lt;GlobalExceptionMiddleware&gt; logger</span>)</span>
+    {
+        _logger = logger;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context, RequestDelegate next</span>)</span>
+    {
+        <span class="hljs-keyword">try</span>
+        {
+            <span class="hljs-keyword">await</span> next(context);
+        }
+        <span class="hljs-keyword">catch</span> (ValidationException ex)
+        {
+            _logger.LogWarning(<span class="hljs-string">&quot;Validation failed: {Errors}&quot;</span>, ex.Errors);
+            context.Response.StatusCode = StatusCodes.Status400BadRequest;
+            context.Response.ContentType = <span class="hljs-string">&quot;application/json&quot;</span>;
+            <span class="hljs-keyword">await</span> context.Response.WriteAsJsonAsync(<span class="hljs-keyword">new</span>
+            {
+                type = <span class="hljs-string">&quot;validation_error&quot;</span>,
+                errors = ex.Errors
+            });
+        }
+        <span class="hljs-keyword">catch</span> (OrderNotFoundException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            <span class="hljs-keyword">await</span> context.Response.WriteAsJsonAsync(<span class="hljs-keyword">new</span> { error = ex.Message });
+        }
+        <span class="hljs-keyword">catch</span> (DomainException ex)
+        {
+            context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+            <span class="hljs-keyword">await</span> context.Response.WriteAsJsonAsync(<span class="hljs-keyword">new</span> { error = ex.Message });
+        }
+        <span class="hljs-keyword">catch</span> (Exception ex)
+        {
+            _logger.LogError(ex, <span class="hljs-string">&quot;Unhandled exception for {Method} {Path}&quot;</span>,
+                context.Request.Method, context.Request.Path);
+
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            <span class="hljs-keyword">await</span> context.Response.WriteAsJsonAsync(<span class="hljs-keyword">new</span>
+            {
+                error = <span class="hljs-string">&quot;An unexpected error occurred. Please try again later.&quot;</span>
+            });
+        }
+    }
+}
+</code></pre>
+<pre><code class="has-line-data language-csharp" data-line-start="1065" data-line-end="1069"><span class="hljs-comment">// Register and use in Program.cs</span>
+builder.Services.AddScoped&lt;GlobalExceptionMiddleware&gt;();
+app.UseMiddleware&lt;GlobalExceptionMiddleware&gt;(); <span class="hljs-comment">// First middleware — catches everything</span>
+</code></pre>
+<p class="has-line-data" data-line-start="1070" data-line-end="1071"><strong>Using Problem Details (RFC 7807 standard for API errors):</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="1073" data-line-end="1111">builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler&lt;GlobalExceptionHandler&gt;();
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">GlobalExceptionHandler</span> : <span class="hljs-title">IExceptionHandler</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;GlobalExceptionHandler&gt; _logger;
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">GlobalExceptionHandler</span>(<span class="hljs-params">ILogger&lt;GlobalExceptionHandler&gt; logger</span>)</span>
+    {
+        _logger = logger;
+    }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> ValueTask&lt;<span class="hljs-built_in">bool</span>&gt; <span class="hljs-title">TryHandleAsync</span>(<span class="hljs-params">
+        HttpContext context,
+        Exception exception,
+        CancellationToken ct</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> (statusCode, title) = exception <span class="hljs-keyword">switch</span>
+        {
+            ValidationException =&gt; (<span class="hljs-number">400</span>, <span class="hljs-string">&quot;Validation Error&quot;</span>),
+            OrderNotFoundException =&gt; (<span class="hljs-number">404</span>, <span class="hljs-string">&quot;Not Found&quot;</span>),
+            DomainException =&gt; (<span class="hljs-number">422</span>, <span class="hljs-string">&quot;Business Rule Violation&quot;</span>),
+            _ =&gt; (<span class="hljs-number">500</span>, <span class="hljs-string">&quot;Internal Server Error&quot;</span>)
+        };
+
+        <span class="hljs-keyword">if</span> (statusCode == <span class="hljs-number">500</span>)
+            _logger.LogError(exception, <span class="hljs-string">&quot;Unhandled exception&quot;</span>);
+
+        <span class="hljs-keyword">await</span> Results.Problem(
+            title: title,
+            detail: exception.Message,
+            statusCode: statusCode)
+            .ExecuteAsync(context);
+
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    }
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1114" data-line-end="1115"><a id="The_using_Statement_and_Exception_Safety_1114"></a>The <code>using</code> Statement and Exception Safety</h3>
+<p class="has-line-data" data-line-start="1116" data-line-end="1117">The <code>using</code> statement guarantees that <code>Dispose()</code> is called even if an exception is thrown. It is equivalent to try/finally.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1119" data-line-end="1135"><span class="hljs-comment">// These two are equivalent</span>
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(connectionString);
+<span class="hljs-comment">// ... use connection</span>
+<span class="hljs-comment">// Dispose() is called automatically even if an exception occurs</span>
+
+<span class="hljs-comment">// Equivalent to:</span>
+<span class="hljs-keyword">var</span> connection = <span class="hljs-keyword">new</span> SqlConnection(connectionString);
+<span class="hljs-keyword">try</span>
+{
+    <span class="hljs-comment">// ... use connection</span>
+}
+<span class="hljs-keyword">finally</span>
+{
+    connection?.Dispose();
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1136" data-line-end="1137">Any class implementing <code>IDisposable</code> should be wrapped in <code>using</code>. This includes: <code>SqlConnection</code>, <code>SqlCommand</code>, <code>HttpClient</code> (usually — though in practice use <code>IHttpClientFactory</code>), <code>StreamReader</code>, <code>FileStream</code>, <code>MemoryStream</code>.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1140" data-line-end="1141"><a id="AggregateException_Handling_Multiple_Exceptions_1140"></a>AggregateException — Handling Multiple Exceptions</h3>
+<p class="has-line-data" data-line-start="1142" data-line-end="1143">When you run multiple tasks in parallel and multiple fail, the errors are collected in an <code>AggregateException</code>.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1145" data-line-end="1177"><span class="hljs-keyword">try</span>
+{
+    <span class="hljs-keyword">await</span> Task.WhenAll(
+        FetchUserAsync(),
+        FetchOrdersAsync(),
+        FetchInventoryAsync());
+}
+<span class="hljs-keyword">catch</span> (AggregateException aex)
+{
+    <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> inner <span class="hljs-keyword">in</span> aex.Flatten().InnerExceptions)
+    {
+        _logger.LogError(inner, <span class="hljs-string">&quot;One of the parallel tasks failed.&quot;</span>);
+    }
+}
+
+<span class="hljs-comment">// With await, AggregateException is usually unwrapped automatically</span>
+<span class="hljs-comment">// The first exception is thrown. To see all of them, capture the task first:</span>
+<span class="hljs-keyword">var</span> task = Task.WhenAll(FetchUserAsync(), FetchOrdersAsync());
+<span class="hljs-keyword">try</span>
+{
+    <span class="hljs-keyword">await</span> task;
+}
+<span class="hljs-keyword">catch</span>
+{
+    <span class="hljs-comment">// task.Exception is an AggregateException with all failures</span>
+    <span class="hljs-keyword">if</span> (task.Exception != <span class="hljs-literal">null</span>)
+    {
+        <span class="hljs-keyword">foreach</span> (<span class="hljs-keyword">var</span> ex <span class="hljs-keyword">in</span> task.Exception.InnerExceptions)
+            _logger.LogError(ex, <span class="hljs-string">&quot;Parallel task failure.&quot;</span>);
+    }
+}
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1180" data-line-end="1181"><a id="Exception_Handling_Best_Practices_1180"></a>Exception Handling Best Practices</h3>
+<p class="has-line-data" data-line-start="1182" data-line-end="1183"><strong>Catch specific, not general:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="1185" data-line-end="1191"><span class="hljs-comment">// BAD — swallows every possible problem</span>
+<span class="hljs-keyword">catch</span> (Exception ex) { Console.WriteLine(<span class="hljs-string">&quot;Error.&quot;</span>); }
+
+<span class="hljs-comment">// GOOD — handle what you can deal with; let the rest propagate</span>
+<span class="hljs-keyword">catch</span> (FileNotFoundException ex) { <span class="hljs-keyword">return</span> DefaultConfiguration(); }
+</code></pre>
+<p class="has-line-data" data-line-start="1192" data-line-end="1193"><strong>Never swallow exceptions silently:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="1195" data-line-end="1207"><span class="hljs-comment">// THE WORST THING IN ANY CODEBASE</span>
+<span class="hljs-comment">// Someone reported a bug, you spent three days finding it</span>
+<span class="hljs-comment">// Then you found this.</span>
+<span class="hljs-keyword">catch</span> (Exception) { } <span class="hljs-comment">// No log, no rethrow, no action. Just silence.</span>
+
+<span class="hljs-comment">// At minimum, log it</span>
+<span class="hljs-keyword">catch</span> (Exception ex)
+{
+    _logger.LogError(ex, <span class="hljs-string">&quot;Failed to process order {OrderId}&quot;</span>, orderId);
+    <span class="hljs-keyword">throw</span>; <span class="hljs-comment">// And re-throw if you cannot handle it here</span>
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1208" data-line-end="1209"><strong>Do not use exceptions for flow control:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="1211" data-line-end="1231"><span class="hljs-comment">// BAD — exceptions are expensive. This uses them as if-else.</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">UserExists</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> email</span>)</span>
+{
+    <span class="hljs-keyword">try</span>
+    {
+        <span class="hljs-keyword">var</span> user = _repo.GetByEmail(email); <span class="hljs-comment">// throws NotFoundException if not found</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+    }
+    <span class="hljs-keyword">catch</span> (NotFoundException)
+    {
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+    }
+}
+
+<span class="hljs-comment">// GOOD — design the method to return null or use TryGet pattern</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">UserExists</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> email</span>)</span>
+{
+    <span class="hljs-keyword">return</span> _repo.FindByEmail(email) != <span class="hljs-literal">null</span>;
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1232" data-line-end="1233"><strong>Log at the boundary, not everywhere:</strong></p>
+<p class="has-line-data" data-line-start="1234" data-line-end="1235">Log exceptions where you handle them, not at every level. If you log and re-throw, the same exception gets logged multiple times at different levels, polluting your logs.</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1237" data-line-end="1255"><span class="hljs-comment">// BAD — logged at every layer</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">ProcessAsync</span>()</span>
+{
+    <span class="hljs-keyword">try</span> { <span class="hljs-keyword">await</span> _service.DoWorkAsync(); }
+    <span class="hljs-keyword">catch</span> (Exception ex) { _logger.LogError(ex, <span class="hljs-string">&quot;Error in ProcessAsync&quot;</span>); <span class="hljs-keyword">throw</span>; }
+}
+
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">DoWorkAsync</span>()</span>
+{
+    <span class="hljs-keyword">try</span> { <span class="hljs-keyword">await</span> _repo.SaveAsync(); }
+    <span class="hljs-keyword">catch</span> (Exception ex) { _logger.LogError(ex, <span class="hljs-string">&quot;Error in DoWorkAsync&quot;</span>); <span class="hljs-keyword">throw</span>; }
+}
+
+<span class="hljs-comment">// GOOD — log once at the top boundary (middleware or controller)</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">ProcessAsync</span>()</span> { <span class="hljs-keyword">await</span> _service.DoWorkAsync(); } <span class="hljs-comment">// Let it propagate</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">DoWorkAsync</span>()</span> { <span class="hljs-keyword">await</span> _repo.SaveAsync(); }       <span class="hljs-comment">// Let it propagate</span>
+<span class="hljs-comment">// Global exception middleware catches and logs it once</span>
+</code></pre>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1258" data-line-end="1259"><a id="Exception_Handling_in_async_Methods_1258"></a>Exception Handling in async Methods</h3>
+<pre><code class="has-line-data language-csharp" data-line-start="1261" data-line-end="1283"><span class="hljs-comment">// Exceptions in async methods are captured in the returned Task</span>
+<span class="hljs-comment">// They are thrown when the Task is awaited</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task&lt;<span class="hljs-built_in">string</span>&gt; <span class="hljs-title">FetchDataAsync</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> url</span>)</span>
+{
+    <span class="hljs-comment">// If this throws, the exception is stored in the Task</span>
+    <span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> _httpClient.GetStringAsync(url);
+    <span class="hljs-keyword">return</span> response;
+}
+
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">CallerAsync</span>()</span>
+{
+    <span class="hljs-keyword">try</span>
+    {
+        <span class="hljs-keyword">var</span> data = <span class="hljs-keyword">await</span> FetchDataAsync(<span class="hljs-string">&quot;https://api.example.com/data&quot;</span>);
+    }
+    <span class="hljs-keyword">catch</span> (HttpRequestException ex)
+    {
+        <span class="hljs-comment">// Exception from FetchDataAsync is caught here, naturally</span>
+        Console.WriteLine(<span class="hljs-string">$&quot;HTTP error: <span class="hljs-subst">{ex.Message}</span>&quot;</span>);
+    }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1284" data-line-end="1285"><strong>Fire-and-forget with exception handling:</strong></p>
+<pre><code class="has-line-data language-csharp" data-line-start="1287" data-line-end="1300"><span class="hljs-comment">// If you must fire-and-forget, at least handle the exception</span>
+_ = Task.Run(<span class="hljs-keyword">async</span> () =&gt;
+{
+    <span class="hljs-keyword">try</span>
+    {
+        <span class="hljs-keyword">await</span> SendNotificationAsync();
+    }
+    <span class="hljs-keyword">catch</span> (Exception ex)
+    {
+        _logger.LogError(ex, <span class="hljs-string">&quot;Background notification failed.&quot;</span>);
+    }
+});
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1303" data-line-end="1304"><a id="4_Interview_Questions_and_Answers_1303"></a>4. Interview Questions and Answers</h2>
+<h3 class="code-line has-line-data" data-line-start="1305" data-line-end="1306"><a id="NonQuery_1305"></a>NonQuery</h3>
+<p class="has-line-data" data-line-start="1307" data-line-end="1308"><strong>Q: What does ExecuteNonQuery return and what does the return value mean?</strong></p>
+<p class="has-line-data" data-line-start="1309" data-line-end="1310"><code>ExecuteNonQuery</code> returns an integer representing the number of rows affected by the command. For INSERT, UPDATE, and DELETE, it is the count of rows changed. It returns -1 for DDL statements like CREATE TABLE or for stored procedures that do not explicitly set ROWCOUNT. A return value of 0 means the command ran successfully but no rows matched the condition.</p>
+<hr>
+<p class="has-line-data" data-line-start="1313" data-line-end="1314"><strong>Q: What is the difference between ExecuteNonQuery, ExecuteScalar, and ExecuteReader?</strong></p>
+<p class="has-line-data" data-line-start="1315" data-line-end="1316"><code>ExecuteNonQuery</code> runs a command that does not return a result set (INSERT, UPDATE, DELETE) and returns the count of rows affected. <code>ExecuteScalar</code> runs a query and returns the first column of the first row as a single object — used for aggregate queries like COUNT or SUM. <code>ExecuteReader</code> runs a SELECT query and returns a <code>SqlDataReader</code> that allows forward-only, read-only iteration over the result set.</p>
+<hr>
+<p class="has-line-data" data-line-start="1319" data-line-end="1320"><strong>Q: Why should you always use parameterised queries instead of string concatenation?</strong></p>
+<p class="has-line-data" data-line-start="1321" data-line-end="1322">String concatenation is vulnerable to SQL injection — an attacker can include SQL code in user input that changes the intent of the query, potentially deleting tables, bypassing authentication, or extracting sensitive data. Parameterised queries treat input values as data, not as SQL code. The database driver escapes the values before sending them to the database. This is non-negotiable security.</p>
+<hr>
+<p class="has-line-data" data-line-start="1325" data-line-end="1326"><strong>Q: What is a database transaction and when would you use one?</strong></p>
+<p class="has-line-data" data-line-start="1327" data-line-end="1328">A transaction is a group of database operations treated as a single unit of work. Either all operations succeed and are committed, or any failure causes all operations to be rolled back. Use transactions whenever you have multiple related database changes that must all succeed together — money transfers, order placement (create order + reserve inventory + log activity), or any operation where partial completion would leave data in an inconsistent state.</p>
+<hr>
+<p class="has-line-data" data-line-start="1331" data-line-end="1332"><strong>Q: What is the difference between <a href="http://ADO.NET">ADO.NET</a> and Dapper?</strong></p>
+<p class="has-line-data" data-line-start="1333" data-line-end="1334"><a href="http://ADO.NET">ADO.NET</a> is the low-level data access API in .NET. You write SQL, manage connections, create commands, and manually map data reader results to objects. Dapper is a micro-ORM that wraps <a href="http://ADO.NET">ADO.NET</a> — you still write SQL (unlike Entity Framework which generates it), but Dapper handles parameter mapping and result-to-object mapping automatically. Dapper is much less code than raw <a href="http://ADO.NET">ADO.NET</a> and has near-zero performance overhead compared to raw <a href="http://ADO.NET">ADO.NET</a>, making it popular for high-performance scenarios.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1337" data-line-end="1338"><a id="Extension_Methods_1337"></a>Extension Methods</h3>
+<p class="has-line-data" data-line-start="1339" data-line-end="1340"><strong>Q: What are extension methods and how do you define one?</strong></p>
+<p class="has-line-data" data-line-start="1341" data-line-end="1342">Extension methods allow you to add methods to existing types without modifying the original class or creating a subclass. To define one: create a <code>static</code> class, create a <code>static</code> method inside it, and prefix the first parameter with <code>this</code> followed by the type you are extending. The method then appears on that type’s IntelliSense and can be called using dot notation. The compiler transforms the call into a static method invocation.</p>
+<hr>
+<p class="has-line-data" data-line-start="1345" data-line-end="1346"><strong>Q: Can extension methods access private members of the extended class?</strong></p>
+<p class="has-line-data" data-line-start="1347" data-line-end="1348">No. Extension methods are defined outside the class they extend and can only access public and internal (within the same assembly) members. They have no special access to private fields or methods. If you need access to private members, you must modify the class itself.</p>
+<hr>
+<p class="has-line-data" data-line-start="1351" data-line-end="1352"><strong>Q: What happens if an instance method and an extension method have the same signature?</strong></p>
+<p class="has-line-data" data-line-start="1353" data-line-end="1354">The instance method always wins. Extension methods are considered only when the compiler cannot find a matching instance method on the type. This means if the type is later updated to include a method with the same name and signature, your extension method silently stops being called — a potential source of subtle bugs. This is why extension methods should not duplicate names of existing instance methods.</p>
+<hr>
+<p class="has-line-data" data-line-start="1357" data-line-end="1358"><strong>Q: How is LINQ implemented in .NET?</strong></p>
+<p class="has-line-data" data-line-start="1359" data-line-end="1360">LINQ is built entirely on extension methods defined on <code>IEnumerable&lt;T&gt;</code> and <code>IQueryable&lt;T&gt;</code> in the <code>System.Linq</code> namespace. Methods like <code>Where</code>, <code>Select</code>, <code>OrderBy</code>, <code>GroupBy</code>, <code>First</code>, <code>ToList</code>, and <code>Count</code> are all extension methods. This is why LINQ works on any type that implements <code>IEnumerable&lt;T&gt;</code> — your custom collections, arrays, lists, and database query objects all get LINQ for free.</p>
+<hr>
+<h3 class="code-line has-line-data" data-line-start="1363" data-line-end="1364"><a id="Exception_Handling_1363"></a>Exception Handling</h3>
+<p class="has-line-data" data-line-start="1365" data-line-end="1366"><strong>Q: What is the difference between <code>throw</code> and <code>throw ex</code>?</strong></p>
+<p class="has-line-data" data-line-start="1367" data-line-end="1368"><code>throw</code> re-throws the current exception while preserving the original stack trace — the full call stack from where the exception was first thrown is maintained. <code>throw ex</code> throws the exception as if it originated at the current location, resetting the stack trace and losing all information about the original source. Always use <code>throw</code> when re-throwing. Use <code>throw ex</code> only in the rare case where you deliberately want to hide the original stack trace origin.</p>
+<hr>
+<p class="has-line-data" data-line-start="1371" data-line-end="1372"><strong>Q: What is the <code>finally</code> block and is it always guaranteed to run?</strong></p>
+<p class="has-line-data" data-line-start="1373" data-line-end="1374">The <code>finally</code> block runs after the <code>try</code> block and any executed <code>catch</code> block, regardless of whether an exception was thrown. It runs if the <code>try</code> block completes normally, if an exception is thrown and caught, if an exception is thrown and not caught, or if there is a <code>return</code> statement inside the <code>try</code>. It does NOT run if the process is killed (Environment.FailFast or process crash), the thread is aborted, or the machine loses power.</p>
+<hr>
+<p class="has-line-data" data-line-start="1377" data-line-end="1378"><strong>Q: What is an exception filter (the <code>when</code> keyword) and why is it better than catch-and-rethrow?</strong></p>
+<p class="has-line-data" data-line-start="1379" data-line-end="1380">An exception filter adds a boolean condition to a catch block. The block only catches the exception if both the type matches and the condition is true. If the condition is false, the runtime continues looking for another handler without unwinding the stack — the stack trace is preserved perfectly. With catch-and-rethrow using <code>throw</code>, even though the stack trace is preserved, the debugger may stop at the rethrow point. With <code>when</code>, the debugger stops at the original throw location, which is more useful for diagnosis.</p>
+<hr>
+<p class="has-line-data" data-line-start="1383" data-line-end="1384"><strong>Q: What is the difference between a domain exception and a system exception? When do you create custom exceptions?</strong></p>
+<p class="has-line-data" data-line-start="1385" data-line-end="1386">System exceptions (like <code>NullReferenceException</code>, <code>ArgumentException</code>) represent programming errors or unexpected system conditions. Domain exceptions represent business rule violations that are expected in the normal operation of the system — an order being placed with insufficient stock, a user trying to access a resource they do not own. Create custom exceptions when: you have a specific error condition callers need to handle differently, you need to carry additional context (like which product ID caused the stock problem), or you want to document business rules as first-class code. Do not create custom exceptions for every small error — use built-in types like <code>ArgumentNullException</code> and <code>InvalidOperationException</code> for general cases.</p>
+<hr>
+<p class="has-line-data" data-line-start="1389" data-line-end="1390"><strong>Q: How do you handle exceptions in parallel tasks using Task.WhenAll?</strong></p>
+<p class="has-line-data" data-line-start="1391" data-line-end="1392">When multiple tasks fail, <code>Task.WhenAll</code> collects all exceptions into an <code>AggregateException</code>. When you <code>await</code> the task, only the first inner exception is re-thrown by default. To see all exceptions, capture the task before awaiting it, then check <code>task.Exception.InnerExceptions</code> after catching the exception. Alternatively, use <code>.Flatten()</code> on the <code>AggregateException</code> to normalise nested <code>AggregateException</code> instances into a flat list of inner exceptions.</p>
+<hr>
+<p class="has-line-data" data-line-start="1395" data-line-end="1396"><strong>Q: Where should you log exceptions in a layered application?</strong></p>
+<p class="has-line-data" data-line-start="1397" data-line-end="1398">Log exceptions at the outermost handling boundary — the global exception middleware, a top-level error handler, or the application entry point. Do not log at every layer and re-throw, as this results in the same exception being logged multiple times with duplicate noise in your logs. Let exceptions propagate naturally up the call stack and handle them once. The exception carries its stack trace, so you do not lose information by not logging at intermediate layers.</p>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1401" data-line-end="1402"><a id="Quick_Reference_Cheat_Sheet_1401"></a>Quick Reference Cheat Sheet</h2>
+<h3 class="code-line has-line-data" data-line-start="1403" data-line-end="1404"><a id="ExecuteNonQuery_at_a_Glance_1403"></a>ExecuteNonQuery at a Glance</h3>
+<pre><code class="has-line-data" data-line-start="1406" data-line-end="1417">Operation           Method              Returns
+INSERT/UPDATE/DELETE  ExecuteNonQuery   int (rows affected)
+COUNT/SUM/MAX/single  ExecuteScalar     object (first col, first row)
+SELECT (rows)         ExecuteReader     SqlDataReader (iterate rows)
+
+Always:
+    Use parameterised queries (@Param syntax)
+    Wrap connections in using
+    Use async versions (ExecuteNonQueryAsync)
+    Use transactions for multi-step operations
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1418" data-line-end="1419"><a id="Extension_Method_Template_1418"></a>Extension Method Template</h3>
+<pre><code class="has-line-data language-csharp" data-line-start="1421" data-line-end="1430"><span class="hljs-comment">// Always: static class, static method, &#x27;this&#x27; on first param</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title">TypeExtensions</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> ReturnType <span class="hljs-title">MethodName</span>(<span class="hljs-params"><span class="hljs-keyword">this</span> TypeBeingExtended source, <span class="hljs-keyword">params</span>...</span>)</span>
+    {
+        <span class="hljs-comment">// implementation</span>
+    }
+}
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1431" data-line-end="1432"><a id="Exception_Handling_Rules_1431"></a>Exception Handling Rules</h3>
+<pre><code class="has-line-data" data-line-start="1434" data-line-end="1448">Always:
+    Catch specific exceptions before general ones
+    Use throw (not throw ex) when re-throwing
+    Log once at the boundary, not at every layer
+    Use finally for cleanup / using for IDisposable
+    Create custom exceptions for meaningful domain errors
+
+Never:
+    Swallow exceptions silently (empty catch blocks)
+    Use exceptions for normal control flow
+    Catch Exception at every layer and re-log
+    Use throw ex (resets the stack trace)
+    Leave resources uncleaned when an exception occurs
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1449" data-line-end="1450"><a id="Custom_Exception_Template_1449"></a>Custom Exception Template</h3>
+<pre><code class="has-line-data language-csharp" data-line-start="1452" data-line-end="1470"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">YourException</span> : <span class="hljs-title">Exception</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">YourException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params">message</span>)</span> { }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">YourException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message, Exception innerException</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params">message, innerException</span>)</span> { }
+
+    <span class="hljs-comment">// Add properties for extra context</span>
+    <span class="hljs-keyword">public</span> <span class="hljs-built_in">string</span> SomeContext { <span class="hljs-keyword">get</span>; }
+
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">YourException</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> message, <span class="hljs-built_in">string</span> context</span>)
+        : <span class="hljs-title">base</span>(<span class="hljs-params">message</span>)</span>
+    {
+        SomeContext = context;
+    }
+}
+</code></pre>
+<hr>
+<p class="has-line-data" data-line-start="1473" data-line-end="1474"><em>These three topics appear constantly in real codebases — in every data access layer, every utility library, and every API. Understand them thoroughly and you will write code that is safe, readable, and maintainable.</em></p>
+
+</body>
+</html>

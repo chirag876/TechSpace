@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>C# & .NET Interview Questions Guide Part 2.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<h1 class="code-line has-line-data" data-line-start="0" data-line-end="1"><a id="C_NET_Interview_Questions_Guide_Part_2_0"></a>C# &amp; .NET Interview Questions Guide Part 2</h1>
+<h2 class="code-line has-line-data" data-line-start="1" data-line-end="2"><a id="Comprehensive_QA_from_Basic_to_Advanced_1"></a>Comprehensive Q&amp;A from Basic to Advanced</h2>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="5" data-line-end="6"><a id="Table_of_Contents_5"></a>Table of Contents</h2>
+<ol>
+<li class="has-line-data" data-line-start="6" data-line-end="7"><a href="#clean-architecture">Clean Architecture</a></li>
+<li class="has-line-data" data-line-start="7" data-line-end="8"><a href="#singleton--sealed-classes">Singleton &amp; Sealed Classes</a></li>
+<li class="has-line-data" data-line-start="8" data-line-end="9"><a href="#aspnet-core-lifecycle">ASP.NET Core Lifecycle</a></li>
+<li class="has-line-data" data-line-start="9" data-line-end="10"><a href="#net-core-vs-net-framework">.NET Core vs .NET Framework</a></li>
+<li class="has-line-data" data-line-start="10" data-line-end="11"><a href="#microservices-communication">Microservices Communication</a></li>
+<li class="has-line-data" data-line-start="11" data-line-end="13"><a href="#middleware">Middleware</a></li>
+</ol>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="15" data-line-end="16"><a id="Clean_Architecture_15"></a>Clean Architecture</h2>
+<h3 class="code-line has-line-data" data-line-start="17" data-line-end="18"><a id="Basic_Level_17"></a>Basic Level</h3>
+<p class="has-line-data" data-line-start="19" data-line-end="21"><strong>Q1: What is Clean Architecture?</strong><br>
+A: Clean Architecture is a design pattern that emphasizes separation of concerns and independence of frameworks. It organizes code into layers (Presentation, Application, Domain, Infrastructure) where each layer has a specific responsibility and minimal dependencies on other layers.</p>
+<p class="has-line-data" data-line-start="22" data-line-end="24"><strong>Q2: What are the main layers in Clean Architecture?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="24" data-line-end="25"><strong>Presentation Layer</strong>: UI/API controllers, view models</li>
+<li class="has-line-data" data-line-start="25" data-line-end="26"><strong>Application Layer</strong>: Business logic, use cases, DTOs, specifications</li>
+<li class="has-line-data" data-line-start="26" data-line-end="27"><strong>Domain Layer</strong>: Entities, value objects, interfaces, domain services</li>
+<li class="has-line-data" data-line-start="27" data-line-end="29"><strong>Infrastructure Layer</strong>: Database access, external services, implementations</li>
+</ul>
+<p class="has-line-data" data-line-start="29" data-line-end="31"><strong>Q3: What is the Dependency Inversion Principle in Clean Architecture?</strong><br>
+A: High-level modules should not depend on low-level modules. Both should depend on abstractions. This is achieved through interfaces and dependency injection, making code loosely coupled and testable.</p>
+<p class="has-line-data" data-line-start="32" data-line-end="34"><strong>Q4: Can you explain the flow of data in Clean Architecture?</strong><br>
+A: Data typically flows from the Presentation Layer → Application Layer (services) → Domain Layer (business logic) → Infrastructure Layer (data access). The reverse flow uses interfaces to maintain dependency direction.</p>
+<h3 class="code-line has-line-data" data-line-start="35" data-line-end="36"><a id="Intermediate_Level_35"></a>Intermediate Level</h3>
+<p class="has-line-data" data-line-start="37" data-line-end="39"><strong>Q5: What are DTOs and why are they used in Clean Architecture?</strong><br>
+A: Data Transfer Objects are objects used to transfer data between layers. They prevent exposing domain models directly to clients, providing a contract for API responses and decoupling presentation from domain logic.</p>
+<p class="has-line-data" data-line-start="40" data-line-end="42"><strong>Q6: How do you handle database queries in Clean Architecture? (Specification Pattern)</strong><br>
+A: The Specification Pattern encapsulates query logic into separate classes. Instead of writing queries directly in repositories, you create Specification objects that contain the criteria and are passed to repositories, improving reusability and testability.</p>
+<p class="has-line-data" data-line-start="43" data-line-end="45"><strong>Q7: What is the Repository Pattern and how does it fit in Clean Architecture?</strong><br>
+A: The Repository Pattern abstracts data access logic. It acts as an in-memory collection of domain objects, sitting in the Infrastructure Layer but exposing interfaces defined in the Application/Domain layers, enabling easy testing and switching data sources.</p>
+<p class="has-line-data" data-line-start="46" data-line-end="48"><strong>Q8: How do you handle cross-cutting concerns (logging, caching, validation) in Clean Architecture?</strong><br>
+A: Cross-cutting concerns should be handled through:</p>
+<ul>
+<li class="has-line-data" data-line-start="48" data-line-end="49"><strong>Middleware</strong> (in <a href="http://ASP.NET">ASP.NET</a> Core)</li>
+<li class="has-line-data" data-line-start="49" data-line-end="50"><strong>Decorators</strong> (wrapping service implementations)</li>
+<li class="has-line-data" data-line-start="50" data-line-end="51"><strong>Aspects</strong> (using libraries like PostSharp)</li>
+<li class="has-line-data" data-line-start="51" data-line-end="53"><strong>Pipeline behaviors</strong> (MediatR)</li>
+</ul>
+<p class="has-line-data" data-line-start="53" data-line-end="55"><strong>Q9: What’s the difference between a Use Case and a Service in Clean Architecture?</strong><br>
+A: A Use Case (Application Service) represents a single business operation that can be performed by the application. A Service may be a utility or domain service. Use Cases are orchestrators; services contain reusable business logic.</p>
+<h3 class="code-line has-line-data" data-line-start="56" data-line-end="57"><a id="Advanced_Level_56"></a>Advanced Level</h3>
+<p class="has-line-data" data-line-start="58" data-line-end="60"><strong>Q10: How do you implement Domain-Driven Design (DDD) within Clean Architecture?</strong><br>
+A: Combine them by:</p>
+<ul>
+<li class="has-line-data" data-line-start="60" data-line-end="61">Using <strong>Aggregates</strong> as domain models (clusters of entities)</li>
+<li class="has-line-data" data-line-start="61" data-line-end="62">Defining <strong>Bounded Contexts</strong> matching business domains</li>
+<li class="has-line-data" data-line-start="62" data-line-end="63">Using <strong>Value Objects</strong> for immutable domain concepts</li>
+<li class="has-line-data" data-line-start="63" data-line-end="64">Placing <strong>Domain Services</strong> in the Domain layer for cross-aggregate logic</li>
+<li class="has-line-data" data-line-start="64" data-line-end="66">Creating <strong>Ubiquitous Language</strong> shared between developers and business</li>
+</ul>
+<p class="has-line-data" data-line-start="66" data-line-end="68"><strong>Q11: How do you handle circular dependencies in Clean Architecture?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="68" data-line-end="69">Move common abstractions to a separate layer</li>
+<li class="has-line-data" data-line-start="69" data-line-end="70">Use dependency inversion (depend on abstractions)</li>
+<li class="has-line-data" data-line-start="70" data-line-end="71">Refactor domain logic into separate, focused services</li>
+<li class="has-line-data" data-line-start="71" data-line-end="72">Consider if architectural boundaries are correctly defined</li>
+<li class="has-line-data" data-line-start="72" data-line-end="74">Use interfaces to break dependency cycles</li>
+</ul>
+<p class="has-line-data" data-line-start="74" data-line-end="76"><strong>Q12: Explain the CQRS pattern and how it integrates with Clean Architecture.</strong><br>
+A: Command Query Responsibility Segregation separates read and write operations. In Clean Architecture:</p>
+<ul>
+<li class="has-line-data" data-line-start="76" data-line-end="77"><strong>Commands</strong> handle write operations (use cases that modify state)</li>
+<li class="has-line-data" data-line-start="77" data-line-end="78"><strong>Queries</strong> handle read operations (optimized for retrieval)</li>
+<li class="has-line-data" data-line-start="78" data-line-end="79">Each can have its own data model and optimization strategies</li>
+<li class="has-line-data" data-line-start="79" data-line-end="81">Improves scalability and makes intent clear</li>
+</ul>
+<p class="has-line-data" data-line-start="81" data-line-end="83"><strong>Q13: How would you structure a multi-tenant Clean Architecture application?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="83" data-line-end="84">Add <strong>Tenant Context</strong> handling in middleware/application service</li>
+<li class="has-line-data" data-line-start="84" data-line-end="85">Isolate <strong>tenant-specific business logic</strong> in application layer</li>
+<li class="has-line-data" data-line-start="85" data-line-end="86">Use <strong>tenant-aware repositories</strong> in infrastructure layer</li>
+<li class="has-line-data" data-line-start="86" data-line-end="87">Consider database design: shared DB with tenant column, or separate databases per tenant</li>
+<li class="has-line-data" data-line-start="87" data-line-end="89">Validate tenant access at application boundaries</li>
+</ul>
+<p class="has-line-data" data-line-start="89" data-line-end="91"><strong>Q14: What are the common mistakes in implementing Clean Architecture and how do you avoid them?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="91" data-line-end="92"><strong>Over-engineering</strong>: Don’t create layers for simple applications</li>
+<li class="has-line-data" data-line-start="92" data-line-end="93"><strong>Leaky abstractions</strong>: Ensure layers truly encapsulate responsibilities</li>
+<li class="has-line-data" data-line-start="93" data-line-end="94"><strong>Wrong dependency direction</strong>: Always depend inward, never outward</li>
+<li class="has-line-data" data-line-start="94" data-line-end="95"><strong>God objects</strong>: Keep entities and services focused</li>
+<li class="has-line-data" data-line-start="95" data-line-end="96"><strong>Missing domain logic</strong>: Don’t just use the domain layer for data storage</li>
+<li class="has-line-data" data-line-start="96" data-line-end="98"><strong>Over-abstraction</strong>: Don’t create interfaces for everything</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="100" data-line-end="101"><a id="Singleton_Sealed_Classes_100"></a>Singleton &amp; Sealed Classes</h2>
+<h3 class="code-line has-line-data" data-line-start="102" data-line-end="103"><a id="Basic_Level_102"></a>Basic Level</h3>
+<p class="has-line-data" data-line-start="104" data-line-end="106"><strong>Q15: What is a Singleton pattern?</strong><br>
+A: Singleton is a creational design pattern that ensures a class has only one instance and provides a global point of access to it. It’s useful for resources that should be shared application-wide (logger, database connection pool, configuration).</p>
+<p class="has-line-data" data-line-start="107" data-line-end="109"><strong>Q16: How do you implement a Singleton in C#?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="110" data-line-end="120"><span class="hljs-comment">// Lazy initialization</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> Lazy&lt;Singleton&gt; _instance = 
+        <span class="hljs-keyword">new</span> Lazy&lt;Singleton&gt;(() =&gt; <span class="hljs-keyword">new</span> Singleton());
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton Instance =&gt; _instance.Value;
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span>()</span> { }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="121" data-line-end="123"><strong>Q17: What is a sealed class?</strong><br>
+A: A sealed class cannot be inherited. It’s declared using the <code>sealed</code> modifier. It’s useful for preventing unintended inheritance and enabling compiler optimizations since the compiler knows no derived classes exist.</p>
+<p class="has-line-data" data-line-start="124" data-line-end="126"><strong>Q18: Can you create an instance of a sealed class?</strong><br>
+A: Yes, you can create instances of sealed classes. The <code>sealed</code> modifier only prevents inheritance. You still instantiate them normally.</p>
+<p class="has-line-data" data-line-start="127" data-line-end="129"><strong>Q19: Can a sealed class have a sealed method?</strong><br>
+A: No, it’s redundant. All methods in a sealed class are already implicitly sealed since the class cannot be inherited. The <code>sealed</code> keyword on methods only makes sense in derived classes overriding virtual members.</p>
+<h3 class="code-line has-line-data" data-line-start="130" data-line-end="131"><a id="Intermediate_Level_130"></a>Intermediate Level</h3>
+<p class="has-line-data" data-line-start="132" data-line-end="134"><strong>Q20: What are the different ways to implement Singleton in C#? (Compare them)</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="135" data-line-end="177"><span class="hljs-comment">// 1. Eager initialization</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">SingletonEager</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> SingletonEager _instance = <span class="hljs-keyword">new</span> SingletonEager();
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">SingletonEager</span>()</span> { }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SingletonEager Instance =&gt; _instance;
+}
+
+<span class="hljs-comment">// 2. Lazy initialization (thread-safe)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">SingletonLazy</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> Lazy&lt;SingletonLazy&gt; _instance = 
+        <span class="hljs-keyword">new</span> Lazy&lt;SingletonLazy&gt;(() =&gt; <span class="hljs-keyword">new</span> SingletonLazy());
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">SingletonLazy</span>()</span> { }
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SingletonLazy Instance =&gt; _instance.Value;
+}
+
+<span class="hljs-comment">// 3. Double-checked locking (not recommended in .NET)</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">SingletonDoubleCheck</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> SingletonDoubleCheck _instance;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">object</span> _lock = <span class="hljs-keyword">new</span> <span class="hljs-built_in">object</span>();
+    
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">SingletonDoubleCheck</span>()</span> { }
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> SingletonDoubleCheck Instance
+    {
+        <span class="hljs-keyword">get</span>
+        {
+            <span class="hljs-keyword">if</span> (_instance == <span class="hljs-literal">null</span>)
+            {
+                <span class="hljs-keyword">lock</span> (_lock)
+                {
+                    <span class="hljs-keyword">if</span> (_instance == <span class="hljs-literal">null</span>)
+                        _instance = <span class="hljs-keyword">new</span> SingletonDoubleCheck();
+                }
+            }
+            <span class="hljs-keyword">return</span> _instance;
+        }
+    }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="177" data-line-end="178"><strong>Best practice</strong>: Use <code>Lazy&lt;T&gt;</code> for the cleanest, thread-safe implementation.</p>
+<p class="has-line-data" data-line-start="179" data-line-end="181"><strong>Q21: Is Singleton thread-safe? How?</strong><br>
+A: With proper implementation (like <code>Lazy&lt;T&gt;</code>), yes. <code>Lazy&lt;T&gt;</code> uses <code>LazyThreadSafetyMode.ExecutionAndPublication</code> by default, ensuring thread-safe lazy initialization. The private constructor prevents external instantiation.</p>
+<p class="has-line-data" data-line-start="182" data-line-end="184"><strong>Q22: What are the problems with Singleton pattern?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="184" data-line-end="185"><strong>Hard to test</strong>: Singletons with global state make unit testing difficult</li>
+<li class="has-line-data" data-line-start="185" data-line-end="186"><strong>Hidden dependencies</strong>: Classes depend on a global instance, making dependencies unclear</li>
+<li class="has-line-data" data-line-start="186" data-line-end="187"><strong>Concurrency issues</strong>: If not implemented carefully, can have threading problems</li>
+<li class="has-line-data" data-line-start="187" data-line-end="188"><strong>Violates Single Responsibility</strong>: Manages its own lifecycle + business logic</li>
+<li class="has-line-data" data-line-start="188" data-line-end="189"><strong>Makes code tightly coupled</strong>: Difficult to swap implementations</li>
+<li class="has-line-data" data-line-start="189" data-line-end="191"><strong>Not suitable for multi-threaded environments</strong> if poorly designed</li>
+</ul>
+<p class="has-line-data" data-line-start="191" data-line-end="193"><strong>Q23: Can you use Dependency Injection instead of Singleton?</strong><br>
+A: Yes, and it’s preferred in modern .NET applications. Use DI containers to register services:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="194" data-line-end="204"><span class="hljs-comment">// Register as singleton</span>
+services.AddSingleton&lt;IMyService, MyService&gt;();
+
+<span class="hljs-comment">// Inject where needed</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">MyController</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> IMyService _service;
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">MyController</span>(<span class="hljs-params">IMyService service</span>)</span> =&gt; _service = service;
+}
+</code></pre>
+<p class="has-line-data" data-line-start="204" data-line-end="205">This is cleaner, more testable, and follows SOLID principles.</p>
+<p class="has-line-data" data-line-start="206" data-line-end="208"><strong>Q24: When should you use a sealed class?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="208" data-line-end="209">When class is designed to not be inherited</li>
+<li class="has-line-data" data-line-start="209" data-line-end="210">When you want to prevent accidental misuse</li>
+<li class="has-line-data" data-line-start="210" data-line-end="211">For performance: sealed classes allow virtual method calls to be devirtualized</li>
+<li class="has-line-data" data-line-start="211" data-line-end="212">When you control the entire hierarchy and want to prevent future inheritance</li>
+<li class="has-line-data" data-line-start="212" data-line-end="214">Example: String is sealed in .NET</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="214" data-line-end="215"><a id="Advanced_Level_214"></a>Advanced Level</h3>
+<p class="has-line-data" data-line-start="216" data-line-end="218"><strong>Q25: Explain sealed methods in the context of virtual method overriding.</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="219" data-line-end="235"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Base</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">virtual</span> <span class="hljs-keyword">void</span> <span class="hljs-title">DoSomething</span>()</span> { }
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Derived</span> : <span class="hljs-title">Base</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">void</span> <span class="hljs-title">DoSomething</span>()</span> { }
+    <span class="hljs-comment">// Prevents further overriding in subclasses</span>
+}
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">FurtherDerived</span> : <span class="hljs-title">Derived</span>
+{
+    <span class="hljs-comment">// Cannot override DoSomething() here - it&#x27;s sealed</span>
+}
+</code></pre>
+<p class="has-line-data" data-line-start="235" data-line-end="236">Sealed methods prevent derived classes from overriding them, useful for security or behavior guarantees.</p>
+<p class="has-line-data" data-line-start="237" data-line-end="239"><strong>Q26: What’s the relationship between Singleton and sealed classes? (Commonly ignored)</strong><br>
+A: They’re independent concepts:</p>
+<ul>
+<li class="has-line-data" data-line-start="239" data-line-end="240"><strong>Sealed class</strong>: Prevents inheritance (structural constraint)</li>
+<li class="has-line-data" data-line-start="240" data-line-end="243"><strong>Singleton</strong>: Ensures one instance (behavioral pattern)<br>
+A Singleton should often be sealed to prevent inheritance and instantiation workarounds, but you can have sealed non-Singletons and Singletons that aren’t sealed (though not recommended).</li>
+</ul>
+<p class="has-line-data" data-line-start="243" data-line-end="245"><strong>Q27: How does reflection affect Singleton pattern?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="246" data-line-end="254"><span class="hljs-comment">// Reflection can break Singleton!</span>
+<span class="hljs-keyword">var</span> constructor = <span class="hljs-keyword">typeof</span>(Singleton).GetConstructors(
+    System.Reflection.BindingFlags.NonPublic | 
+    System.Reflection.BindingFlags.Instance)[<span class="hljs-number">0</span>];
+<span class="hljs-keyword">var</span> instance = (Singleton)Activator.CreateInstance(
+    <span class="hljs-keyword">typeof</span>(Singleton), <span class="hljs-literal">true</span>);
+<span class="hljs-comment">// Now you have a second instance!</span>
+</code></pre>
+<p class="has-line-data" data-line-start="254" data-line-end="255"><strong>Defense</strong>: Use sealed class, make constructor <code>sealed</code>, or throw exception in constructor if <code>IsValueCreated</code> is true.</p>
+<p class="has-line-data" data-line-start="256" data-line-end="258"><strong>Q28: Explain the difference between Singleton and Static Classes.</strong><br>
+A:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Singleton</th>
+<th>Static Class</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Instance</td>
+<td>One instance created</td>
+<td>No instances</td>
+</tr>
+<tr>
+<td>Can implement interfaces</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Can inherit</td>
+<td>Yes (if not sealed)</td>
+<td>No (always abstract)</td>
+</tr>
+<tr>
+<td>Can be passed as parameter</td>
+<td>Yes</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Serialization</td>
+<td>Possible with care</td>
+<td>Not applicable</td>
+</tr>
+<tr>
+<td>Testability</td>
+<td>Better (can mock interface)</td>
+<td>Harder to test</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="267" data-line-end="268">Static classes are for utility functions; Singletons for stateful, reusable instances.</p>
+<p class="has-line-data" data-line-start="269" data-line-end="271"><strong>Q29: How do you handle Singleton serialization and deserialization?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="272" data-line-end="292">[<span class="hljs-meta">Serializable</span>]
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">sealed</span> <span class="hljs-keyword">class</span> <span class="hljs-title">Singleton</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">readonly</span> Lazy&lt;Singleton&gt; _instance = 
+        <span class="hljs-keyword">new</span> Lazy&lt;Singleton&gt;(() =&gt; <span class="hljs-keyword">new</span> Singleton());
+    
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Singleton Instance =&gt; _instance.Value;
+    
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-title">Singleton</span>()</span> { }
+    
+    <span class="hljs-comment">// Ensure deserialization returns the same instance</span>
+    [<span class="hljs-meta">OnDeserialized</span>]
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title">OnDeserialized</span>(<span class="hljs-params">StreamingContext context</span>)</span> { }
+    
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-built_in">object</span> <span class="hljs-title">ReadResolve</span>()</span>
+    {
+        <span class="hljs-keyword">return</span> Instance; <span class="hljs-comment">// Return the existing singleton instance</span>
+    }
+}
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="295" data-line-end="296"><a id="ASPNET_Core_Lifecycle_295"></a><a href="http://ASP.NET">ASP.NET</a> Core Lifecycle</h2>
+<h3 class="code-line has-line-data" data-line-start="297" data-line-end="298"><a id="Basic_Level_297"></a>Basic Level</h3>
+<p class="has-line-data" data-line-start="299" data-line-end="301"><strong>Q30: What are the main phases in <a href="http://ASP.NET">ASP.NET</a> Core request lifecycle?</strong><br>
+A:</p>
+<ol>
+<li class="has-line-data" data-line-start="301" data-line-end="302"><strong>Request arrives at server</strong></li>
+<li class="has-line-data" data-line-start="302" data-line-end="303"><strong>Middleware pipeline processes request</strong> (in order)</li>
+<li class="has-line-data" data-line-start="303" data-line-end="304"><strong>Routing determines which handler processes request</strong></li>
+<li class="has-line-data" data-line-start="304" data-line-end="305"><strong>Action/handler executes</strong> (MVC, Razor Pages, gRPC, etc.)</li>
+<li class="has-line-data" data-line-start="305" data-line-end="306"><strong>Response flows back through middleware</strong> (in reverse order)</li>
+<li class="has-line-data" data-line-start="306" data-line-end="308"><strong>Response sent to client</strong></li>
+</ol>
+<p class="has-line-data" data-line-start="308" data-line-end="310"><strong>Q31: What is the Startup class in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A: The Startup class (or Program.cs in .NET 6+) configures:</p>
+<ul>
+<li class="has-line-data" data-line-start="310" data-line-end="311"><strong>ConfigureServices()</strong>: Registers services in the dependency injection container</li>
+<li class="has-line-data" data-line-start="311" data-line-end="313"><strong>Configure()</strong>: Configures the HTTP request pipeline with middleware</li>
+</ul>
+<p class="has-line-data" data-line-start="313" data-line-end="314">In .NET 6+, this is simplified using the Minimal Hosting Model in Program.cs.</p>
+<p class="has-line-data" data-line-start="315" data-line-end="317"><strong>Q32: What are middleware components?</strong><br>
+A: Middleware are components that handle HTTP requests and responses. They form a pipeline where each middleware can process the request, pass it to the next middleware, and process the response coming back. Examples: Authentication, Logging, Error handling, CORS.</p>
+<p class="has-line-data" data-line-start="318" data-line-end="320"><strong>Q33: What is the order of middleware execution?</strong><br>
+A: Middleware executes in the order it’s registered in the Configure() method for the request phase, then in reverse order for the response phase (like a stack).</p>
+<p class="has-line-data" data-line-start="321" data-line-end="323"><strong>Q34: What is dependency injection in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A: Dependency Injection is a technique where a class doesn’t create its dependencies but receives them (usually through constructor). <a href="http://ASP.NET">ASP.NET</a> Core has a built-in DI container that manages object lifetimes and instantiation.</p>
+<p class="has-line-data" data-line-start="324" data-line-end="326"><strong>Q35: What are the different service lifetimes in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="326" data-line-end="327"><strong>Transient</strong>: New instance created every time (stateless services)</li>
+<li class="has-line-data" data-line-start="327" data-line-end="328"><strong>Scoped</strong>: New instance per HTTP request (DbContext, repositories)</li>
+<li class="has-line-data" data-line-start="328" data-line-end="330"><strong>Singleton</strong>: Same instance for the entire application lifetime (configuration, logging)</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="330" data-line-end="331"><a id="Intermediate_Level_330"></a>Intermediate Level</h3>
+<p class="has-line-data" data-line-start="332" data-line-end="334"><strong>Q36: Explain the difference between Configure and ConfigureServices.</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="334" data-line-end="335"><strong>ConfigureServices()</strong>: Registers services in DI container. Called first. Happens once at startup.</li>
+<li class="has-line-data" data-line-start="335" data-line-end="337"><strong>Configure()</strong>: Sets up request pipeline. Called once at startup. Receives services from DI container. Called for each request to process it through middleware.</li>
+</ul>
+<p class="has-line-data" data-line-start="337" data-line-end="339"><strong>Q37: What is IApplicationBuilder and IServiceCollection?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="339" data-line-end="340"><strong>IServiceCollection</strong>: Used in ConfigureServices() to register services</li>
+<li class="has-line-data" data-line-start="340" data-line-end="342"><strong>IApplicationBuilder</strong>: Used in Configure() to build the request pipeline with middleware</li>
+</ul>
+<p class="has-line-data" data-line-start="342" data-line-end="344"><strong>Q38: How does routing work in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A: Routing matches incoming HTTP requests to handlers (controller actions, Razor Pages, etc.) based on:</p>
+<ul>
+<li class="has-line-data" data-line-start="344" data-line-end="345"><strong>Conventional routing</strong>: Pattern like <code>{controller}/{action}/{id}</code></li>
+<li class="has-line-data" data-line-start="345" data-line-end="346"><strong>Attribute routing</strong>: <code>[Route(&quot;api/[controller]&quot;)]</code> directly on controller/action</li>
+<li class="has-line-data" data-line-start="346" data-line-end="348"><strong>Endpoint routing</strong> (.NET Core 3+): More flexible, uses MapControllers(), MapRazorPages(), etc.</li>
+</ul>
+<p class="has-line-data" data-line-start="348" data-line-end="350"><strong>Q39: What is the difference between UseRouting() and UseEndpoints()?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="350" data-line-end="351"><strong>UseRouting()</strong>: Determines which endpoint should handle the request</li>
+<li class="has-line-data" data-line-start="351" data-line-end="352"><strong>UseEndpoints()</strong>: Executes the selected endpoint</li>
+<li class="has-line-data" data-line-start="352" data-line-end="354">Middleware between them can access route data via <code>HttpContext.GetRouteData()</code></li>
+</ul>
+<p class="has-line-data" data-line-start="354" data-line-end="356"><strong>Q40: How do you handle exceptions in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="356" data-line-end="357"><strong>Try-catch blocks</strong> in action methods</li>
+<li class="has-line-data" data-line-start="357" data-line-end="358"><strong>Exception filter</strong>: <code>[ExceptionFilter]</code></li>
+<li class="has-line-data" data-line-start="358" data-line-end="359"><strong>Global exception handling middleware</strong>:</li>
+</ul>
+<pre><code class="has-line-data language-csharp" data-line-start="360" data-line-end="369">app.UseExceptionHandler(app =&gt; 
+{
+    app.Run(<span class="hljs-keyword">async</span> context =&gt;
+    {
+        <span class="hljs-keyword">var</span> feature = context.Features.Get&lt;IExceptionHandlerFeature&gt;();
+        <span class="hljs-comment">// Handle exception</span>
+    });
+});
+</code></pre>
+<ul>
+<li class="has-line-data" data-line-start="369" data-line-end="371"><strong>Problem details middleware</strong> (.NET 7+)</li>
+</ul>
+<p class="has-line-data" data-line-start="371" data-line-end="373"><strong>Q41: What is the role of IHostBuilder in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A: IHostBuilder is used to configure and build the host that runs an <a href="http://ASP.NET">ASP.NET</a> Core application. It configures:</p>
+<ul>
+<li class="has-line-data" data-line-start="373" data-line-end="374">Services (DI container)</li>
+<li class="has-line-data" data-line-start="374" data-line-end="375">Configuration (appsettings.json, environment variables)</li>
+<li class="has-line-data" data-line-start="375" data-line-end="376">Logging</li>
+<li class="has-line-data" data-line-start="376" data-line-end="378">Built-in middleware</li>
+</ul>
+<p class="has-line-data" data-line-start="378" data-line-end="380"><strong>Q42: Explain service resolution in the DI container.</strong><br>
+A: When a service is requested:</p>
+<ol>
+<li class="has-line-data" data-line-start="380" data-line-end="381">Container checks if the service is registered</li>
+<li class="has-line-data" data-line-start="381" data-line-end="382">Checks the lifetime (Transient, Scoped, Singleton)</li>
+<li class="has-line-data" data-line-start="382" data-line-end="383">Creates/retrieves the instance</li>
+<li class="has-line-data" data-line-start="383" data-line-end="384">Recursively resolves constructor dependencies</li>
+<li class="has-line-data" data-line-start="384" data-line-end="386">Returns the configured instance</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="386" data-line-end="387"><a id="Advanced_Level_386"></a>Advanced Level</h3>
+<p class="has-line-data" data-line-start="388" data-line-end="390"><strong>Q43: What is the difference between IServiceCollection and IServiceProvider?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="390" data-line-end="391"><strong>IServiceCollection</strong>: Used at startup to register services (container configuration)</li>
+<li class="has-line-data" data-line-start="391" data-line-end="392"><strong>IServiceProvider</strong>: Used at runtime to resolve/retrieve registered services (container query)</li>
+</ul>
+<pre><code class="has-line-data language-csharp" data-line-start="393" data-line-end="399"><span class="hljs-comment">// ConfigureServices</span>
+services.AddScoped&lt;IRepository, Repository&gt;(); <span class="hljs-comment">// IServiceCollection</span>
+
+<span class="hljs-comment">// In action/middleware</span>
+<span class="hljs-keyword">var</span> repo = serviceProvider.GetRequiredService&lt;IRepository&gt;(); <span class="hljs-comment">// IServiceProvider</span>
+</code></pre>
+<p class="has-line-data" data-line-start="400" data-line-end="402"><strong>Q44: How does scope work in <a href="http://ASP.NET">ASP.NET</a> Core dependency injection? (Commonly ignored)</strong><br>
+A: Each HTTP request creates a new <strong>IServiceScope</strong>:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="403" data-line-end="413"><span class="hljs-comment">// Correct: Use scoped services with HttpContext</span>
+<span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context, IMyService service</span>)</span>
+{
+    <span class="hljs-comment">// &#x27;service&#x27; is scoped to this request</span>
+}
+
+<span class="hljs-comment">// Wrong: Capturing scoped service in static/singleton</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IMyService _service; <span class="hljs-comment">// Danger!</span>
+services.AddSingleton&lt;IMyService&gt;(_ =&gt; _service); <span class="hljs-comment">// Scoped in singleton!</span>
+</code></pre>
+<p class="has-line-data" data-line-start="413" data-line-end="414">Scoped services <strong>must never be captured</strong> in singletons or statics.</p>
+<p class="has-line-data" data-line-start="415" data-line-end="417"><strong>Q45: What is the difference between AddScoped vs AddSingleton when registering DbContext?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="417" data-line-end="418"><strong>AddDbContext<T>()</strong>: Automatically registers as Scoped (default). Safe because DbContext is not thread-safe.</li>
+<li class="has-line-data" data-line-start="418" data-line-end="420"><strong>AddSingleton<DbContext>()</strong>: Dangerous! DbContext is not thread-safe for concurrent requests.</li>
+</ul>
+<p class="has-line-data" data-line-start="420" data-line-end="422"><strong>Q46: Explain the host lifecycle in <a href="http://ASP.NET">ASP.NET</a> Core.</strong><br>
+A:</p>
+<pre><code class="has-line-data" data-line-start="423" data-line-end="430">1. CreateHostBuilder() - Creates IHostBuilder
+2. Build() - Creates IHost
+3. StartAsync() - Calls all IHostedService.StartAsync()
+4. Request handling loop - Main application logic
+5. StopAsync() - Calls all IHostedService.StopAsync() in reverse
+6. Dispose() - Cleans up resources
+</code></pre>
+<p class="has-line-data" data-line-start="431" data-line-end="433"><strong>Q47: What are IHostedService and BackgroundService?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="433" data-line-end="434"><strong>IHostedService</strong>: Interface for long-running background tasks in application lifetime</li>
+<li class="has-line-data" data-line-start="434" data-line-end="435"><strong>BackgroundService</strong>: Base class that implements IHostedService, providing ExecuteAsync() override</li>
+</ul>
+<pre><code class="has-line-data language-csharp" data-line-start="436" data-line-end="448"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">TimerService</span> : <span class="hljs-title">BackgroundService</span>
+{
+    <span class="hljs-function"><span class="hljs-keyword">protected</span> <span class="hljs-keyword">override</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">ExecuteAsync</span>(<span class="hljs-params">CancellationToken stoppingToken</span>)</span>
+    {
+        <span class="hljs-keyword">while</span> (!stoppingToken.IsCancellationRequested)
+        {
+            <span class="hljs-comment">// Long-running task</span>
+            <span class="hljs-keyword">await</span> Task.Delay(<span class="hljs-number">1000</span>, stoppingToken);
+        }
+    }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="449" data-line-end="451"><strong>Q48: How does middleware ordering affect application behavior? (Commonly ignored)</strong><br>
+A: Order is <strong>critical</strong>:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="452" data-line-end="459">app.UseExceptionHandler(); <span class="hljs-comment">// Should be first to catch exceptions from other middleware</span>
+app.UseAuthentication();   <span class="hljs-comment">// Before authorization</span>
+app.UseAuthorization();    <span class="hljs-comment">// After authentication</span>
+app.UseRouting();          <span class="hljs-comment">// Determine endpoint</span>
+app.MapControllers();      <span class="hljs-comment">// Register endpoints</span>
+app.UseEndpoints(...);     <span class="hljs-comment">// Execute endpoint</span>
+</code></pre>
+<p class="has-line-data" data-line-start="459" data-line-end="460">Wrong order = bugs that are hard to track (e.g., authorization before authentication).</p>
+<p class="has-line-data" data-line-start="461" data-line-end="463"><strong>Q49: Explain middleware short-circuit behavior.</strong><br>
+A: Middleware can stop the pipeline without calling <code>next()</code>:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="464" data-line-end="474">app.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+{
+    <span class="hljs-keyword">if</span> (someCondition)
+    {
+        context.Response.StatusCode = <span class="hljs-number">401</span>; <span class="hljs-comment">// Short-circuit</span>
+        <span class="hljs-keyword">return</span>; <span class="hljs-comment">// Don&#x27;t call next()</span>
+    }
+    <span class="hljs-keyword">await</span> next(); <span class="hljs-comment">// Continue pipeline</span>
+});
+</code></pre>
+<p class="has-line-data" data-line-start="474" data-line-end="475">Useful for: authentication failures, rate limiting, request validation.</p>
+<p class="has-line-data" data-line-start="476" data-line-end="478"><strong>Q50: What is the purpose of the health check middleware?</strong><br>
+A: Health checks provide endpoints to determine application readiness/liveness for orchestration systems (Kubernetes, load balancers):</p>
+<pre><code class="has-line-data language-csharp" data-line-start="479" data-line-end="484">services.AddHealthChecks()
+    .AddDbContextCheck&lt;AppDbContext&gt;();
+
+app.MapHealthChecks(<span class="hljs-string">&quot;/health&quot;</span>);
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="487" data-line-end="488"><a id="NET_Core_vs_NET_Framework_487"></a>.NET Core vs .NET Framework</h2>
+<h3 class="code-line has-line-data" data-line-start="489" data-line-end="490"><a id="Basic_Level_489"></a>Basic Level</h3>
+<p class="has-line-data" data-line-start="491" data-line-end="493"><strong>Q51: What is .NET Framework?</strong><br>
+A: .NET Framework is the original Microsoft .NET platform (released 2002) running on Windows only. It’s the full framework with deep Windows integration, large runtime, and extensive built-in libraries. It’s now in maintenance mode.</p>
+<p class="has-line-data" data-line-start="494" data-line-end="496"><strong>Q52: What is .NET Core?</strong><br>
+A: .NET Core is the modern, cross-platform, open-source rewrite of .NET Framework (released 2016). Starting from .NET 5, it’s just called “.NET” and is the future direction. It runs on Windows, Linux, and macOS.</p>
+<p class="has-line-data" data-line-start="497" data-line-end="499"><strong>Q53: Is .NET Core open-source?</strong><br>
+A: Yes, .NET Core/.NET is completely open-source on GitHub under MIT license. Contributions welcome.</p>
+<p class="has-line-data" data-line-start="500" data-line-end="502"><strong>Q54: Can .NET Framework applications run on .NET Core?</strong><br>
+A: Not directly, but you can migrate them. .NET Framework and .NET Core are incompatible by design. However, .NET Framework code can often run on .NET Core with modifications (remove Windows-specific code, use compatible NuGet packages).</p>
+<p class="has-line-data" data-line-start="503" data-line-end="505"><strong>Q55: What is the release cadence for .NET Core?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="505" data-line-end="506">.NET releases annually (March) with LTS versions every 2 years</li>
+<li class="has-line-data" data-line-start="506" data-line-end="507">Current LTS versions: .NET 6, 8</li>
+<li class="has-line-data" data-line-start="507" data-line-end="508">Non-LTS versions: 5, 7, 9 (supported for 18 months)</li>
+<li class="has-line-data" data-line-start="508" data-line-end="510">LTS versions get 3 years of support</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="510" data-line-end="511"><a id="Intermediate_Level_510"></a>Intermediate Level</h3>
+<p class="has-line-data" data-line-start="512" data-line-end="514"><strong>Q56: Compare CLR (Common Language Runtime) in .NET Framework vs .NET Core.</strong><br>
+A:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>.NET Framework CLR</th>
+<th>.NET Core CLR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Platform</td>
+<td>Windows only</td>
+<td>Cross-platform</td>
+</tr>
+<tr>
+<td>Size</td>
+<td>Large (~200MB)</td>
+<td>Smaller, modular</td>
+</tr>
+<tr>
+<td>Performance</td>
+<td>Good</td>
+<td>Better (optimized)</td>
+</tr>
+<tr>
+<td>Startup</td>
+<td>Slower</td>
+<td>Faster</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>GAC (Global Assembly Cache)</td>
+<td>Self-contained</td>
+</tr>
+<tr>
+<td>Updates</td>
+<td>OS patches</td>
+<td>App updates independently</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="523" data-line-end="525"><strong>Q57: What is the difference between Windows Presentation Foundation (WPF) and <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="525" data-line-end="526"><strong>WPF</strong>: Desktop UI framework for .NET Framework (Windows only)</li>
+<li class="has-line-data" data-line-start="526" data-line-end="527"><strong><a href="http://ASP.NET">ASP.NET</a> Core</strong>: Web framework, cross-platform</li>
+<li class="has-line-data" data-line-start="527" data-line-end="529">.NET has <strong>WPF/WinForms</strong> for Windows desktop, <strong>Maui</strong> for cross-platform mobile/desktop, <strong>Blazor</strong> for web UIs</li>
+</ul>
+<p class="has-line-data" data-line-start="529" data-line-end="531"><strong>Q58: How do you migrate from .NET Framework to .NET Core?</strong><br>
+A:</p>
+<ol>
+<li class="has-line-data" data-line-start="531" data-line-end="532">Use <strong>Portability Analyzer</strong> to check compatibility</li>
+<li class="has-line-data" data-line-start="532" data-line-end="533">Identify Windows-specific code (System.Windows, etc.)</li>
+<li class="has-line-data" data-line-start="533" data-line-end="534">Find alternative NuGet packages compatible with .NET</li>
+<li class="has-line-data" data-line-start="534" data-line-end="535">Update project file to target .NET (csproj format)</li>
+<li class="has-line-data" data-line-start="535" data-line-end="536">Fix API calls (some removed, some changed)</li>
+<li class="has-line-data" data-line-start="536" data-line-end="537">Test thoroughly</li>
+<li class="has-line-data" data-line-start="537" data-line-end="539">Consider containerization for deployment</li>
+</ol>
+<p class="has-line-data" data-line-start="539" data-line-end="541"><strong>Q59: What’s the difference in how assemblies are deployed?</strong><br>
+A:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>.NET Framework</th>
+<th>.NET Core</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Assembly resolution</td>
+<td>GAC, application bin folder</td>
+<td>App-local only</td>
+</tr>
+<tr>
+<td>Version conflicts</td>
+<td>GAC bindings</td>
+<td>Single version per app</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>xcopy to bin folder</td>
+<td>Self-contained or runtime-dependent</td>
+</tr>
+<tr>
+<td>Side-by-side versions</td>
+<td>Framework versions on machine</td>
+<td>Per-application</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="548" data-line-end="550"><strong>Q60: What is SelfContained deployment in .NET Core? (Commonly ignored)</strong><br>
+A: Self-contained deployment bundles the entire .NET runtime with your application:</p>
+<pre><code class="has-line-data language-bash" data-line-start="551" data-line-end="553">dotnet publish -c Release --self-contained -r win-x64
+</code></pre>
+<ul>
+<li class="has-line-data" data-line-start="553" data-line-end="554"><strong>Advantages</strong>: Works without .NET installed, versions isolated</li>
+<li class="has-line-data" data-line-start="554" data-line-end="555"><strong>Disadvantages</strong>: Larger deployment size, security patches must be applied per app</li>
+<li class="has-line-data" data-line-start="555" data-line-end="557"><strong>Opposed to</strong>: Framework-dependent deployment (smaller, uses machine .NET runtime)</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="557" data-line-end="558"><a id="Advanced_Level_557"></a>Advanced Level</h3>
+<p class="has-line-data" data-line-start="559" data-line-end="561"><strong>Q61: Explain the architecture differences in how types are loaded in .NET Framework vs .NET Core.</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="561" data-line-end="562"><strong>.NET Framework</strong>: Single CLR per AppDomain, types loaded into AppDomain</li>
+<li class="has-line-data" data-line-start="562" data-line-end="563"><strong>.NET Core</strong>: No AppDomains, types loaded into single shared runtime</li>
+<li class="has-line-data" data-line-start="563" data-line-end="565"><strong>.NET Core implication</strong>: No isolation between assemblies; if one loads v1.0, all see v1.0</li>
+</ul>
+<p class="has-line-data" data-line-start="565" data-line-end="567"><strong>Q62: How do you handle breaking changes when migrating from .NET Framework to .NET Core?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="567" data-line-end="568"><strong>Removed namespaces</strong>: <a href="http://System.Web">System.Web</a>, System.Net.Mail (web-specific)</li>
+<li class="has-line-data" data-line-start="568" data-line-end="569"><strong>API changes</strong>: Some collection methods signature changes</li>
+<li class="has-line-data" data-line-start="569" data-line-end="570"><strong>Platform APIs</strong>: P/Invoke for Windows APIs still works, but other platform code removed</li>
+<li class="has-line-data" data-line-start="570" data-line-end="572"><strong>Solution</strong>: Use compatibility shims, create abstraction layers, test against .NET</li>
+</ul>
+<p class="has-line-data" data-line-start="572" data-line-end="574"><strong>Q63: What is the difference in how NuGet packages target different frameworks?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-xml" data-line-start="575" data-line-end="584"><span class="hljs-comment">&lt;!-- Legacy .NET Framework --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">Target</span> <span class="hljs-attr">Framework</span>=<span class="hljs-string">&quot;net462&quot;</span> /&gt;</span>
+
+<span class="hljs-comment">&lt;!-- Modern .NET --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">Target</span> <span class="hljs-attr">Framework</span>=<span class="hljs-string">&quot;net8.0&quot;</span> /&gt;</span>
+
+<span class="hljs-comment">&lt;!-- Multi-targeting --&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">TargetFrameworks</span>&gt;</span>net462;net8.0<span class="hljs-tag">&lt;/<span class="hljs-name">TargetFrameworks</span>&gt;</span>
+</code></pre>
+<p class="has-line-data" data-line-start="584" data-line-end="585">.NET Core packages can target .NET Framework with compatibility layer, but not vice versa.</p>
+<p class="has-line-data" data-line-start="586" data-line-end="588"><strong>Q64: Explain the concept of .NET Standard and why it existed.</strong><br>
+A: .NET Standard is a specification of .NET APIs that multiple .NET implementations must support:</p>
+<ul>
+<li class="has-line-data" data-line-start="588" data-line-end="589"><strong>Purpose</strong>: Allow libraries to target one framework (.NET Standard 2.0) and work on both .NET Framework and .NET Core</li>
+<li class="has-line-data" data-line-start="589" data-line-end="590"><strong>History</strong>: Needed when .NET Core was incompatible with Framework</li>
+<li class="has-line-data" data-line-start="590" data-line-end="592"><strong>Modern status</strong>: No longer necessary since .NET Core is universal. Target .NET directly.</li>
+</ul>
+<pre><code class="has-line-data language-csharp" data-line-start="593" data-line-end="599"><span class="hljs-comment">// Old: library targets .NET Standard for compatibility</span>
+&lt;TargetFramework&gt;netstandard2<span class="hljs-number">.0</span>&lt;/TargetFramework&gt;
+
+<span class="hljs-comment">// Modern: target .NET directly</span>
+&lt;TargetFramework&gt;net8<span class="hljs-number">.0</span>&lt;/TargetFramework&gt;
+</code></pre>
+<p class="has-line-data" data-line-start="600" data-line-end="602"><strong>Q65: How do licensing and support differ between .NET Framework and .NET Core?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="602" data-line-end="603"><strong>.NET Framework</strong>: Licensed per OS copy, mainstream support ended 2020, extended support until 2029</li>
+<li class="has-line-data" data-line-start="603" data-line-end="604"><strong>.NET Core/.NET</strong>: MIT open-source license, community and Microsoft support, LTS versions get 3-year support</li>
+<li class="has-line-data" data-line-start="604" data-line-end="606"><strong>Cost</strong>: .NET is free (open-source); Framework licensing depends on Windows licensing</li>
+</ul>
+<p class="has-line-data" data-line-start="606" data-line-end="608"><strong>Q66: What is the performance difference between .NET Framework and .NET Core? (Commonly ignored)</strong><br>
+A: .NET Core is generally faster:</p>
+<ul>
+<li class="has-line-data" data-line-start="608" data-line-end="609"><strong>Startup time</strong>: .NET Core ~10ms vs Framework ~100ms+</li>
+<li class="has-line-data" data-line-start="609" data-line-end="610"><strong>Throughput</strong>: .NET Core 30-40% faster in benchmarks (TechEmpower)</li>
+<li class="has-line-data" data-line-start="610" data-line-end="611"><strong>Memory</strong>: .NET Core more efficient (no startup overhead)</li>
+<li class="has-line-data" data-line-start="611" data-line-end="612"><strong>Reasons</strong>: Redesigned for cloud/containers, better JIT compilation, AOT compilation support</li>
+<li class="has-line-data" data-line-start="612" data-line-end="614"><strong>Benchmarks</strong>: Use BenchmarkDotNet to measure in your code</li>
+</ul>
+<p class="has-line-data" data-line-start="614" data-line-end="616"><strong>Q67: Explain how the .NET ecosystem converged (from multiple runtimes to unified .NET).</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="616" data-line-end="617"><strong>Before .NET 5</strong>: Separate runtimes (.NET Framework, .NET Core, Mono)</li>
+<li class="has-line-data" data-line-start="617" data-line-end="618"><strong>.NET 5+</strong>: All merged into one unified platform</li>
+<li class="has-line-data" data-line-start="618" data-line-end="619"><strong>Runtimes available</strong>: CoreCLR (JIT), Mono (ahead-of-time for mobile), NativeAOT</li>
+<li class="has-line-data" data-line-start="619" data-line-end="620"><strong>Platform support</strong>: Windows, Linux, macOS, iOS, Android, WebAssembly</li>
+<li class="has-line-data" data-line-start="620" data-line-end="622"><strong>Result</strong>: Single target (.NET 8, 9, etc.) that works everywhere</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="624" data-line-end="625"><a id="Microservices_Communication_624"></a>Microservices Communication</h2>
+<h3 class="code-line has-line-data" data-line-start="626" data-line-end="627"><a id="Basic_Level_626"></a>Basic Level</h3>
+<p class="has-line-data" data-line-start="628" data-line-end="630"><strong>Q68: What is a microservice architecture?</strong><br>
+A: Microservices architecture breaks an application into small, independently deployable services, each handling a specific business capability. They communicate through well-defined APIs (REST, gRPC, messaging), are loosely coupled, and can scale independently.</p>
+<p class="has-line-data" data-line-start="631" data-line-end="633"><strong>Q69: What are the main communication patterns between microservices?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="633" data-line-end="634"><strong>Synchronous (blocking)</strong>: REST, gRPC (wait for response)</li>
+<li class="has-line-data" data-line-start="634" data-line-end="635"><strong>Asynchronous (non-blocking)</strong>: Message queues, event streaming (fire and forget)</li>
+<li class="has-line-data" data-line-start="635" data-line-end="636"><strong>Request-Reply</strong>: Service calls and waits for response (RESTful)</li>
+<li class="has-line-data" data-line-start="636" data-line-end="638"><strong>Publish-Subscribe</strong>: Services publish events, others subscribe</li>
+</ul>
+<p class="has-line-data" data-line-start="638" data-line-end="640"><strong>Q70: What is REST API communication?</strong><br>
+A: REST (Representational State Transfer) uses HTTP verbs (GET, POST, PUT, DELETE) to operate on resources:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="641" data-line-end="655"><span class="hljs-comment">// GET: Retrieve</span>
+GET /api/products/<span class="hljs-number">1</span>
+
+<span class="hljs-comment">// POST: Create</span>
+POST /api/products
+Body: { <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Product&quot;</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">100</span> }
+
+<span class="hljs-comment">// PUT: Update</span>
+PUT /api/products/<span class="hljs-number">1</span>
+Body: { <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Updated&quot;</span>, <span class="hljs-string">&quot;price&quot;</span>: <span class="hljs-number">200</span> }
+
+<span class="hljs-comment">// DELETE: Remove</span>
+DELETE /api/products/<span class="hljs-number">1</span>
+</code></pre>
+<p class="has-line-data" data-line-start="656" data-line-end="658"><strong>Q71: What is gRPC communication?</strong><br>
+A: gRPC is a high-performance RPC framework using HTTP/2 and Protocol Buffers:</p>
+<ul>
+<li class="has-line-data" data-line-start="658" data-line-end="659"><strong>Binary protocol</strong>: More efficient than JSON</li>
+<li class="has-line-data" data-line-start="659" data-line-end="660"><strong>Streaming</strong>: Supports bidirectional streaming</li>
+<li class="has-line-data" data-line-start="660" data-line-end="661"><strong>Performance</strong>: Faster than REST</li>
+<li class="has-line-data" data-line-start="661" data-line-end="663"><strong>Drawback</strong>: Requires .proto contract definition, not browser-friendly</li>
+</ul>
+<p class="has-line-data" data-line-start="663" data-line-end="665"><strong>Q72: What is message-based communication?</strong><br>
+A: Services communicate through message queues (RabbitMQ, Azure Service Bus) or event streams (Kafka):</p>
+<ul>
+<li class="has-line-data" data-line-start="665" data-line-end="666"><strong>Decoupled</strong>: Services don’t need to know each other</li>
+<li class="has-line-data" data-line-start="666" data-line-end="667"><strong>Asynchronous</strong>: Sender doesn’t wait for processing</li>
+<li class="has-line-data" data-line-start="667" data-line-end="668"><strong>Reliable</strong>: Message persisted until consumed</li>
+<li class="has-line-data" data-line-start="668" data-line-end="670"><strong>Scalable</strong>: Multiple consumers can process messages</li>
+</ul>
+<p class="has-line-data" data-line-start="670" data-line-end="672"><strong>Q73: What’s the difference between synchronous and asynchronous communication?</strong><br>
+A:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Synchronous (REST)</th>
+<th>Asynchronous (Messaging)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Blocking</td>
+<td>Yes, waits for response</td>
+<td>No, returns immediately</td>
+</tr>
+<tr>
+<td>Coupling</td>
+<td>Tightly coupled</td>
+<td>Loosely coupled</td>
+</tr>
+<tr>
+<td>Error handling</td>
+<td>Immediate response codes</td>
+<td>Retry mechanisms</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>Higher (network wait)</td>
+<td>Lower (return immediately)</td>
+</tr>
+<tr>
+<td>Use case</td>
+<td>Real-time updates</td>
+<td>High-volume operations</td>
+</tr>
+</tbody>
+</table>
+<h3 class="code-line has-line-data" data-line-start="680" data-line-end="681"><a id="Intermediate_Level_680"></a>Intermediate Level</h3>
+<p class="has-line-data" data-line-start="682" data-line-end="684"><strong>Q74: How do you handle API versioning in microservices?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="685" data-line-end="700"><span class="hljs-comment">// URL versioning</span>
+GET /api/v1/products
+GET /api/v2/products
+
+<span class="hljs-comment">// Header versioning</span>
+GET /api/products
+Header: X-API-Version: <span class="hljs-number">2</span>
+
+<span class="hljs-comment">// Query parameter</span>
+GET /api/products?version=<span class="hljs-number">2</span>
+
+<span class="hljs-comment">// Accept header</span>
+GET /api/products
+Header: Accept: application/vnd.myapi.v2+json
+</code></pre>
+<p class="has-line-data" data-line-start="700" data-line-end="701"><strong>Recommendation</strong>: URL versioning is simplest; header versioning more RESTful.</p>
+<p class="has-line-data" data-line-start="702" data-line-end="704"><strong>Q75: What is service discovery and why is it important?</strong><br>
+A: Service discovery is the process of finding which service instances are available (IP, port):</p>
+<ul>
+<li class="has-line-data" data-line-start="704" data-line-end="705"><strong>Manual</strong>: Hardcoded service URLs (not scalable)</li>
+<li class="has-line-data" data-line-start="705" data-line-end="706"><strong>Client-side</strong>: Client queries registry (Consul, Eureka)</li>
+<li class="has-line-data" data-line-start="706" data-line-end="707"><strong>Server-side</strong>: Load balancer queries registry</li>
+<li class="has-line-data" data-line-start="707" data-line-end="708"><strong>Cloud-native</strong>: Kubernetes handles service discovery automatically</li>
+<li class="has-line-data" data-line-start="708" data-line-end="710"><strong>Importance</strong>: Services are dynamic; instances appear/disappear during scaling</li>
+</ul>
+<p class="has-line-data" data-line-start="710" data-line-end="712"><strong>Q76: How do you implement retries and timeouts in microservices?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="713" data-line-end="727"><span class="hljs-comment">// Using Polly library</span>
+<span class="hljs-keyword">var</span> policy = Policy
+    .Handle&lt;HttpRequestException&gt;()
+    .Or&lt;TimeoutException&gt;()
+    .WaitAndRetry(
+        retryCount: <span class="hljs-number">3</span>,
+        sleepDurationProvider: attempt =&gt; 
+            TimeSpan.FromSeconds(Math.Pow(<span class="hljs-number">2</span>, attempt)),
+        onRetry: (outcome, timespan) =&gt; 
+            Console.WriteLine(<span class="hljs-string">$&quot;Retrying after <span class="hljs-subst">{timespan.TotalSeconds}</span>s&quot;</span>));
+
+<span class="hljs-keyword">var</span> response = <span class="hljs-keyword">await</span> policy.ExecuteAsync(() =&gt; 
+    httpClient.GetAsync(<span class="hljs-string">&quot;https://api.example.com/data&quot;</span>));
+</code></pre>
+<p class="has-line-data" data-line-start="728" data-line-end="730"><strong>Q77: What is the Circuit Breaker pattern?</strong><br>
+A: Circuit Breaker prevents cascading failures when a service is down:</p>
+<pre><code class="has-line-data" data-line-start="731" data-line-end="736">- Closed: Normal operation, requests pass through
+- Open: Service down, requests fail fast (no calls made)
+- Half-Open: Testing if service recovered, allows test request
+- Back to Closed or Open based on test result
+</code></pre>
+<p class="has-line-data" data-line-start="736" data-line-end="737">Prevents repeated calls to failing services, reducing load on broken service.</p>
+<p class="has-line-data" data-line-start="738" data-line-end="740"><strong>Q78: How do you handle transactions across microservices? (Saga pattern)</strong><br>
+A: Distributed transactions are problematic. Use Saga pattern:</p>
+<ul>
+<li class="has-line-data" data-line-start="740" data-line-end="741"><strong>Choreography</strong>: Each service listens to events and triggers next step</li>
+<li class="has-line-data" data-line-start="741" data-line-end="742"><strong>Orchestration</strong>: Central coordinator directs the flow</li>
+</ul>
+<pre><code class="has-line-data language-csharp" data-line-start="743" data-line-end="746"><span class="hljs-comment">// Order → Payment → Inventory → Notification</span>
+<span class="hljs-comment">// If Payment fails, compensation: Refund Order</span>
+</code></pre>
+<p class="has-line-data" data-line-start="746" data-line-end="747">Alternative: Accept eventual consistency, use compensating transactions.</p>
+<p class="has-line-data" data-line-start="748" data-line-end="750"><strong>Q79: How do you log and trace requests across microservices?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="751" data-line-end="761"><span class="hljs-comment">// Correlation ID pattern</span>
+<span class="hljs-comment">// 1. Incoming request gets/generates correlation ID</span>
+<span class="hljs-keyword">var</span> correlationId = context.Request.Headers[<span class="hljs-string">&quot;X-Correlation-ID&quot;</span>];
+
+<span class="hljs-comment">// 2. Pass correlation ID to downstream services</span>
+client.DefaultRequestHeaders.Add(<span class="hljs-string">&quot;X-Correlation-ID&quot;</span>, correlationId);
+
+<span class="hljs-comment">// 3. Log with correlation ID</span>
+logger.LogInformation(<span class="hljs-string">&quot;Processing order {CorrelationId}&quot;</span>, correlationId);
+</code></pre>
+<p class="has-line-data" data-line-start="761" data-line-end="762">Tools: Application Insights, Jaeger, Zipkin for distributed tracing.</p>
+<p class="has-line-data" data-line-start="763" data-line-end="765"><strong>Q80: What is API Gateway pattern?</strong><br>
+A: API Gateway sits between clients and microservices:</p>
+<ul>
+<li class="has-line-data" data-line-start="765" data-line-end="766"><strong>Single entry point</strong> for clients</li>
+<li class="has-line-data" data-line-start="766" data-line-end="767"><strong>Request routing</strong> to appropriate service</li>
+<li class="has-line-data" data-line-start="767" data-line-end="768"><strong>Authentication/authorization</strong> centralized</li>
+<li class="has-line-data" data-line-start="768" data-line-end="769"><strong>Rate limiting, logging</strong> at gateway</li>
+<li class="has-line-data" data-line-start="769" data-line-end="771"><strong>Response aggregation</strong> (combining multiple service responses)</li>
+</ul>
+<p class="has-line-data" data-line-start="771" data-line-end="772">Examples: Azure API Management, Kong, AWS API Gateway.</p>
+<h3 class="code-line has-line-data" data-line-start="773" data-line-end="774"><a id="Advanced_Level_773"></a>Advanced Level</h3>
+<p class="has-line-data" data-line-start="775" data-line-end="777"><strong>Q81: How do you handle authentication and authorization across microservices?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="778" data-line-end="791"><span class="hljs-comment">// Option 1: Centralized (OAuth 2.0 / OpenID Connect)</span>
+<span class="hljs-comment">// Gateway authenticates, passes token to services</span>
+services.AddAuthentication(<span class="hljs-string">&quot;Bearer&quot;</span>)
+    .AddJwtBearer(options =&gt;
+    {
+        options.Authority = <span class="hljs-string">&quot;https://auth-service&quot;</span>;
+        options.Audience = <span class="hljs-string">&quot;my-api&quot;</span>;
+    });
+
+<span class="hljs-comment">// Option 2: Service-to-service (mTLS)</span>
+<span class="hljs-comment">// Each service has certificate, validates others</span>
+<span class="hljs-comment">// Kubernetes: Istio handles automatically</span>
+</code></pre>
+<p class="has-line-data" data-line-start="792" data-line-end="794"><strong>Q82: Explain idempotency in microservices communication. (Commonly ignored)</strong><br>
+A: Idempotent operations produce same result regardless of how many times called:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="795" data-line-end="808"><span class="hljs-comment">// Idempotent: Multiple calls safe</span>
+PUT /api/orders/<span class="hljs-number">1</span>
+{ status: <span class="hljs-string">&quot;shipped&quot;</span> }
+
+<span class="hljs-comment">// Non-idempotent: Multiple calls problematic</span>
+POST /api/orders/<span class="hljs-number">1</span>/increment-status
+<span class="hljs-comment">// Called twice = shipped twice!</span>
+
+<span class="hljs-comment">// Solution: Idempotency key</span>
+POST /api/orders
+Headers: { <span class="hljs-string">&quot;Idempotency-Key&quot;</span>: <span class="hljs-string">&quot;uuid&quot;</span> }
+<span class="hljs-comment">// Duplicate request returns cached response, not duplicate order</span>
+</code></pre>
+<p class="has-line-data" data-line-start="809" data-line-end="811"><strong>Q83: How do you handle partial failures in microservices?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="811" data-line-end="812"><strong>Service A calls B</strong>: B timeout</li>
+<li class="has-line-data" data-line-start="812" data-line-end="813"><strong>Service A calls C</strong>: C success</li>
+<li class="has-line-data" data-line-start="813" data-line-end="815"><strong>Result</strong>: Inconsistent state</li>
+</ul>
+<p class="has-line-data" data-line-start="815" data-line-end="816">Solutions:</p>
+<ul>
+<li class="has-line-data" data-line-start="816" data-line-end="817"><strong>Bulkhead pattern</strong>: Isolate failures to specific component</li>
+<li class="has-line-data" data-line-start="817" data-line-end="818"><strong>Fallback</strong>: Return degraded response</li>
+<li class="has-line-data" data-line-start="818" data-line-end="819"><strong>Async compensation</strong>: Trigger rollback transaction</li>
+<li class="has-line-data" data-line-start="819" data-line-end="821"><strong>Eventual consistency</strong>: Accept temporary inconsistency</li>
+</ul>
+<p class="has-line-data" data-line-start="821" data-line-end="823"><strong>Q84: What is the difference between Saga and Distributed Transactions?</strong><br>
+A:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Saga</th>
+<th>Distributed Tx</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ACID</td>
+<td>Eventual consistency</td>
+<td>Strong consistency</td>
+</tr>
+<tr>
+<td>Complexity</td>
+<td>Higher (compensation)</td>
+<td>Lower (database handles)</td>
+</tr>
+<tr>
+<td>Scalability</td>
+<td>Scales well</td>
+<td>Doesn’t scale (needs coordination)</td>
+</tr>
+<tr>
+<td>Implementation</td>
+<td>Complex</td>
+<td>Simple (SQL transactions)</td>
+</tr>
+<tr>
+<td>Use case</td>
+<td>Microservices</td>
+<td>Single system</td>
+</tr>
+</tbody>
+</table>
+<p class="has-line-data" data-line-start="831" data-line-end="833"><strong>Q85: How do you implement Contract-First API design for microservices?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="834" data-line-end="849"><span class="hljs-comment">// Define contract first (interface, OpenAPI spec)</span>
+[<span class="hljs-meta">ApiController</span>]
+[<span class="hljs-meta">Route(<span class="hljs-string">&quot;api/[controller]&quot;</span>)</span>]
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">interface</span> <span class="hljs-title">IProductService</span>
+{
+    [<span class="hljs-meta">HttpGet(<span class="hljs-string">&quot;{id}&quot;</span>)</span>]
+    <span class="hljs-function">Task&lt;ProductDto&gt; <span class="hljs-title">GetProductAsync</span>(<span class="hljs-params"><span class="hljs-built_in">int</span> id</span>)</span>;
+    
+    [<span class="hljs-meta">HttpPost</span>]
+    <span class="hljs-function">Task&lt;ProductDto&gt; <span class="hljs-title">CreateProductAsync</span>(<span class="hljs-params">CreateProductDto dto</span>)</span>;
+}
+
+<span class="hljs-comment">// Service implements contract</span>
+<span class="hljs-comment">// Client depends on contract (interface/spec), not implementation</span>
+</code></pre>
+<p class="has-line-data" data-line-start="849" data-line-end="850"><strong>Benefit</strong>: Client and server can develop independently as long as contract honored.</p>
+<p class="has-line-data" data-line-start="851" data-line-end="853"><strong>Q86: Explain the difference between Event Sourcing and CQRS in microservices.</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="853" data-line-end="854"><strong>CQRS</strong>: Separate read and write models. Read model optimized for queries, write model for inserts.</li>
+<li class="has-line-data" data-line-start="854" data-line-end="855"><strong>Event Sourcing</strong>: Store events (state changes), not state. Rebuild state by replaying events.</li>
+</ul>
+<pre><code class="has-line-data language-csharp" data-line-start="856" data-line-end="863"><span class="hljs-comment">// Traditional: Store current state</span>
+{ OrderId: <span class="hljs-number">1</span>, Status: <span class="hljs-string">&quot;Shipped&quot;</span> }
+
+<span class="hljs-comment">// Event Sourcing: Store events</span>
+{ OrderCreated: <span class="hljs-number">1</span> } → { PaymentProcessed } → { OrderShipped }
+<span class="hljs-comment">// Rebuild status by replaying events</span>
+</code></pre>
+<p class="has-line-data" data-line-start="864" data-line-end="866"><strong>Q87: How do you handle schema evolution in microservices?</strong><br>
+A: As APIs change, ensure backward/forward compatibility:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="867" data-line-end="881"><span class="hljs-comment">// v1</span>
+{ <span class="hljs-string">&quot;productId&quot;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Widget&quot;</span> }
+
+<span class="hljs-comment">// v2: Add new field, keep old</span>
+{ <span class="hljs-string">&quot;productId&quot;</span>: <span class="hljs-number">1</span>, <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;Widget&quot;</span>, <span class="hljs-string">&quot;category&quot;</span>: <span class="hljs-string">&quot;Tools&quot;</span> }
+
+<span class="hljs-comment">// Consumer expectations:</span>
+<span class="hljs-comment">// - New field might be null/optional</span>
+<span class="hljs-comment">// - Removed field breaks old consumers</span>
+<span class="hljs-comment">// - Rename requires both fields temporarily</span>
+
+<span class="hljs-comment">// Best practice: Add fields, never remove</span>
+<span class="hljs-comment">// Use deprecation warnings for removal</span>
+</code></pre>
+<p class="has-line-data" data-line-start="882" data-line-end="884"><strong>Q88: What is the difference between Request-Reply and Event-Driven communication?</strong><br>
+A:</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Request-Reply</th>
+<th>Event-Driven</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Timing</td>
+<td>Synchronous</td>
+<td>Asynchronous</td>
+</tr>
+<tr>
+<td>Coupling</td>
+<td>Tight</td>
+<td>Loose</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>High (waits)</td>
+<td>Low (returns immediately)</td>
+</tr>
+<tr>
+<td>Failure</td>
+<td>Caller sees failure</td>
+<td>Failure handled independently</td>
+</tr>
+<tr>
+<td>Complexity</td>
+<td>Simple</td>
+<td>Complex (eventual consistency)</td>
+</tr>
+<tr>
+<td>Use case</td>
+<td>Real-time (shopping cart)</td>
+<td>High-volume (audit logs)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="895" data-line-end="896"><a id="Middleware_895"></a>Middleware</h2>
+<h3 class="code-line has-line-data" data-line-start="897" data-line-end="898"><a id="Basic_Level_897"></a>Basic Level</h3>
+<p class="has-line-data" data-line-start="899" data-line-end="901"><strong>Q89: What is middleware in <a href="http://ASP.NET">ASP.NET</a> Core?</strong><br>
+A: Middleware is a component that handles HTTP requests and responses. It forms a pipeline where each middleware:</p>
+<ol>
+<li class="has-line-data" data-line-start="901" data-line-end="902">Processes incoming request</li>
+<li class="has-line-data" data-line-start="902" data-line-end="903">Optionally calls next middleware via <code>await next()</code></li>
+<li class="has-line-data" data-line-start="903" data-line-end="904">Processes outgoing response</li>
+<li class="has-line-data" data-line-start="904" data-line-end="906">Returns response</li>
+</ol>
+<p class="has-line-data" data-line-start="906" data-line-end="907">Think of it as an assembly line for HTTP requests.</p>
+<p class="has-line-data" data-line-start="908" data-line-end="910"><strong>Q90: How do you create a simple middleware?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="911" data-line-end="942"><span class="hljs-comment">// Method 1: Inline middleware</span>
+app.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+{
+    <span class="hljs-comment">// Before</span>
+    Console.WriteLine(<span class="hljs-string">&quot;Request coming in&quot;</span>);
+    <span class="hljs-keyword">await</span> next();
+    <span class="hljs-comment">// After</span>
+    Console.WriteLine(<span class="hljs-string">&quot;Response going out&quot;</span>);
+});
+
+<span class="hljs-comment">// Method 2: Class-based middleware</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">MyMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> RequestDelegate _next;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">MyMiddleware</span>(<span class="hljs-params">RequestDelegate next</span>)</span>
+    {
+        _next = next;
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context</span>)</span>
+    {
+        <span class="hljs-comment">// Before</span>
+        <span class="hljs-keyword">await</span> _next(context);
+        <span class="hljs-comment">// After</span>
+    }
+}
+
+<span class="hljs-comment">// Register</span>
+app.UseMiddleware&lt;MyMiddleware&gt;();
+</code></pre>
+<p class="has-line-data" data-line-start="943" data-line-end="945"><strong>Q91: What is the RequestDelegate?</strong><br>
+A: RequestDelegate is a delegate that processes HTTP request:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="946" data-line-end="948"><span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-built_in">delegate</span> Task <span class="hljs-title">RequestDelegate</span>(<span class="hljs-params">HttpContext context</span>)</span>;
+</code></pre>
+<p class="has-line-data" data-line-start="948" data-line-end="949">Each middleware wraps the next RequestDelegate, forming the pipeline.</p>
+<p class="has-line-data" data-line-start="950" data-line-end="952"><strong>Q92: What is middleware ordering?</strong><br>
+A: Middleware processes requests in registration order, responses in reverse:</p>
+<pre><code class="has-line-data" data-line-start="953" data-line-end="956">Request:  MW1 → MW2 → MW3 → Handler
+Response: ← MW1 ← MW2 ← MW3 ← Handler
+</code></pre>
+<p class="has-line-data" data-line-start="956" data-line-end="957">Order matters! Example: Auth before Authorization.</p>
+<p class="has-line-data" data-line-start="958" data-line-end="960"><strong>Q93: What built-in middleware does <a href="http://ASP.NET">ASP.NET</a> Core provide?</strong><br>
+A:</p>
+<ul>
+<li class="has-line-data" data-line-start="960" data-line-end="961"><code>UseExceptionHandler()</code>: Global exception handling</li>
+<li class="has-line-data" data-line-start="961" data-line-end="962"><code>UseAuthentication()</code>: Verify credentials</li>
+<li class="has-line-data" data-line-start="962" data-line-end="963"><code>UseAuthorization()</code>: Check permissions</li>
+<li class="has-line-data" data-line-start="963" data-line-end="964"><code>UseRouting()</code>: Match request to endpoint</li>
+<li class="has-line-data" data-line-start="964" data-line-end="965"><code>UseCors()</code>: Handle cross-origin requests</li>
+<li class="has-line-data" data-line-start="965" data-line-end="966"><code>UseStaticFiles()</code>: Serve static files</li>
+<li class="has-line-data" data-line-start="966" data-line-end="967"><code>UseSession()</code>: Session management</li>
+<li class="has-line-data" data-line-start="967" data-line-end="969"><code>UseHsts()</code>: HTTPS enforcement</li>
+</ul>
+<p class="has-line-data" data-line-start="969" data-line-end="971"><strong>Q94: What is short-circuit in middleware?</strong><br>
+A: When middleware doesn’t call <code>await next()</code>, it stops the pipeline (short-circuits):</p>
+<pre><code class="has-line-data language-csharp" data-line-start="972" data-line-end="982">app.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+{
+    <span class="hljs-keyword">if</span> (context.Request.Path.StartsWithSegments(<span class="hljs-string">&quot;/admin&quot;</span>))
+    {
+        context.Response.StatusCode = <span class="hljs-number">403</span>; <span class="hljs-comment">// Forbidden</span>
+        <span class="hljs-keyword">return</span>; <span class="hljs-comment">// Don&#x27;t call next - short-circuit!</span>
+    }
+    <span class="hljs-keyword">await</span> next();
+});
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="983" data-line-end="984"><a id="Intermediate_Level_983"></a>Intermediate Level</h3>
+<p class="has-line-data" data-line-start="985" data-line-end="987"><strong>Q95: How do you pass data between middleware components?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="988" data-line-end="1004"><span class="hljs-comment">// Method 1: HttpContext.Items</span>
+app.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+{
+    context.Items[<span class="hljs-string">&quot;RequestId&quot;</span>] = Guid.NewGuid();
+    <span class="hljs-keyword">await</span> next();
+});
+
+<span class="hljs-comment">// Method 2: Request header</span>
+context.Request.Headers.Add(<span class="hljs-string">&quot;X-Request-Id&quot;</span>, requestId);
+
+<span class="hljs-comment">// Method 3: HttpContext.Features</span>
+context.Features.Set&lt;MyFeature&gt;(<span class="hljs-keyword">new</span> MyFeature { ... });
+
+<span class="hljs-comment">// Access in next middleware</span>
+<span class="hljs-keyword">var</span> requestId = context.Items[<span class="hljs-string">&quot;RequestId&quot;</span>];
+</code></pre>
+<p class="has-line-data" data-line-start="1005" data-line-end="1007"><strong>Q96: How do you create logging middleware?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1008" data-line-end="1038"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">LoggingMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> RequestDelegate _next;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger&lt;LoggingMiddleware&gt; _logger;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">LoggingMiddleware</span>(<span class="hljs-params">RequestDelegate next, ILogger&lt;LoggingMiddleware&gt; logger</span>)</span>
+    {
+        _next = next;
+        _logger = logger;
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context</span>)</span>
+    {
+        _logger.LogInformation(<span class="hljs-string">$&quot;Request: <span class="hljs-subst">{context.Request.Method}</span> <span class="hljs-subst">{context.Request.Path}</span>&quot;</span>);
+        
+        <span class="hljs-keyword">var</span> originalBody = context.Response.Body;
+        <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> memoryStream = <span class="hljs-keyword">new</span> MemoryStream())
+        {
+            context.Response.Body = memoryStream;
+            
+            <span class="hljs-keyword">await</span> _next(context);
+            
+            _logger.LogInformation(<span class="hljs-string">$&quot;Response: <span class="hljs-subst">{context.Response.StatusCode}</span>&quot;</span>);
+            
+            memoryStream.Position = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">await</span> memoryStream.CopyToAsync(originalBody);
+        }
+    }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1039" data-line-end="1041"><strong>Q97: How do you create authentication middleware?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1042" data-line-end="1078"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">CustomAuthMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> RequestDelegate _next;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">CustomAuthMiddleware</span>(<span class="hljs-params">RequestDelegate next</span>)</span>
+    {
+        _next = next;
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> token = context.Request.Headers[<span class="hljs-string">&quot;Authorization&quot;</span>].ToString();
+        
+        <span class="hljs-keyword">if</span> (<span class="hljs-built_in">string</span>.IsNullOrEmpty(token))
+        {
+            context.Response.StatusCode = <span class="hljs-number">401</span>;
+            <span class="hljs-keyword">await</span> context.Response.WriteAsync(<span class="hljs-string">&quot;Unauthorized&quot;</span>);
+            <span class="hljs-keyword">return</span>; <span class="hljs-comment">// Short-circuit</span>
+        }
+        
+        <span class="hljs-comment">// Validate token</span>
+        <span class="hljs-keyword">if</span> (ValidateToken(token))
+        {
+            <span class="hljs-comment">// Extract user info from token</span>
+            context.User = <span class="hljs-keyword">new</span> ClaimsPrincipal(
+                <span class="hljs-keyword">new</span> ClaimsIdentity(<span class="hljs-keyword">new</span>[] { 
+                    <span class="hljs-keyword">new</span> Claim(ClaimTypes.NameIdentifier, userId) 
+                }, <span class="hljs-string">&quot;custom&quot;</span>));
+        }
+        
+        <span class="hljs-keyword">await</span> _next(context);
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">private</span> <span class="hljs-built_in">bool</span> <span class="hljs-title">ValidateToken</span>(<span class="hljs-params"><span class="hljs-built_in">string</span> token</span>)</span> { <span class="hljs-comment">/* ... */</span> }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1079" data-line-end="1081"><strong>Q98: How do you create error handling middleware?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1082" data-line-end="1118"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ErrorHandlingMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> RequestDelegate _next;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ILogger _logger;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ErrorHandlingMiddleware</span>(<span class="hljs-params">RequestDelegate next, ILogger logger</span>)</span>
+    {
+        _next = next;
+        _logger = logger;
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context</span>)</span>
+    {
+        <span class="hljs-keyword">try</span>
+        {
+            <span class="hljs-keyword">await</span> _next(context);
+        }
+        <span class="hljs-keyword">catch</span> (Exception ex)
+        {
+            _logger.LogError(ex, <span class="hljs-string">&quot;An error occurred&quot;</span>);
+            
+            context.Response.StatusCode = <span class="hljs-number">500</span>;
+            context.Response.ContentType = <span class="hljs-string">&quot;application/json&quot;</span>;
+            
+            <span class="hljs-keyword">await</span> context.Response.WriteAsJsonAsync(<span class="hljs-keyword">new</span> 
+            { 
+                message = <span class="hljs-string">&quot;An error occurred&quot;</span>,
+                error = ex.Message 
+            });
+        }
+    }
+}
+
+<span class="hljs-comment">// Register as first middleware</span>
+app.UseMiddleware&lt;ErrorHandlingMiddleware&gt;();
+</code></pre>
+<p class="has-line-data" data-line-start="1119" data-line-end="1121"><strong>Q99: How do you create CORS middleware? (Commonly ignored)</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1122" data-line-end="1147"><span class="hljs-comment">// In ConfigureServices</span>
+services.AddCors(options =&gt;
+{
+    options.AddPolicy(<span class="hljs-string">&quot;AllowFrontend&quot;</span>, policy =&gt;
+    {
+        policy
+            .WithOrigins(<span class="hljs-string">&quot;https://frontend.example.com&quot;</span>)
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+});
+
+<span class="hljs-comment">// In Configure</span>
+app.UseCors(<span class="hljs-string">&quot;AllowFrontend&quot;</span>);
+
+<span class="hljs-comment">// Or simple</span>
+app.UseCors(policy =&gt;
+{
+    policy
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader();
+});
+</code></pre>
+<p class="has-line-data" data-line-start="1147" data-line-end="1148"><strong>Important</strong>: CORS must be registered AFTER routing, BEFORE endpoints that need it.</p>
+<p class="has-line-data" data-line-start="1149" data-line-end="1151"><strong>Q100: What is middleware branching?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1152" data-line-end="1170">app.Map(<span class="hljs-string">&quot;/api&quot;</span>, api =&gt;
+{
+    api.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+    {
+        <span class="hljs-comment">// This middleware only runs for /api paths</span>
+        <span class="hljs-keyword">await</span> next();
+    });
+    api.UseRouting();
+    api.UseEndpoints(endpoints =&gt; endpoints.MapControllers());
+});
+
+app.MapWhen(context =&gt; context.Request.Path.StartsWithSegments(<span class="hljs-string">&quot;/admin&quot;</span>), admin =&gt;
+{
+    <span class="hljs-comment">// This branch only for /admin requests</span>
+    admin.UseAuthentication();
+    admin.UseAuthorization();
+});
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1171" data-line-end="1172"><a id="Advanced_Level_1171"></a>Advanced Level</h3>
+<p class="has-line-data" data-line-start="1173" data-line-end="1175"><strong>Q101: How do you implement conditional middleware execution?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1176" data-line-end="1192">app.UseWhen(context =&gt; context.Request.Path.StartsWithSegments(<span class="hljs-string">&quot;/api&quot;</span>), api =&gt;
+{
+    <span class="hljs-comment">// Only execute for /api requests</span>
+    api.UseAuthentication();
+});
+
+<span class="hljs-comment">// Or with MapWhen (creates separate branch)</span>
+app.MapWhen(context =&gt; context.Request.Method == <span class="hljs-string">&quot;POST&quot;</span>, post =&gt;
+{
+    post.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+    {
+        <span class="hljs-comment">// Only for POST requests</span>
+        <span class="hljs-keyword">await</span> next();
+    });
+});
+</code></pre>
+<p class="has-line-data" data-line-start="1193" data-line-end="1195"><strong>Q102: How do you implement rate limiting middleware? (Commonly ignored)</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1196" data-line-end="1250"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">RateLimitMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> RequestDelegate _next;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">int</span> _maxRequests;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> <span class="hljs-built_in">int</span> _windowSeconds;
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;DateTime&gt;&gt; _requestLog;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">RateLimitMiddleware</span>(<span class="hljs-params">RequestDelegate next, <span class="hljs-built_in">int</span> maxRequests = <span class="hljs-number">100</span>, 
+        <span class="hljs-built_in">int</span> windowSeconds = <span class="hljs-number">60</span></span>)</span>
+    {
+        _next = next;
+        _maxRequests = maxRequests;
+        _windowSeconds = windowSeconds;
+        _requestLog = <span class="hljs-keyword">new</span> Dictionary&lt;<span class="hljs-built_in">string</span>, List&lt;DateTime&gt;&gt;();
+    }
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> clientId = context.Request.HttpContext.Connection.RemoteIpAddress.ToString();
+        <span class="hljs-keyword">var</span> now = DateTime.UtcNow;
+        
+        <span class="hljs-keyword">if</span> (!_requestLog.ContainsKey(clientId))
+            _requestLog[clientId] = <span class="hljs-keyword">new</span> List&lt;DateTime&gt;();
+        
+        <span class="hljs-keyword">var</span> recentRequests = _requestLog[clientId]
+            .Where(d =&gt; (now - d).TotalSeconds &lt; _windowSeconds)
+            .ToList();
+        
+        <span class="hljs-keyword">if</span> (recentRequests.Count &gt;= _maxRequests)
+        {
+            context.Response.StatusCode = <span class="hljs-number">429</span>; <span class="hljs-comment">// Too Many Requests</span>
+            <span class="hljs-keyword">await</span> context.Response.WriteAsync(<span class="hljs-string">&quot;Rate limit exceeded&quot;</span>);
+            <span class="hljs-keyword">return</span>;
+        }
+        
+        _requestLog[clientId] = recentRequests;
+        _requestLog[clientId].Add(now);
+        
+        <span class="hljs-keyword">await</span> _next(context);
+    }
+}
+
+<span class="hljs-comment">// Modern: Use built-in RateLimitingMiddleware (.NET 7+)</span>
+services.AddRateLimiting(options =&gt;
+{
+    options.AddFixedWindowLimiter(<span class="hljs-string">&quot;fixed&quot;</span>, opt =&gt;
+    {
+        opt.PermitLimit = <span class="hljs-number">100</span>;
+        opt.Window = TimeSpan.FromSeconds(<span class="hljs-number">60</span>);
+    });
+});
+
+app.UseRateLimiter();
+</code></pre>
+<p class="has-line-data" data-line-start="1251" data-line-end="1253"><strong>Q103: How do you handle streaming responses in middleware? (Commonly ignored)</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1254" data-line-end="1279">app.Use(<span class="hljs-keyword">async</span> (context, next) =&gt;
+{
+    <span class="hljs-keyword">var</span> originalBody = context.Response.Body;
+    
+    <span class="hljs-comment">// Important: Some middleware needs direct access to body stream</span>
+    <span class="hljs-comment">// Don&#x27;t buffer if streaming file/content</span>
+    
+    <span class="hljs-keyword">if</span> (context.Request.Path.StartsWithSegments(<span class="hljs-string">&quot;/files&quot;</span>))
+    {
+        <span class="hljs-comment">// Let streaming pass through directly</span>
+        <span class="hljs-keyword">await</span> next();
+    }
+    <span class="hljs-keyword">else</span>
+    {
+        <span class="hljs-comment">// Only buffer for non-streaming responses</span>
+        <span class="hljs-keyword">using</span> (<span class="hljs-keyword">var</span> memoryStream = <span class="hljs-keyword">new</span> MemoryStream())
+        {
+            context.Response.Body = memoryStream;
+            <span class="hljs-keyword">await</span> next();
+            memoryStream.Position = <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">await</span> memoryStream.CopyToAsync(originalBody);
+        }
+    }
+});
+</code></pre>
+<p class="has-line-data" data-line-start="1279" data-line-end="1280"><strong>Gotcha</strong>: Buffering middleware can break file streaming; check content type first.</p>
+<p class="has-line-data" data-line-start="1281" data-line-end="1283"><strong>Q104: How do you implement middleware that depends on services from DI?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1284" data-line-end="1307"><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">ServiceDependentMiddleware</span>
+{
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> RequestDelegate _next;
+    <span class="hljs-comment">// Singleton/scoped services injected via constructor</span>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">readonly</span> ISingletonService _singletonService;
+    
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-title">ServiceDependentMiddleware</span>(<span class="hljs-params">RequestDelegate next, 
+        ISingletonService singletonService</span>)</span>
+    {
+        _next = next;
+        _singletonService = singletonService;
+    }
+    
+    <span class="hljs-comment">// Scoped services injected via InvokeAsync</span>
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">InvokeAsync</span>(<span class="hljs-params">HttpContext context, 
+        IScopedService scopedService</span>)</span>
+    {
+        <span class="hljs-keyword">var</span> data = _singletonService.GetData();
+        <span class="hljs-keyword">await</span> scopedService.ProcessAsync(context);
+        <span class="hljs-keyword">await</span> _next(context);
+    }
+}
+</code></pre>
+<p class="has-line-data" data-line-start="1307" data-line-end="1308"><strong>Rule</strong>: Singleton services in constructor, scoped in InvokeAsync.</p>
+<p class="has-line-data" data-line-start="1309" data-line-end="1311"><strong>Q105: What is middleware composition and pipeline ordering best practices?</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1312" data-line-end="1337"><span class="hljs-comment">// Recommended order:</span>
+app.UseExceptionHandler();           <span class="hljs-comment">// 1. Catch exceptions from all middleware</span>
+app.UseHsts();                       <span class="hljs-comment">// 2. Security headers</span>
+app.UseHttpsRedirection();           <span class="hljs-comment">// 3. Redirect HTTP to HTTPS</span>
+app.UseStaticFiles();                <span class="hljs-comment">// 4. Static files (bypass MVC)</span>
+app.UseCookiePolicy();               <span class="hljs-comment">// 5. Cookie handling</span>
+app.UseRouting();                    <span class="hljs-comment">// 6. Determine endpoint (required)</span>
+app.UseCors();                       <span class="hljs-comment">// 7. CORS (after routing, before auth)</span>
+app.UseAuthentication();             <span class="hljs-comment">// 8. Verify user identity</span>
+app.UseAuthorization();              <span class="hljs-comment">// 9. Check permissions</span>
+app.UseSession();                    <span class="hljs-comment">// 10. Session (after cookie)</span>
+app.UseResponseCaching();            <span class="hljs-comment">// 11. Cache responses</span>
+app.MapControllers();                <span class="hljs-comment">// 12. Register endpoints</span>
+app.UseEndpoints(endpoints =&gt; ...);  <span class="hljs-comment">// 13. Execute endpoint</span>
+
+<span class="hljs-comment">// Mnemonic: SHAPE CAR</span>
+<span class="hljs-comment">// S: Static files</span>
+<span class="hljs-comment">// H: HTTPS redirect</span>
+<span class="hljs-comment">// A: Authentication</span>
+<span class="hljs-comment">// P: (Policies) CORS</span>
+<span class="hljs-comment">// E: Exception handling</span>
+<span class="hljs-comment">// C: Cookies/CORS</span>
+<span class="hljs-comment">// A: Authorization</span>
+<span class="hljs-comment">// R: Routing &amp; Response handling</span>
+</code></pre>
+<p class="has-line-data" data-line-start="1338" data-line-end="1340"><strong>Q106: How do you test middleware in isolation? (Commonly ignored)</strong><br>
+A:</p>
+<pre><code class="has-line-data language-csharp" data-line-start="1341" data-line-end="1361">[<span class="hljs-meta">TestClass</span>]
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title">MyMiddlewareTests</span>
+{
+    [<span class="hljs-meta">TestMethod</span>]
+    <span class="hljs-function"><span class="hljs-keyword">public</span> <span class="hljs-keyword">async</span> Task <span class="hljs-title">Middleware_ShouldAddHeader_WhenCalled</span>()</span>
+    {
+        <span class="hljs-comment">// Arrange</span>
+        <span class="hljs-keyword">var</span> middleware = <span class="hljs-keyword">new</span> MyMiddleware(
+            next: <span class="hljs-keyword">async</span> (ctx) =&gt; { }  <span class="hljs-comment">// Mock next delegate</span>
+        );
+        <span class="hljs-keyword">var</span> context = <span class="hljs-keyword">new</span> DefaultHttpContext();
+        
+        <span class="hljs-comment">// Act</span>
+        <span class="hljs-keyword">await</span> middleware.InvokeAsync(context);
+        
+        <span class="hljs-comment">// Assert</span>
+        Assert.IsTrue(context.Response.Headers.ContainsKey(<span class="hljs-string">&quot;X-Custom&quot;</span>));
+    }
+}
+</code></pre>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1364" data-line-end="1365"><a id="Summary_Cheat_Sheet_1364"></a>Summary Cheat Sheet</h2>
+<h3 class="code-line has-line-data" data-line-start="1366" data-line-end="1367"><a id="Clean_Architecture_1366"></a>Clean Architecture</h3>
+<ul>
+<li class="has-line-data" data-line-start="1367" data-line-end="1368">Layer dependencies point inward only</li>
+<li class="has-line-data" data-line-start="1368" data-line-end="1369">Use DTOs for API boundaries</li>
+<li class="has-line-data" data-line-start="1369" data-line-end="1370">Repository Pattern for data access</li>
+<li class="has-line-data" data-line-start="1370" data-line-end="1371">Specification Pattern for queries</li>
+<li class="has-line-data" data-line-start="1371" data-line-end="1373">CQRS for read/write separation</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1373" data-line-end="1374"><a id="Singleton_Sealed_Classes_1373"></a>Singleton &amp; Sealed Classes</h3>
+<ul>
+<li class="has-line-data" data-line-start="1374" data-line-end="1375">Use <code>Lazy&lt;T&gt;</code> for thread-safe Singleton</li>
+<li class="has-line-data" data-line-start="1375" data-line-end="1376">Sealed class prevents inheritance + enables optimization</li>
+<li class="has-line-data" data-line-start="1376" data-line-end="1377">Prefer DI over Singleton pattern</li>
+<li class="has-line-data" data-line-start="1377" data-line-end="1379">Sealed methods prevent overriding in derived classes</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1379" data-line-end="1380"><a id="ASPNET_Core_Lifecycle_1379"></a><a href="http://ASP.NET">ASP.NET</a> Core Lifecycle</h3>
+<ol>
+<li class="has-line-data" data-line-start="1380" data-line-end="1381">Request → Middleware pipeline → Routing → Handler → Response</li>
+<li class="has-line-data" data-line-start="1381" data-line-end="1382">ConfigureServices registers; Configure builds pipeline</li>
+<li class="has-line-data" data-line-start="1382" data-line-end="1383">Scoped services per HTTP request (safe with DbContext)</li>
+<li class="has-line-data" data-line-start="1383" data-line-end="1384">Middleware order critical: Exception → Auth → Routing → Endpoint</li>
+<li class="has-line-data" data-line-start="1384" data-line-end="1386">IHostedService runs background tasks</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="1386" data-line-end="1387"><a id="NET_Core_vs_NET_Framework_1386"></a>.NET Core vs .NET Framework</h3>
+<ul>
+<li class="has-line-data" data-line-start="1387" data-line-end="1388">.NET Core: Cross-platform, modern, faster, open-source</li>
+<li class="has-line-data" data-line-start="1388" data-line-end="1389">.NET Framework: Windows-only, legacy, deprecated</li>
+<li class="has-line-data" data-line-start="1389" data-line-end="1390">No AppDomains in .NET Core (simpler, less isolated)</li>
+<li class="has-line-data" data-line-start="1390" data-line-end="1392">Self-contained deployment bundles runtime with app</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1392" data-line-end="1393"><a id="Microservices_Communication_1392"></a>Microservices Communication</h3>
+<ul>
+<li class="has-line-data" data-line-start="1393" data-line-end="1394">Synchronous (REST/gRPC): Simple but tightly coupled</li>
+<li class="has-line-data" data-line-start="1394" data-line-end="1395">Asynchronous (Messaging): Loosely coupled, eventually consistent</li>
+<li class="has-line-data" data-line-start="1395" data-line-end="1396">Service Discovery: Find available service instances</li>
+<li class="has-line-data" data-line-start="1396" data-line-end="1397">Circuit Breaker: Prevent cascading failures</li>
+<li class="has-line-data" data-line-start="1397" data-line-end="1398">Saga Pattern: Distributed transactions</li>
+<li class="has-line-data" data-line-start="1398" data-line-end="1399">Correlation ID: Trace requests across services</li>
+<li class="has-line-data" data-line-start="1399" data-line-end="1401">Idempotency Key: Safe retry semantics</li>
+</ul>
+<h3 class="code-line has-line-data" data-line-start="1401" data-line-end="1402"><a id="Middleware_1401"></a>Middleware</h3>
+<ul>
+<li class="has-line-data" data-line-start="1402" data-line-end="1403">Pipeline processes requests in order, responses in reverse</li>
+<li class="has-line-data" data-line-start="1403" data-line-end="1404">Short-circuit by not calling <code>next()</code></li>
+<li class="has-line-data" data-line-start="1404" data-line-end="1405">Singleton services in constructor, Scoped in InvokeAsync</li>
+<li class="has-line-data" data-line-start="1405" data-line-end="1406">Typical order: Exception → HTTPS → Static Files → Routing → Auth → Endpoint</li>
+<li class="has-line-data" data-line-start="1406" data-line-end="1408">Can branch/condition middleware with Map/MapWhen</li>
+</ul>
+<hr>
+<h2 class="code-line has-line-data" data-line-start="1410" data-line-end="1411"><a id="Tips_for_Interview_Success_1410"></a>Tips for Interview Success</h2>
+<ol>
+<li class="has-line-data" data-line-start="1412" data-line-end="1413"><strong>Understand the “why”</strong>: Not just what Clean Architecture is, but why it matters</li>
+<li class="has-line-data" data-line-start="1413" data-line-end="1414"><strong>Provide code examples</strong>: Show you can implement, not just explain</li>
+<li class="has-line-data" data-line-start="1414" data-line-end="1415"><strong>Discuss trade-offs</strong>: “It depends on…” shows nuanced thinking</li>
+<li class="has-line-data" data-line-start="1415" data-line-end="1416"><strong>Mention commonly ignored aspects</strong>: Demonstrates depth (idempotency, scoped services, middleware ordering)</li>
+<li class="has-line-data" data-line-start="1416" data-line-end="1417"><strong>Relate to real scenarios</strong>: “In my last project…” makes answers concrete</li>
+<li class="has-line-data" data-line-start="1417" data-line-end="1418"><strong>Ask clarifying questions</strong>: Shows you think critically about requirements</li>
+<li class="has-line-data" data-line-start="1418" data-line-end="1419"><strong>Discuss testing</strong>: Senior roles care about testability and maintainability</li>
+<li class="has-line-data" data-line-start="1419" data-line-end="1420"><strong>Performance considerations</strong>: Mention TechEmpower, benchmarking, async patterns</li>
+<li class="has-line-data" data-line-start="1420" data-line-end="1421"><strong>Security implications</strong>: Auth, CORS, input validation</li>
+<li class="has-line-data" data-line-start="1421" data-line-end="1423"><strong>Operational concerns</strong>: Logging, monitoring, graceful degradation</li>
+</ol>
+<p class="has-line-data" data-line-start="1423" data-line-end="1424">Good luck</p>
+
+</body>
+</html>

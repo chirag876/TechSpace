@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Guide to Loops, Conditional Statements, and Control Flow in C#.md</title>
+  <style>
+  @import url("https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.9.0-alpha2/katex.min.css");
+
+  body {
+    font-family: Georgia, Cambria, serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #373D49;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.5em; }
+  h3 { font-size: 1.25em; }
+  a { color: #35D7BB; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code {
+    font-family: "Ubuntu Mono", Monaco, monospace;
+    background: #F5F7FA;
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+  }
+  pre {
+    background: #F5F7FA;
+    padding: 1em;
+    border-radius: 3px;
+    overflow-x: auto;
+  }
+  .hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 0;
+    color: #333;
+  }
+  pre code { background: none; padding: 0; }
+  blockquote {
+    border-left: 3px solid #A0AABF;
+    padding-left: 1em;
+    margin-left: 0;
+    font-style: italic;
+    color: #666;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  th, td {
+    border: 1px solid #E8E8E8;
+    padding: 0.5em;
+    text-align: left;
+  }
+  th {
+    background: #F5F7FA;
+    font-weight: 600;
+  }
+  #preview .table {
+    width: auto;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+  .katex-display {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+</style>
+</head>
+<body id="preview">
+<h1 class="code-line has-line-data" data-line-start="0" data-line-end="1"><a id="C_NET_Interview_Questions_Guide_0"></a>C# &amp; .NET Interview Questions Guide</h1>
+<h2 class="code-line has-line-data" data-line-start="2" data-line-end="3"><a id="Complete_Coverage_Basic_to_Advanced_Commonly_2"></a>Complete Coverage: Basic to Advanced + Commonly</h2>
+<h2 class="code-line has-line-data" data-line-start="4" data-line-end="5"><a id="Overlooked_Topics_4"></a>Overlooked Topics</h2>
+<h2 class="code-line has-line-data" data-line-start="6" data-line-end="7"><a id="Table_of_Contents_6"></a>Table of Contents</h2>
+<ol>
+<li class="has-line-data" data-line-start="8" data-line-end="9">OOPS (Object-Oriented Programming)</li>
+<li class="has-line-data" data-line-start="9" data-line-end="10">Static Classes &amp; Keywords</li>
+<li class="has-line-data" data-line-start="10" data-line-end="11">async/await</li>
+<li class="has-line-data" data-line-start="11" data-line-end="12">Dependency Injection (DI)</li>
+<li class="has-line-data" data-line-start="12" data-line-end="13">SOLID Principles</li>
+<li class="has-line-data" data-line-start="13" data-line-end="14">Service Lifetime</li>
+<li class="has-line-data" data-line-start="14" data-line-end="15">Commonly Ignored Questions</li>
+<li class="has-line-data" data-line-start="15" data-line-end="17">Real-World Scenarios</li>
+</ol>
+<h2 class="code-line has-line-data" data-line-start="17" data-line-end="18"><a id="OOPS_17"></a>OOPS</h2>
+<h2 class="code-line has-line-data" data-line-start="19" data-line-end="20"><a id="Basic_Level_19"></a>Basic Level</h2>
+<ol>
+<li class="has-line-data" data-line-start="21" data-line-end="23"><strong>What is Object-Oriented Programming (OOP)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="24" data-line-end="27">Answer: A programming paradigm based on objects and classes that
+organize code into reusable, self-contained units.
+</code></pre>
+<ol start="2">
+<li class="has-line-data" data-line-start="27" data-line-end="29"><strong>What are the four pillars of OOP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="30" data-line-end="32">Answer: Encapsulation, Inheritance, Polymorphism, and Abstraction.
+</code></pre>
+<ol start="3">
+<li class="has-line-data" data-line-start="32" data-line-end="34"><strong>What is a class and an object?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="35" data-line-end="37">Answer: A class is a blueprint, an object is an instance of that blueprint.
+</code></pre>
+<ol start="4">
+<li class="has-line-data" data-line-start="37" data-line-end="40"><strong>What is encapsulation?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="41" data-line-end="44">Answer: Bundling data and methods together and hiding internal details
+using access modifiers (public, private, protected).
+</code></pre>
+<ol start="5">
+<li class="has-line-data" data-line-start="44" data-line-end="47"><strong>What are access modifiers in C#?</strong><br>
+Answer: public, private, protected, internal, protected internal, private<br>
+protected.</li>
+<li class="has-line-data" data-line-start="47" data-line-end="49"><strong>What is the difference between a reference type and a value type?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="50" data-line-end="53">Answer: Value types (struct, int, double) are stored on the stack; reference
+types (class, object) are stored on the heap.
+</code></pre>
+<ol start="7">
+<li class="has-line-data" data-line-start="53" data-line-end="55"><strong>What is inheritance?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="56" data-line-end="59">Answer: A mechanism where a derived class inherits properties and
+methods from a base class.
+</code></pre>
+<ol start="8">
+<li class="has-line-data" data-line-start="59" data-line-end="61"><strong>Can you inherit from multiple classes in C#?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="62" data-line-end="65">Answer: No, C# does not support multiple inheritance from classes. You can
+implement multiple interfaces though.
+</code></pre>
+<ol start="9">
+<li class="has-line-data" data-line-start="65" data-line-end="67"><strong>What is polymorphism?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="68" data-line-end="71">Answer: The ability of objects to take multiple forms. Two types: compile-
+time (method overloading) and runtime (method overriding).
+</code></pre>
+<ol start="10">
+<li class="has-line-data" data-line-start="71" data-line-end="73"><strong>What is abstraction?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="74" data-line-end="77">Answer: Hiding complex implementation details and showing only the
+necessary features.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="77" data-line-end="78"><a id="Intermediate_Level_77"></a>Intermediate Level</h3>
+<ol start="11">
+<li class="has-line-data" data-line-start="79" data-line-end="81"><strong>What is the difference between abstract classes and interfaces?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="82" data-line-end="92">Answer:
+Abstract classes can have concrete methods, fields; interfaces cannot
+(before C# 8.0)
+Abstract classes can have access modifiers; interface members are
+public by default
+A class can implement multiple interfaces but inherit from only one
+abstract class
+Abstract classes are “IS-A” relationships; interfaces are “CAN-DO”
+relationships
+</code></pre>
+<ol start="12">
+<li class="has-line-data" data-line-start="93" data-line-end="95"><strong>Can you instantiate an abstract class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="96" data-line-end="99">Answer: No, abstract classes cannot be instantiated directly. You must create
+a derived class.
+</code></pre>
+<ol start="13">
+<li class="has-line-data" data-line-start="99" data-line-end="101"><strong>What are virtual and override keywords?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="102" data-line-end="105">Answer: virtual allows a method to be overridden in derived classes;
+override explicitly overrides a virtual method.
+</code></pre>
+<ol start="14">
+<li class="has-line-data" data-line-start="105" data-line-end="107"><strong>What is method hiding (using the new keyword)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="108" data-line-end="112">Answer: It’s when a derived class defines a method with the same name as a
+base class method without using override. It hides the base method
+completely.
+</code></pre>
+<ol start="15">
+<li class="has-line-data" data-line-start="112" data-line-end="114"><strong>What is the difference between method overloading and method overriding?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="115" data-line-end="121">Answer:
+Overloading: Multiple methods with the same name but different
+parameters (compile-time polymorphism)
+Overriding: Child class provides specific implementation of parent’s
+virtual method (runtime polymorphism)
+</code></pre>
+<ol start="16">
+<li class="has-line-data" data-line-start="121" data-line-end="123"><strong>Can you override a static method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="124" data-line-end="127">Answer: No, static methods cannot be overridden. They can only be hidden
+using the new keyword.
+</code></pre>
+<ol start="17">
+<li class="has-line-data" data-line-start="127" data-line-end="129"><strong>What is a constructor and a destructor?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="130" data-line-end="133">Answer: Constructor initializes an object; destructor cleans up resources. C#
+uses finalizers (~ClassName) not destructors.
+</code></pre>
+<ol start="18">
+<li class="has-line-data" data-line-start="133" data-line-end="135"><strong>Can a constructor be private?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="136" data-line-end="139">Answer: Yes, private constructors are used in singleton patterns and factory
+patterns to control object creation.
+</code></pre>
+<ol start="19">
+<li class="has-line-data" data-line-start="139" data-line-end="141"><strong>What is constructor chaining?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="142" data-line-end="144">Answer: Calling one constructor from another using : this() or : base().
+</code></pre>
+<ol start="20">
+<li class="has-line-data" data-line-start="144" data-line-end="146"><strong>What is an immutable object?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="147" data-line-end="150">Answer: An object whose state cannot be changed after creation. Use
+readonly keyword or properties with only getters.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="151" data-line-end="152"><a id="Advanced_Level_151"></a>Advanced Level</h3>
+<ol start="21">
+<li class="has-line-data" data-line-start="153" data-line-end="155"><strong>What is the difference between struct and class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="156" data-line-end="163">Answer:
+Struct is a value type; class is a reference type
+Struct is stored on stack; class on heap
+Struct cannot inherit from other structs/classes; class can inherit
+Struct members cannot be initialized inline; class members can
+Struct is copied by value; class by reference
+</code></pre>
+<ol start="22">
+<li class="has-line-data" data-line-start="163" data-line-end="165"><strong>When should you use a struct over a class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="166" data-line-end="169">Answer: For small, immutable data structures; when you want stack
+allocation; for performance-critical code; when you don’t need inheritance.
+</code></pre>
+<ol start="23">
+<li class="has-line-data" data-line-start="169" data-line-end="171"><strong>What is the diamond problem in inheritance?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="172" data-line-end="176">Answer: When a class inherits from two classes that have a common
+ancestor, it’s unclear which ancestor’s methods to use. C# avoids this using
+interfaces.
+</code></pre>
+<ol start="24">
+<li class="has-line-data" data-line-start="176" data-line-end="178"><strong>What is covariance and contravariance?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="179" data-line-end="185">Answer:
+Covariance: Allows a derived type where a base type is expected
+(return types)
+Contravariance: Allows a base type where a derived type is expected
+(parameter types)
+</code></pre>
+<ol start="25">
+<li class="has-line-data" data-line-start="185" data-line-end="187"><strong>What are sealed classes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="188" data-line-end="191">Answer: Classes that cannot be inherited from. Used to prevent further
+derivation.
+</code></pre>
+<ol start="26">
+<li class="has-line-data" data-line-start="191" data-line-end="194"><strong>What is the difference between explicit and implicit interface</strong><br>
+<strong>implementation?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="195" data-line-end="202">Answer:
+Implicit: Implement interface members as public members
+Explicit: Implement using InterfaceName.MemberName, making them
+private
+Explicit implementation is useful when interfaces have conflicting
+member names
+</code></pre>
+<ol start="27">
+<li class="has-line-data" data-line-start="202" data-line-end="205"><strong>What is a nested class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="206" data-line-end="209">Answer: A class defined inside another class. Can access private members of
+the outer class if non-static.
+</code></pre>
+<ol start="28">
+<li class="has-line-data" data-line-start="209" data-line-end="212"><strong>What is the purpose of the base keyword?</strong><br>
+Answer: To access base class members (methods, properties, constructors)<br>
+from a derived class.</li>
+<li class="has-line-data" data-line-start="212" data-line-end="214"><strong>How does C# handle multiple inheritance through interfaces?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="215" data-line-end="218">Answer: A class can implement multiple interfaces, effectively achieving
+multiple inheritance of type/contract.
+</code></pre>
+<ol start="30">
+<li class="has-line-data" data-line-start="218" data-line-end="220"><strong>What is the Object class in C#?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="221" data-line-end="224">Answer: The base class of all classes in C#. Key methods: GetType(),
+ToString(), GetHashCode(), Equals().
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="224" data-line-end="225"><a id="Static_Classes_Keywords_224"></a>Static Classes &amp; Keywords</h2>
+<h3 class="code-line has-line-data" data-line-start="226" data-line-end="227"><a id="Basic_Level_226"></a>Basic Level</h3>
+<ol start="31">
+<li class="has-line-data" data-line-start="228" data-line-end="230"><strong>What is a static class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="231" data-line-end="234">Answer: A class that cannot be instantiated. All members must be static.
+Used for utility/helper methods.
+</code></pre>
+<ol start="32">
+<li class="has-line-data" data-line-start="234" data-line-end="236"><strong>What is the static keyword?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="237" data-line-end="240">Answer: Makes a member (variable, method, class) belong to the type itself,
+not to instances.
+</code></pre>
+<ol start="33">
+<li class="has-line-data" data-line-start="240" data-line-end="242"><strong>What is the difference between static and non-static members?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="243" data-line-end="247">Answer:
+Static members are shared across all instances
+Non-static members are unique to each instance
+</code></pre>
+<ol start="34">
+<li class="has-line-data" data-line-start="247" data-line-end="249"><strong>Can you inherit from a static class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="250" data-line-end="252">Answer: No, static classes are sealed implicitly and cannot be inherited.
+</code></pre>
+<ol start="35">
+<li class="has-line-data" data-line-start="252" data-line-end="254"><strong>Can a static class have instance members?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="255" data-line-end="257">Answer: No, all members in a static class must be static.
+</code></pre>
+<ol start="36">
+<li class="has-line-data" data-line-start="258" data-line-end="260"><strong>What is a static variable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="261" data-line-end="264">Answer: A variable shared across all instances of a class. Initialized once and
+persists for the application lifetime.
+</code></pre>
+<ol start="37">
+<li class="has-line-data" data-line-start="264" data-line-end="266"><strong>What is a static method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="267" data-line-end="270">Answer: A method that belongs to the class, not to instances. Called using
+ClassName.MethodName().
+</code></pre>
+<ol start="38">
+<li class="has-line-data" data-line-start="270" data-line-end="272"><strong>What is a static constructor?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="273" data-line-end="277">Answer: A parameterless constructor that initializes static members. Called
+automatically before the first instance is created or a static member is
+accessed.
+</code></pre>
+<ol start="39">
+<li class="has-line-data" data-line-start="277" data-line-end="279"><strong>When is a static constructor called?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="280" data-line-end="283">Answer: Before the first instance is created or before a static member is
+accessed, whichever comes first.
+</code></pre>
+<ol start="40">
+<li class="has-line-data" data-line-start="283" data-line-end="285"><strong>Can a static constructor throw an exception?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="286" data-line-end="289">Answer: Yes, but it will prevent the class from being used and throw a
+TypeInitializationException.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="289" data-line-end="290"><a id="Intermediate_Level_289"></a>Intermediate Level</h3>
+<ol start="41">
+<li class="has-line-data" data-line-start="291" data-line-end="293"><strong>What is a static property?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="294" data-line-end="297">Answer: A property that belongs to the class itself. Accessed via
+ClassName.PropertyName.
+</code></pre>
+<ol start="42">
+<li class="has-line-data" data-line-start="297" data-line-end="300"><strong>What is the difference between a static class and a class with all static</strong><br>
+<strong>members?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="301" data-line-end="306">Answer:
+Static class: Cannot be instantiated, all members must be static
+Regular class with static members: Can be instantiated, mix of static
+and instance members
+</code></pre>
+<ol start="43">
+<li class="has-line-data" data-line-start="306" data-line-end="308"><strong>Can you use ‘this’ keyword in a static method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="309" data-line-end="312">Answer: No, this refers to the current instance, which doesn’t exist in static
+context.
+</code></pre>
+<ol start="44">
+<li class="has-line-data" data-line-start="312" data-line-end="315"><strong>What is a static import (using static)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="316" data-line-end="319">Answer: Allows you to use static members without the class name: using
+static ClassName;
+</code></pre>
+<ol start="45">
+<li class="has-line-data" data-line-start="319" data-line-end="322"><strong>What happens if you try to access an instance member from a static method?</strong><br>
+Answer: Compiler error - you cannot access instance members from a static<br>
+context.</li>
+<li class="has-line-data" data-line-start="322" data-line-end="324"><strong>Are static members initialized before instance members?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="325" data-line-end="327">Answer: Yes, static members are initialized first.
+</code></pre>
+<ol start="47">
+<li class="has-line-data" data-line-start="327" data-line-end="329"><strong>Can a static method call a non-static method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="330" data-line-end="332">Answer: No, unless it creates an instance first.
+</code></pre>
+<ol start="48">
+<li class="has-line-data" data-line-start="332" data-line-end="334"><strong>What is a static field initialization order?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="335" data-line-end="338">Answer: Static fields are initialized in the order they’re declared before the
+static constructor runs.
+</code></pre>
+<ol start="49">
+<li class="has-line-data" data-line-start="338" data-line-end="340"><strong>What is the purpose of static readonly?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="341" data-line-end="344">Answer: To create a constant that can be initialized at runtime but cannot be
+changed after assignment.
+</code></pre>
+<ol start="50">
+<li class="has-line-data" data-line-start="344" data-line-end="346"><strong>What is the difference between const and static readonly?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="347" data-line-end="352">Answer:
+const: Compile-time constant, inlined, cannot be changed
+static readonly: Runtime constant, not inlined, can be initialized in
+constructor
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="352" data-line-end="353"><a id="Advanced_Level_352"></a>Advanced Level</h3>
+<ol start="51">
+<li class="has-line-data" data-line-start="354" data-line-end="356"><strong>How do static classes relate to dependency injection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="357" data-line-end="360">Answer: Static classes are generally avoided in DI because they’re hard to
+mock and test, creating tight coupling.
+</code></pre>
+<ol start="52">
+<li class="has-line-data" data-line-start="360" data-line-end="362"><strong>What is the issue with static methods in terms of testability?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="363" data-line-end="366">Answer: Static methods cannot be mocked, making unit testing difficult. DI is
+preferred for testable code.
+</code></pre>
+<ol start="53">
+<li class="has-line-data" data-line-start="366" data-line-end="369"><strong>Can you use async methods in a static context?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="370" data-line-end="373">Answer: Yes, but you need to be careful with static state and concurrent
+access.
+</code></pre>
+<ol start="54">
+<li class="has-line-data" data-line-start="373" data-line-end="376"><strong>What is a static factory method?</strong><br>
+Answer: A static method that creates and returns instances of a class.<br>
+Provides more flexibility than constructors.</li>
+<li class="has-line-data" data-line-start="376" data-line-end="378"><strong>What are the pitfalls of using static variables in multithreaded applications?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="379" data-line-end="382">Answer: Race conditions, need for synchronization, state sharing issues. Use
+thread-local storage or locks if necessary.
+</code></pre>
+<ol start="56">
+<li class="has-line-data" data-line-start="382" data-line-end="384"><strong>How do you ensure thread safety with static variables?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="385" data-line-end="388">Answer: Use locks (lock statement), volatile keyword, Interlocked class,
+or ThreadLocal&lt;T&gt;.
+</code></pre>
+<ol start="57">
+<li class="has-line-data" data-line-start="388" data-line-end="390"><strong>What is a static factory pattern?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="391" data-line-end="394">Answer: A design pattern using static methods to control object creation
+instead of constructors.
+</code></pre>
+<ol start="58">
+<li class="has-line-data" data-line-start="394" data-line-end="396"><strong>Can you override a static method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="397" data-line-end="399">Answer: No, you can only hide it using the new keyword.
+</code></pre>
+<ol start="59">
+<li class="has-line-data" data-line-start="399" data-line-end="401"><strong>What is the difference between static and sealed?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="402" data-line-end="405">Answer: static makes all members belong to the type; sealed prevents
+inheritance.
+</code></pre>
+<ol start="60">
+<li class="has-line-data" data-line-start="405" data-line-end="407"><strong>What is the memory overhead of static variables?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="408" data-line-end="411">Answer: Static variables are stored in the heap and persist for the application
+lifetime, increasing memory usage.
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="411" data-line-end="412"><a id="asyncawait_411"></a>async/await</h2>
+<h3 class="code-line has-line-data" data-line-start="413" data-line-end="414"><a id="Basic_Level_413"></a>Basic Level</h3>
+<ol start="61">
+<li class="has-line-data" data-line-start="415" data-line-end="417"><strong>What is asynchronous programming?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="418" data-line-end="421">Answer: Programming that doesn’t block the calling thread. The operation
+runs independently, and the result is obtained when ready.
+</code></pre>
+<ol start="62">
+<li class="has-line-data" data-line-start="422" data-line-end="424"><strong>What is the async keyword?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="425" data-line-end="428">Answer: A modifier that indicates a method is asynchronous and can use
+await.
+</code></pre>
+<ol start="63">
+<li class="has-line-data" data-line-start="428" data-line-end="430"><strong>What is the await keyword?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="431" data-line-end="434">Answer: Pauses execution until an awaitable Task completes, then resumes
+with the result.
+</code></pre>
+<ol start="64">
+<li class="has-line-data" data-line-start="434" data-line-end="436"><strong>What is a Task in C#?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="437" data-line-end="440">Answer: Represents an asynchronous operation that may or may not return
+a value.
+</code></pre>
+<ol start="65">
+<li class="has-line-data" data-line-start="440" data-line-end="442"><strong>What is the difference between Task and Task?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="443" data-line-end="446">Answer: Task represents an operation without a return value; Task
+represents an operation that returns a value of type T.
+</code></pre>
+<ol start="66">
+<li class="has-line-data" data-line-start="446" data-line-end="448"><strong>What is the naming convention for async methods?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="449" data-line-end="452">Answer: Async methods should be named with an “Async” suffix (e.g.,
+GetDataAsync).
+</code></pre>
+<ol start="67">
+<li class="has-line-data" data-line-start="452" data-line-end="454"><strong>Can an async method return void?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="455" data-line-end="458">Answer: Technically yes, but it’s not recommended. Use Task or Task&lt;T&gt;
+instead. Only use async void for event handlers.
+</code></pre>
+<ol start="68">
+<li class="has-line-data" data-line-start="458" data-line-end="460"><strong>What happens when you await a completed Task?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="461" data-line-end="464">Answer: Execution continues immediately without blocking if the Task is
+already completed.
+</code></pre>
+<ol start="69">
+<li class="has-line-data" data-line-start="464" data-line-end="466"><strong>Can you use await outside an async method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="467" data-line-end="470">Answer: No, you must be in an async method. However, C# 11+ allows top-
+level await in some contexts.
+</code></pre>
+<ol start="70">
+<li class="has-line-data" data-line-start="470" data-line-end="472"><strong>What is the difference between blocking and non-blocking calls?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="473" data-line-end="478">Answer:
+Blocking: Halts execution until the operation completes
+Non-blocking: Returns control immediately; the operation continues in
+the background
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="479" data-line-end="480"><a id="Intermediate_Level_479"></a>Intermediate Level</h3>
+<ol start="71">
+<li class="has-line-data" data-line-start="481" data-line-end="483"><strong>What is ConfigureAwait(false)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="484" data-line-end="487">Answer: Tells the task not to capture the current synchronization context,
+avoiding deadlocks and improving performance.
+</code></pre>
+<ol start="72">
+<li class="has-line-data" data-line-start="487" data-line-end="489"><strong>When should you use ConfigureAwait(false)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="490" data-line-end="493">Answer: In library code to avoid forcing a specific synchronization context on
+the caller.
+</code></pre>
+<ol start="73">
+<li class="has-line-data" data-line-start="493" data-line-end="495"><strong>What is a synchronization context?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="496" data-line-end="499">Answer: An abstraction that ensures continuations run on the same thread.
+Important in UI frameworks like WinForms.
+</code></pre>
+<ol start="74">
+<li class="has-line-data" data-line-start="499" data-line-end="501"><strong>What is the difference between Task.Run and Task.Factory.StartNew?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="502" data-line-end="506">Answer:
+Task.Run: Queues work to the thread pool
+Task.Factory.StartNew: More control over task scheduling and options
+</code></pre>
+<ol start="75">
+<li class="has-line-data" data-line-start="506" data-line-end="508"><strong>What is async all the way?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="509" data-line-end="512">Answer: An architectural pattern where async is used consistently from the
+top-level entry point down to I/O operations.
+</code></pre>
+<ol start="76">
+<li class="has-line-data" data-line-start="512" data-line-end="514"><strong>What happens if you don’t await a Task?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="515" data-line-end="518">Answer: The Task runs in the background; you won’t get the result. May
+cause “fire and forget” issues.
+</code></pre>
+<ol start="77">
+<li class="has-line-data" data-line-start="518" data-line-end="520"><strong>How do you handle exceptions in async methods?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="521" data-line-end="524">Answer: Use try-catch blocks around await statements. The exception
+propagates through the Task.
+</code></pre>
+<ol start="78">
+<li class="has-line-data" data-line-start="524" data-line-end="526"><strong>What is Task.WhenAll?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="527" data-line-end="530">Answer: Waits for multiple tasks to complete. Returns a task that completes
+when all tasks are done.
+</code></pre>
+<ol start="79">
+<li class="has-line-data" data-line-start="530" data-line-end="532"><strong>What is Task.WhenAny?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="533" data-line-end="536">Answer: Returns a task that completes when any of the awaited tasks
+completes.
+</code></pre>
+<ol start="80">
+<li class="has-line-data" data-line-start="537" data-line-end="539"><strong>What is Task.Delay?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="540" data-line-end="543">Answer: An asynchronous equivalent of Thread.Sleep that doesn’t block the
+thread.
+</code></pre>
+<ol start="81">
+<li class="has-line-data" data-line-start="543" data-line-end="545"><strong>What is a deadlock in async code?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="546" data-line-end="549">Answer: When multiple tasks wait for each other to complete, causing
+indefinite blocking.
+</code></pre>
+<ol start="82">
+<li class="has-line-data" data-line-start="549" data-line-end="551"><strong>How can you prevent deadlocks in async code?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="552" data-line-end="555">Answer: Use ConfigureAwait(false), avoid mixing sync and async, use async
+all the way.
+</code></pre>
+<ol start="83">
+<li class="has-line-data" data-line-start="555" data-line-end="557"><strong>What is the difference between async void and async Task?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="558" data-line-end="562">Answer:
+async void: Fire and forget, no way to track completion
+async Task: Can be awaited, exceptions propagate properly
+</code></pre>
+<ol start="84">
+<li class="has-line-data" data-line-start="562" data-line-end="564"><strong>What is ValueTask?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="565" data-line-end="568">Answer: A lightweight struct that represents an async operation. More
+efficient than Task for operations that often complete synchronously.
+</code></pre>
+<ol start="85">
+<li class="has-line-data" data-line-start="568" data-line-end="570"><strong>When should you use ValueTask instead of Task?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="571" data-line-end="574">Answer: For performance-critical code where allocations matter and
+operations often complete synchronously.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="574" data-line-end="575"><a id="Advanced_Level_574"></a>Advanced Level</h3>
+<ol start="86">
+<li class="has-line-data" data-line-start="576" data-line-end="578"><strong>What is async state machine?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="579" data-line-end="582">Answer: The compiler-generated state machine that implements the
+async/await logic. It manages state transitions and continuations.
+</code></pre>
+<ol start="87">
+<li class="has-line-data" data-line-start="582" data-line-end="584"><strong>How does the compiler transform async/await code?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="585" data-line-end="588">Answer: Converts the async method into a state machine with different
+states for each await point.
+</code></pre>
+<ol start="88">
+<li class="has-line-data" data-line-start="588" data-line-end="590"><strong>What is a synchronization context in detail?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="591" data-line-end="594">Answer: An abstraction (SynchronizationContext) that ensures continuations
+run on a specific thread/context (e.g., UI thread).
+</code></pre>
+<ol start="89">
+<li class="has-line-data" data-line-start="595" data-line-end="597"><strong>What is IAsyncEnumerable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="598" data-line-end="601">Answer: Represents an asynchronous enumerable collection. Used with
+await foreach for streaming async data.
+</code></pre>
+<ol start="90">
+<li class="has-line-data" data-line-start="601" data-line-end="603"><strong>What is async streams?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="604" data-line-end="607">Answer: Using async IAsyncEnumerable&lt;T&gt; with yield return to produce
+values asynchronously.
+</code></pre>
+<ol start="91">
+<li class="has-line-data" data-line-start="607" data-line-end="609"><strong>How do you iterate over an async enumerable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="610" data-line-end="612">Answer: Using await foreach (var item in asyncEnumerable).
+</code></pre>
+<ol start="92">
+<li class="has-line-data" data-line-start="612" data-line-end="614"><strong>What is the difference between Task-based asynchrony and async/await?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="615" data-line-end="618">Answer: async/await is syntactic sugar built on top of Task-based
+asynchrony, making it more readable.
+</code></pre>
+<ol start="93">
+<li class="has-line-data" data-line-start="618" data-line-end="620"><strong>What happens if a Task throws an exception?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="621" data-line-end="624">Answer: The exception is captured in the Task. When you await, the
+exception is thrown at the await point.
+</code></pre>
+<ol start="94">
+<li class="has-line-data" data-line-start="624" data-line-end="626"><strong>What is UnobservedTaskException?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="627" data-line-end="630">Answer: An exception thrown by a Task that was never awaited or checked. It
+may cause the application to crash.
+</code></pre>
+<ol start="95">
+<li class="has-line-data" data-line-start="630" data-line-end="632"><strong>How do you prevent UnobservedTaskException?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="633" data-line-end="636">Answer: Always await or attach handlers to Tasks using ContinueWith or
+exception handling.
+</code></pre>
+<ol start="96">
+<li class="has-line-data" data-line-start="636" data-line-end="638"><strong>What is async local storage?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="639" data-line-end="642">Answer: Data stored per async call, not per thread. Use AsyncLocal for this
+purpose.
+</code></pre>
+<ol start="97">
+<li class="has-line-data" data-line-start="642" data-line-end="644"><strong>What is the difference between Thread.Sleep and Task.Delay?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="645" data-line-end="649">Answer:
+Thread.Sleep: Blocks the thread
+Task.Delay: Returns a task that completes after delay without blocking
+</code></pre>
+<ol start="98">
+<li class="has-line-data" data-line-start="649" data-line-end="651"><strong>Can you await a regular synchronous method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="652" data-line-end="654">Answer: No, the method must return Task or Task.
+</code></pre>
+<ol start="99">
+<li class="has-line-data" data-line-start="655" data-line-end="657"><strong>What is a TaskScheduler?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="658" data-line-end="661">Answer: Manages how tasks are executed. Default is the thread pool
+scheduler.
+</code></pre>
+<ol start="100">
+<li class="has-line-data" data-line-start="661" data-line-end="663"><strong>What are the performance implications of async/await?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="664" data-line-end="667">Answer: Minimal overhead due to compiler optimization. But excessive
+allocations and synchronization contexts can impact performance.
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="667" data-line-end="668"><a id="Dependency_Injection_667"></a>Dependency Injection</h2>
+<h3 class="code-line has-line-data" data-line-start="669" data-line-end="670"><a id="Basic_Level_669"></a>Basic Level</h3>
+<ol start="101">
+<li class="has-line-data" data-line-start="671" data-line-end="673"><strong>What is Dependency Injection (DI)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="674" data-line-end="677">Answer: A design pattern where a class receives its dependencies from
+external sources rather than creating them itself.
+</code></pre>
+<ol start="102">
+<li class="has-line-data" data-line-start="677" data-line-end="679"><strong>What is the difference between Dependency Injection and Service Locator?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="680" data-line-end="685">Answer:
+DI: Dependencies are injected into the class (preferred, explicit)
+Service Locator: The class asks a service locator for its dependencies
+(implicit, anti-pattern)
+</code></pre>
+<ol start="103">
+<li class="has-line-data" data-line-start="685" data-line-end="687"><strong>What are the types of Dependency Injection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="688" data-line-end="691">Answer: Constructor Injection, Property Injection, Method Injection, and
+Interface Injection.
+</code></pre>
+<ol start="104">
+<li class="has-line-data" data-line-start="691" data-line-end="693"><strong>What is Constructor Injection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="694" data-line-end="697">Answer: Dependencies are passed through the class constructor. Most
+common and recommended approach.
+</code></pre>
+<ol start="105">
+<li class="has-line-data" data-line-start="697" data-line-end="699"><strong>What is Property Injection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="700" data-line-end="703">Answer: Dependencies are set through public properties after object
+creation.
+</code></pre>
+<ol start="106">
+<li class="has-line-data" data-line-start="703" data-line-end="705"><strong>What is Method Injection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="706" data-line-end="708">Answer: Dependencies are passed as parameters to methods that use them.
+</code></pre>
+<ol start="107">
+<li class="has-line-data" data-line-start="709" data-line-end="711"><strong>What is the IServiceProvider interface?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="712" data-line-end="714">Answer: A built-in interface for retrieving services from the DI container.
+</code></pre>
+<ol start="108">
+<li class="has-line-data" data-line-start="714" data-line-end="716"><strong>What is a DI Container?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="717" data-line-end="720">Answer: A framework that manages object creation and dependency
+resolution (e.g., Microsoft.Extensions.DependencyInjection).
+</code></pre>
+<ol start="109">
+<li class="has-line-data" data-line-start="720" data-line-end="722"><strong>What is the purpose of the IServiceCollection interface?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="723" data-line-end="725">Answer: Used to register services with the DI container during configuration.
+</code></pre>
+<ol start="110">
+<li class="has-line-data" data-line-start="725" data-line-end="727"><strong>How do you register services in .NET Core?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="728" data-line-end="731">Answer: Using IServiceCollection methods like AddScoped, AddSingleton,
+AddTransient.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="731" data-line-end="732"><a id="Intermediate_Level_731"></a>Intermediate Level</h3>
+<ol start="111">
+<li class="has-line-data" data-line-start="733" data-line-end="735"><strong>What is the difference between Scoped, Singleton, and Transient lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="736" data-line-end="741">Answer:
+Singleton: One instance for the application lifetime
+Scoped: One instance per request/scope
+Transient: New instance every time it’s requested
+</code></pre>
+<ol start="112">
+<li class="has-line-data" data-line-start="741" data-line-end="743"><strong>How do you resolve a service from the DI container?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="744" data-line-end="746">Answer: Using IServiceProvider.GetService() or GetRequiredService().
+</code></pre>
+<ol start="113">
+<li class="has-line-data" data-line-start="746" data-line-end="748"><strong>What is constructor injection vs property injection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="749" data-line-end="753">Answer:
+Constructor: Dependencies are required, immutable, explicit
+Property: Dependencies are optional, mutable, implicit
+</code></pre>
+<ol start="114">
+<li class="has-line-data" data-line-start="753" data-line-end="755"><strong>What is the Factory pattern in DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="756" data-line-end="759">Answer: Using a factory function to create instances, providing more control
+over object creation.
+</code></pre>
+<ol start="115">
+<li class="has-line-data" data-line-start="759" data-line-end="761"><strong>How do you register a factory method with the DI container?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="762" data-line-end="765">Answer: Using AddScoped(sp =&gt; new
+MyService(sp.GetService&lt;IDependency&gt;())).
+</code></pre>
+<ol start="116">
+<li class="has-line-data" data-line-start="766" data-line-end="768"><strong>What is auto-wiring?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="769" data-line-end="772">Answer: The DI container automatically resolving dependencies based on
+type signatures.
+</code></pre>
+<ol start="117">
+<li class="has-line-data" data-line-start="772" data-line-end="774"><strong>What is circular dependency?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="775" data-line-end="778">Answer: When two or more services depend on each other, creating a
+circular reference that cannot be resolved.
+</code></pre>
+<ol start="118">
+<li class="has-line-data" data-line-start="778" data-line-end="780"><strong>How do you handle circular dependencies?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="781" data-line-end="784">Answer: Refactor to remove the circular dependency, use lazy loading, or use
+a factory/service locator.
+</code></pre>
+<ol start="119">
+<li class="has-line-data" data-line-start="784" data-line-end="786"><strong>How do you register an interface with a concrete type?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="787" data-line-end="789">Answer: services.AddScoped&lt;IRepository, Repository&gt;();
+</code></pre>
+<ol start="120">
+<li class="has-line-data" data-line-start="789" data-line-end="795"><strong>What is the difference between registering a type and registering an</strong><br>
+<strong>instance?</strong><br>
+Answer:<br>
+Type registration: Container creates the instance<br>
+Instance registration: A pre-created instance is registered</li>
+</ol>
+<h3 class="code-line has-line-data" data-line-start="795" data-line-end="796"><a id="Advanced_Level_795"></a>Advanced Level</h3>
+<ol start="121">
+<li class="has-line-data" data-line-start="797" data-line-end="799"><strong>What is decorator pattern in DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="800" data-line-end="803">Answer: Wrapping one implementation with another to add functionality
+without modifying the original.
+</code></pre>
+<ol start="122">
+<li class="has-line-data" data-line-start="803" data-line-end="805"><strong>How do you implement the decorator pattern with DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="806" data-line-end="809">Answer: Register multiple implementations of the same interface, with one
+decorating the other.
+</code></pre>
+<ol start="123">
+<li class="has-line-data" data-line-start="809" data-line-end="811"><strong>What is the Factory pattern with DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="812" data-line-end="815">Answer: Using a factory service to control object creation within the DI
+container.
+</code></pre>
+<ol start="124">
+<li class="has-line-data" data-line-start="815" data-line-end="817"><strong>What is Composition Root?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="818" data-line-end="821">Answer: The application entry point where all DI configuration happens. Only
+place where the container is used directly.
+</code></pre>
+<ol start="125">
+<li class="has-line-data" data-line-start="822" data-line-end="824"><strong>Why should DI configuration be in the Composition Root?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="825" data-line-end="828">Answer: To keep DI concerns separated from business logic and improve
+testability.
+</code></pre>
+<ol start="126">
+<li class="has-line-data" data-line-start="828" data-line-end="830"><strong>What is Service Locator anti-pattern?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="831" data-line-end="834">Answer: Using a global service locator to resolve dependencies, hiding
+dependencies and making testing difficult.
+</code></pre>
+<ol start="127">
+<li class="has-line-data" data-line-start="834" data-line-end="836"><strong>Why is Service Locator considered an anti-pattern?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="837" data-line-end="840">Answer: Hidden dependencies, harder to test, tighter coupling, unclear
+object creation flow.
+</code></pre>
+<ol start="128">
+<li class="has-line-data" data-line-start="840" data-line-end="842"><strong>What is the purpose of IDisposable in DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="843" data-line-end="846">Answer: Services can implement IDisposable to clean up resources when the
+container is disposed.
+</code></pre>
+<ol start="129">
+<li class="has-line-data" data-line-start="846" data-line-end="848"><strong>How does the DI container handle IDisposable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="849" data-line-end="852">Answer: Scoped and Transient services are disposed when the scope ends;
+Singletons are disposed when the container is disposed.
+</code></pre>
+<ol start="130">
+<li class="has-line-data" data-line-start="852" data-line-end="854"><strong>What is Scope in DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="855" data-line-end="858">Answer: A lifetime period during which scoped instances are reused (typically
+per HTTP request in ASP.NET Core).
+</code></pre>
+<ol start="131">
+<li class="has-line-data" data-line-start="858" data-line-end="860"><strong>How do you create a new scope manually?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="861" data-line-end="863">Answer: Using serviceProvider.CreateScope() to get an IServiceScope.
+</code></pre>
+<ol start="132">
+<li class="has-line-data" data-line-start="863" data-line-end="865"><strong>What is the performance impact of DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="866" data-line-end="869">Answer: Minimal overhead due to compilation. DI containers are highly
+optimized in .NET.
+</code></pre>
+<ol start="133">
+<li class="has-line-data" data-line-start="869" data-line-end="871"><strong>How do you register conditional services in DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="872" data-line-end="875">Answer: Using a factory method to return different implementations based
+on conditions.
+</code></pre>
+<ol start="134">
+<li class="has-line-data" data-line-start="875" data-line-end="877"><strong>What is open generic registration?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="878" data-line-end="881">Answer: Registering generic types like IRepository&lt;&gt; and letting the
+container resolve specific versions.
+</code></pre>
+<ol start="135">
+<li class="has-line-data" data-line-start="882" data-line-end="884"><strong>How do you handle optional dependencies in DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="885" data-line-end="888">Answer: Use property injection, optional constructor parameters, or check
+for null after injection.
+</code></pre>
+<ol start="136">
+<li class="has-line-data" data-line-start="888" data-line-end="890"><strong>What is the difference between GetService and GetRequiredService?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="891" data-line-end="895">Answer:
+GetService: Returns null if not found
+GetRequiredService: Throws InvalidOperationException if not found
+</code></pre>
+<ol start="137">
+<li class="has-line-data" data-line-start="895" data-line-end="897"><strong>What is keyed service registration?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="898" data-line-end="901">Answer: Registering multiple implementations with different keys to
+distinguish between them.
+</code></pre>
+<ol start="138">
+<li class="has-line-data" data-line-start="901" data-line-end="903"><strong>How do you use keyed services in .NET Core?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="904" data-line-end="907">Answer: Using AddKeyedScoped&lt;T&gt;(key, ...) and resolving with
+GetKeyedService&lt;T&gt;(key).
+</code></pre>
+<ol start="139">
+<li class="has-line-data" data-line-start="907" data-line-end="909"><strong>What is dependency inversion principle?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="910" data-line-end="913">Answer: High-level modules should not depend on low-level modules; both
+should depend on abstractions. DI is a way to achieve this.
+</code></pre>
+<ol start="140">
+<li class="has-line-data" data-line-start="913" data-line-end="915"><strong>What is the relationship between DI and SOLID principles?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="916" data-line-end="919">Answer: DI is a technique to implement SOLID principles, particularly
+Dependency Inversion and Single Responsibility.
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="919" data-line-end="920"><a id="SOLID_Principles_919"></a>SOLID Principles</h2>
+<h3 class="code-line has-line-data" data-line-start="921" data-line-end="922"><a id="Basic_Level_921"></a>Basic Level</h3>
+<ol start="141">
+<li class="has-line-data" data-line-start="923" data-line-end="925"><strong>What does SOLID stand for?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="926" data-line-end="929">Answer: Single Responsibility, Open/Closed, Liskov Substitution, Interface
+Segregation, Dependency Inversion.
+</code></pre>
+<ol start="142">
+<li class="has-line-data" data-line-start="929" data-line-end="931"><strong>What is Single Responsibility Principle (SRP)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="932" data-line-end="935">Answer: A class should have only one reason to change, meaning it should
+have only one responsibility.
+</code></pre>
+<ol start="143">
+<li class="has-line-data" data-line-start="936" data-line-end="938"><strong>Why is SRP important?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="939" data-line-end="942">Answer: Improves maintainability, testability, and reusability. Makes code
+easier to understand and modify.
+</code></pre>
+<ol start="144">
+<li class="has-line-data" data-line-start="942" data-line-end="944"><strong>What is an example of violating SRP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="945" data-line-end="948">Answer: A User class that handles user data, authentication, email sending,
+and logging.
+</code></pre>
+<ol start="145">
+<li class="has-line-data" data-line-start="948" data-line-end="950"><strong>How do you fix SRP violations?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="951" data-line-end="954">Answer: Separate concerns into different classes, each with a single
+responsibility.
+</code></pre>
+<ol start="146">
+<li class="has-line-data" data-line-start="954" data-line-end="956"><strong>What is Open/Closed Principle (OCP)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="957" data-line-end="959">Answer: Software should be open for extension but closed for modification.
+</code></pre>
+<ol start="147">
+<li class="has-line-data" data-line-start="959" data-line-end="961"><strong>How do you achieve OCP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="962" data-line-end="965">Answer: Use inheritance, interfaces, and abstract classes. Use design
+patterns like Strategy, Decorator, Observer.
+</code></pre>
+<ol start="148">
+<li class="has-line-data" data-line-start="965" data-line-end="967"><strong>What is an example of violating OCP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="968" data-line-end="971">Answer: Modifying existing code every time you add a new feature instead of
+extending through interfaces.
+</code></pre>
+<ol start="149">
+<li class="has-line-data" data-line-start="971" data-line-end="973"><strong>What is Liskov Substitution Principle (LSP)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="974" data-line-end="977">Answer: Derived classes should be substitutable for their base classes
+without breaking the application.
+</code></pre>
+<ol start="150">
+<li class="has-line-data" data-line-start="977" data-line-end="979"><strong>What is an example of violating LSP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="980" data-line-end="983">Answer: A Rectangle class with a Square subclass that overrides setWidth
+and setHeight, breaking expected behavior.
+</code></pre>
+<ol start="151">
+<li class="has-line-data" data-line-start="983" data-line-end="985"><strong>What is Interface Segregation Principle (ISP)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="986" data-line-end="989">Answer: Clients should not depend on interfaces they don’t use. Keep
+interfaces small and focused.
+</code></pre>
+<ol start="152">
+<li class="has-line-data" data-line-start="989" data-line-end="991"><strong>What is an example of violating ISP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="992" data-line-end="995">Answer: A large IWorker interface with methods unrelated to certain
+implementations that don’t need them.
+</code></pre>
+<ol start="153">
+<li class="has-line-data" data-line-start="996" data-line-end="998"><strong>What is Dependency Inversion Principle (DIP)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="999" data-line-end="1002">Answer: High-level modules should not depend on low-level modules. Both
+should depend on abstractions.
+</code></pre>
+<ol start="154">
+<li class="has-line-data" data-line-start="1002" data-line-end="1004"><strong>How does DI relate to DIP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1005" data-line-end="1008">Answer: Dependency Injection is a technique to implement Dependency
+Inversion Principle.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1008" data-line-end="1009"><a id="Intermediate_Level_1008"></a>Intermediate Level</h3>
+<ol start="155">
+<li class="has-line-data" data-line-start="1010" data-line-end="1012"><strong>How does SRP improve testability?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1013" data-line-end="1016">Answer: With single responsibility, classes are easier to test because they
+have fewer dependencies and concerns.
+</code></pre>
+<ol start="156">
+<li class="has-line-data" data-line-start="1016" data-line-end="1018"><strong>What is the Template Method pattern in relation to OCP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1019" data-line-end="1022">Answer: Defines the skeleton of an algorithm in a base class, allowing
+subclasses to override specific steps without modifying the algorithm.
+</code></pre>
+<ol start="157">
+<li class="has-line-data" data-line-start="1022" data-line-end="1025"><strong>What is the Strategy pattern in relation to OCP?</strong><br>
+Answer: Encapsulates algorithms in separate classes, allowing runtime<br>
+selection without modifying the context class.</li>
+<li class="has-line-data" data-line-start="1025" data-line-end="1027"><strong>How does composition over inheritance relate to SOLID?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1028" data-line-end="1031">Answer: Promotes OCP, LSP, and ISP by avoiding tight coupling and inflexible
+hierarchies.
+</code></pre>
+<ol start="159">
+<li class="has-line-data" data-line-start="1031" data-line-end="1033"><strong>What is the difference between cohesion and coupling?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1034" data-line-end="1040">Answer:
+Cohesion: How closely related responsibilities are within a class (high
+cohesion = good)
+Coupling: How dependent classes are on each other (low coupling =
+good)
+</code></pre>
+<ol start="160">
+<li class="has-line-data" data-line-start="1040" data-line-end="1042"><strong>How do SOLID principles relate to each other?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1043" data-line-end="1046">Answer: They’re interconnected; following one often helps with others. DI is
+central to achieving DIP, which supports OCP.
+</code></pre>
+<ol start="161">
+<li class="has-line-data" data-line-start="1046" data-line-end="1049"><strong>What is the role-based interface in ISP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1050" data-line-end="1053">Answer: Creating interfaces based on client needs/roles rather than
+implementation capabilities.
+</code></pre>
+<ol start="162">
+<li class="has-line-data" data-line-start="1053" data-line-end="1056"><strong>How do you identify SRP violations?</strong><br>
+Answer: Look for multiple reasons a class might change, multiple<br>
+responsibilities, low cohesion.</li>
+<li class="has-line-data" data-line-start="1056" data-line-end="1058"><strong>What is the Liskov Substitution Principle in contracts?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1059" data-line-end="1062">Answer: Derived classes must honor the contracts (preconditions,
+postconditions) of their base classes.
+</code></pre>
+<ol start="164">
+<li class="has-line-data" data-line-start="1062" data-line-end="1064"><strong>What is behavior preservation in LSP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1065" data-line-end="1068">Answer: Ensuring derived classes maintain the expected behavior of the
+base class.
+</code></pre>
+<ol start="165">
+<li class="has-line-data" data-line-start="1068" data-line-end="1070"><strong>How do you apply ISP in a .NET application?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1071" data-line-end="1074">Answer: Define small, focused interfaces based on client requirements, not
+implementation capabilities.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1074" data-line-end="1075"><a id="Advanced_Level_1074"></a>Advanced Level</h3>
+<ol start="166">
+<li class="has-line-data" data-line-start="1076" data-line-end="1078"><strong>What is the relationship between SRP and cohesion?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1079" data-line-end="1082">Answer: High cohesion is achieved by following SRP; related functionality
+stays together, unrelated functionality separates.
+</code></pre>
+<ol start="167">
+<li class="has-line-data" data-line-start="1082" data-line-end="1084"><strong>How do you measure if a design follows SOLID?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1085" data-line-end="1088">Answer: Look at ease of testing, maintainability, number of changes for new
+features, code reuse, and coupling levels.
+</code></pre>
+<ol start="168">
+<li class="has-line-data" data-line-start="1088" data-line-end="1090"><strong>What is the tension between SRP and DRY (Don’t Repeat Yourself)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1091" data-line-end="1094">Answer: Sometimes repeating code follows SRP. DRY should not force
+unrelated code together.
+</code></pre>
+<ol start="169">
+<li class="has-line-data" data-line-start="1094" data-line-end="1096"><strong>How does OCP relate to polymorphism?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1097" data-line-end="1100">Answer: Polymorphism (through interfaces/inheritance) enables OCP by
+allowing extension without modification.
+</code></pre>
+<ol start="170">
+<li class="has-line-data" data-line-start="1100" data-line-end="1103"><strong>What is the Visitor pattern in relation to OCP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1104" data-line-end="1107">Answer: Allows adding new operations to objects without modifying their
+structure, achieving OCP.
+</code></pre>
+<ol start="171">
+<li class="has-line-data" data-line-start="1107" data-line-end="1110"><strong>What is the difference between interface-based and inheritance-based design</strong><br>
+<strong>in SOLID?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1111" data-line-end="1117">Answer:
+Interface-based: More flexible, supports multiple implementations,
+better for DIP
+Inheritance-based: Tighter coupling, less flexible, but can share
+implementation
+</code></pre>
+<ol start="172">
+<li class="has-line-data" data-line-start="1117" data-line-end="1119"><strong>How does the Factory pattern support SOLID?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1120" data-line-end="1123">Answer: Separates object creation (SRP), allows easy extension (OCP), and
+enables DI (DIP).
+</code></pre>
+<ol start="173">
+<li class="has-line-data" data-line-start="1123" data-line-end="1125"><strong>What is the relationship between SOLID and design patterns?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1126" data-line-end="1128">Answer: Design patterns are solutions that help implement SOLID principles.
+</code></pre>
+<ol start="174">
+<li class="has-line-data" data-line-start="1128" data-line-end="1130"><strong>How do you balance SOLID principles with pragmatism?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1131" data-line-end="1134">Answer: Understand the principles deeply, apply them where they add value,
+avoid over-engineering for simple scenarios.
+</code></pre>
+<ol start="175">
+<li class="has-line-data" data-line-start="1134" data-line-end="1136"><strong>What is the impact of SOLID on codebase evolution?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1137" data-line-end="1140">Answer: SOLID-adherent code is more flexible, easier to maintain, and
+requires fewer changes as requirements evolve.
+</code></pre>
+<ol start="176">
+<li class="has-line-data" data-line-start="1140" data-line-end="1142"><strong>How does Interface Segregation relate to API design?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1143" data-line-end="1146">Answer: Small, focused interfaces make APIs easier to understand and
+implement correctly.
+</code></pre>
+<ol start="177">
+<li class="has-line-data" data-line-start="1146" data-line-end="1148"><strong>What is the principle of least surprise in relation to LSP?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1149" data-line-end="1152">Answer: Derived classes should behave as users of the base class would
+expect, not surprise them with unexpected behavior.
+</code></pre>
+<ol start="178">
+<li class="has-line-data" data-line-start="1152" data-line-end="1154"><strong>How do you teach SOLID to junior developers?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1155" data-line-end="1158">Answer: Use real-world examples, show violations and fixes, emphasize
+pragmatism, and enforce through code reviews.
+</code></pre>
+<ol start="179">
+<li class="has-line-data" data-line-start="1158" data-line-end="1161"><strong>What is the cost of over-applying SOLID?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1162" data-line-end="1165">Answer: Over-engineering, excessive interfaces, unnecessary abstraction,
+reduced code readability.
+</code></pre>
+<ol start="180">
+<li class="has-line-data" data-line-start="1165" data-line-end="1169"><strong>What is the long-term benefit of SOLID in large applications?</strong><br>
+Answer: Reduced maintenance cost, faster feature development, better code<br>
+quality, and easier team onboarding.</li>
+</ol>
+<h2 class="code-line has-line-data" data-line-start="1169" data-line-end="1170"><a id="Service_Lifetime_1169"></a>Service Lifetime</h2>
+<h3 class="code-line has-line-data" data-line-start="1171" data-line-end="1172"><a id="Basic_Level_1171"></a>Basic Level</h3>
+<ol start="181">
+<li class="has-line-data" data-line-start="1173" data-line-end="1175"><strong>What is Service Lifetime?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1176" data-line-end="1179">Answer: The duration for which a service instance exists and is reused in a DI
+container.
+</code></pre>
+<ol start="182">
+<li class="has-line-data" data-line-start="1179" data-line-end="1181"><strong>What are the three service lifetimes in .NET Core?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1182" data-line-end="1184">Answer: Singleton, Scoped, and Transient.
+</code></pre>
+<ol start="183">
+<li class="has-line-data" data-line-start="1184" data-line-end="1186"><strong>What is a Singleton service?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1187" data-line-end="1189">Answer: A service created once and reused for the entire application lifetime.
+</code></pre>
+<ol start="184">
+<li class="has-line-data" data-line-start="1189" data-line-end="1191"><strong>When should you use Singleton?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1192" data-line-end="1195">Answer: For stateless services, configuration, database connections, logging,
+caching.
+</code></pre>
+<ol start="185">
+<li class="has-line-data" data-line-start="1195" data-line-end="1197"><strong>What is a Scoped service?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1198" data-line-end="1201">Answer: A service created once per scope (typically per HTTP request in
+ASP.NET Core).
+</code></pre>
+<ol start="186">
+<li class="has-line-data" data-line-start="1201" data-line-end="1204"><strong>When should you use Scoped?</strong><br>
+Answer: For stateful services like Entity Framework DbContext, per-request<br>
+data repositories.</li>
+<li class="has-line-data" data-line-start="1204" data-line-end="1206"><strong>What is a Transient service?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1207" data-line-end="1209">Answer: A new instance is created every time the service is requested.
+</code></pre>
+<ol start="188">
+<li class="has-line-data" data-line-start="1209" data-line-end="1212"><strong>When should you use Transient?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1213" data-line-end="1216">Answer: For lightweight, stateless services; objects that might have state or
+side effects.
+</code></pre>
+<ol start="189">
+<li class="has-line-data" data-line-start="1216" data-line-end="1219"><strong>What is the default lifetime when registering a service?</strong><br>
+Answer: There’s no default; you must specify using AddSingleton,<br>
+AddScoped, or AddTransient.</li>
+<li class="has-line-data" data-line-start="1219" data-line-end="1221"><strong>What happens if you forget to specify lifetime?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1222" data-line-end="1225">Answer: You’ll get a compilation error because the extension method is
+overloaded to require explicit lifetime.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1225" data-line-end="1226"><a id="Intermediate_Level_1225"></a>Intermediate Level</h3>
+<ol start="191">
+<li class="has-line-data" data-line-start="1227" data-line-end="1229"><strong>What is the problem with using Scoped services in Singleton?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1230" data-line-end="1233">Answer: The Scoped instance is captured by the Singleton, and the same
+Scoped instance is reused across scopes, losing Scoped benefits.
+</code></pre>
+<ol start="192">
+<li class="has-line-data" data-line-start="1233" data-line-end="1235"><strong>How do you inject a Scoped service into a Singleton?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1236" data-line-end="1239">Answer: Use a factory pattern or service provider to resolve the Scoped
+service when needed, not during Singleton construction.
+</code></pre>
+<ol start="193">
+<li class="has-line-data" data-line-start="1239" data-line-end="1241"><strong>What is a scope in <a href="http://ASP.NET">ASP.NET</a> Core?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1242" data-line-end="1245">Answer: A lifetime period, typically one HTTP request. A new scope is created
+per request.
+</code></pre>
+<ol start="194">
+<li class="has-line-data" data-line-start="1245" data-line-end="1247"><strong>What is the performance difference between lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1248" data-line-end="1251">Answer: Singleton is fastest (created once); Transient is slowest (created
+every time); Scoped is in between.
+</code></pre>
+<ol start="195">
+<li class="has-line-data" data-line-start="1251" data-line-end="1253"><strong>What is object pooling in relation to lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1254" data-line-end="1257">Answer: Reusing objects instead of creating new ones. Scoped and Singleton
+enable pooling.
+</code></pre>
+<ol start="196">
+<li class="has-line-data" data-line-start="1257" data-line-end="1259"><strong>What is the memory impact of Singleton?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1260" data-line-end="1263">Answer: Singleton instances persist for the application lifetime, consuming
+memory throughout the app’s life.
+</code></pre>
+<ol start="197">
+<li class="has-line-data" data-line-start="1263" data-line-end="1266"><strong>What is the memory impact of Transient?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1267" data-line-end="1269">Answer: Many instances are created and discarded, increasing GC pressure.
+</code></pre>
+<ol start="198">
+<li class="has-line-data" data-line-start="1269" data-line-end="1271"><strong>How do you choose between Scoped and Transient?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1272" data-line-end="1276">Answer:
+Scoped: If the instance should be reused within a request
+Transient: If each component needs a fresh instance
+</code></pre>
+<ol start="199">
+<li class="has-line-data" data-line-start="1276" data-line-end="1278"><strong>What is IDisposable in the context of service lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1279" data-line-end="1282">Answer: Services implementing IDisposable are disposed when their lifetime
+ends (Scoped/Transient at scope end, Singleton at app shutdown).
+</code></pre>
+<ol start="200">
+<li class="has-line-data" data-line-start="1282" data-line-end="1284"><strong>What happens if a Singleton implements IDisposable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1285" data-line-end="1288">Answer: It’s disposed when the application shuts down or when the service
+provider is disposed.
+</code></pre>
+<h3 class="code-line has-line-data" data-line-start="1288" data-line-end="1289"><a id="Advanced_Level_1288"></a>Advanced Level</h3>
+<ol start="201">
+<li class="has-line-data" data-line-start="1290" data-line-end="1292"><strong>What is the captive dependency problem?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1293" data-line-end="1296">Answer: A longer-lived service (Singleton) depends on a shorter-lived service
+(Scoped/Transient), causing the shorter-lived service to become a Singleton.
+</code></pre>
+<ol start="202">
+<li class="has-line-data" data-line-start="1296" data-line-end="1298"><strong>How do you avoid captive dependencies?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1299" data-line-end="1302">Answer: Never inject Scoped/Transient into Singleton directly. Use factories
+or service provider.
+</code></pre>
+<ol start="203">
+<li class="has-line-data" data-line-start="1302" data-line-end="1304"><strong>What is lazy initialization in service lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1305" data-line-end="1308">Answer: Creating services only when needed, not when the DI container is
+built.
+</code></pre>
+<ol start="204">
+<li class="has-line-data" data-line-start="1308" data-line-end="1310"><strong>How do you implement lazy initialization?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1311" data-line-end="1314">Answer: Use Lazy&lt;T&gt; wrapper or factory functions that create services on-
+demand.
+</code></pre>
+<ol start="205">
+<li class="has-line-data" data-line-start="1314" data-line-end="1316"><strong>What is IAsyncDisposable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1317" data-line-end="1320">Answer: An interface for services that need asynchronous cleanup, similar to
+IDisposable but async.
+</code></pre>
+<ol start="206">
+<li class="has-line-data" data-line-start="1320" data-line-end="1323"><strong>How do Scoped services work in background tasks?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1324" data-line-end="1327">Answer: Background tasks don’t have a natural scope, so you must create a
+scope manually using serviceProvider.CreateScope().
+</code></pre>
+<ol start="207">
+<li class="has-line-data" data-line-start="1327" data-line-end="1329"><strong>What is the difference between AddXxx and AddXxxAsync?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1330" data-line-end="1333">Answer: These don’t differ in the DI registration itself; you manually handle
+async in your service initialization.
+</code></pre>
+<ol start="208">
+<li class="has-line-data" data-line-start="1333" data-line-end="1335"><strong>What happens if a Singleton depends on multiple Scoped services?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1336" data-line-end="1339">Answer: All those Scoped services become Singletons too (captive
+dependency), defeating Scoped benefits.
+</code></pre>
+<ol start="209">
+<li class="has-line-data" data-line-start="1339" data-line-end="1341"><strong>How do you register a factory as a service?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1342" data-line-end="1345">Answer: Using AddScoped(sp =&gt; new
+MyService(sp.GetService&lt;IDependency&gt;())).
+</code></pre>
+<ol start="210">
+<li class="has-line-data" data-line-start="1345" data-line-end="1347"><strong>What is service resolution performance?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1348" data-line-end="1351">Answer: The time it takes for the DI container to resolve a service. Compiled
+containers (like Scrutor) optimize this.
+</code></pre>
+<ol start="211">
+<li class="has-line-data" data-line-start="1351" data-line-end="1354"><strong>What is the difference between lifetime validation and compile-time</strong><br>
+<strong>verification?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1355" data-line-end="1359">Answer:
+Validation: Runtime checks for captive dependencies
+Compile-time: Static analysis tools detect issues before runtime
+</code></pre>
+<ol start="212">
+<li class="has-line-data" data-line-start="1359" data-line-end="1361"><strong>How do you enable lifetime validation in .NET Core?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1362" data-line-end="1365">Answer: Using ValidateScopes = true on ServiceCollection or
+ServiceProviderOptions.
+</code></pre>
+<ol start="213">
+<li class="has-line-data" data-line-start="1365" data-line-end="1367"><strong>What is the purpose of ValidateOnBuild?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1368" data-line-end="1371">Answer: Validates service registrations when the service provider is built,
+catching errors early.
+</code></pre>
+<ol start="214">
+<li class="has-line-data" data-line-start="1371" data-line-end="1373"><strong>What is the relationship between service lifetime and request context?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1374" data-line-end="1377">Answer: In ASP.NET Core, a request creates a scope; Scoped services are
+created per request and disposed after the request completes.
+</code></pre>
+<ol start="215">
+<li class="has-line-data" data-line-start="1377" data-line-end="1380"><strong>How do you test services with different lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1381" data-line-end="1384">Answer: Create a test service provider with the appropriate lifetimes, inject
+mocks, and verify behavior.
+</code></pre>
+<ol start="216">
+<li class="has-line-data" data-line-start="1384" data-line-end="1387"><strong>What is the impact of service lifetime on distributed systems?</strong><br>
+Answer: Singleton may cause issues across servers; Scoped and Transient<br>
+are safer but require careful state management.</li>
+<li class="has-line-data" data-line-start="1387" data-line-end="1389"><strong>How do you handle entity framework DBContext lifetime?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1390" data-line-end="1393">Answer: Use Scoped lifetime to ensure one context per request, avoiding
+state leaks.
+</code></pre>
+<ol start="218">
+<li class="has-line-data" data-line-start="1393" data-line-end="1395"><strong>What is the difference between Owned and Func for lifetime control?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1396" data-line-end="1400">Answer:
+Owned: The dependent owns the instance lifetime
+Func: The dependent can create instances on demand
+</code></pre>
+<ol start="219">
+<li class="has-line-data" data-line-start="1400" data-line-end="1402"><strong>What is the purpose of KeyedService in service lifetimes?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1403" data-line-end="1406">Answer: Allows multiple services of the same type with different keys, each
+with their own lifetime.
+</code></pre>
+<ol start="220">
+<li class="has-line-data" data-line-start="1406" data-line-end="1408"><strong>How do you migrate from one lifetime to another?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1409" data-line-end="1412">Answer: Understand the impact, update DI registration, test thoroughly,
+watch for captive dependencies.
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="1412" data-line-end="1413"><a id="Commonly_Ignored_Questions_1412"></a>Commonly Ignored Questions</h2>
+<h3 class="code-line has-line-data" data-line-start="1414" data-line-end="1415"><a id="These_are_questions_often_skipped_during_study_but_frequently_1414"></a>These are questions often skipped during study but frequently</h3>
+<h3 class="code-line has-line-data" data-line-start="1416" data-line-end="1417"><a id="asked_in_interviews_1416"></a>asked in interviews</h3>
+<ol start="221">
+<li class="has-line-data" data-line-start="1418" data-line-end="1420"><strong>What is boxing and unboxing?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1421" data-line-end="1425">Answer: Boxing converts a value type to a reference type (stored on heap);
+unboxing converts back to value type.
+Code Example:
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1426" data-line-end="1430">int x = 5 ;
+object box = x; // Boxing
+int unbox = (int)box; // Unboxing
+</code></pre>
+<ol start="222">
+<li class="has-line-data" data-line-start="1431" data-line-end="1433"><strong>What is the performance impact of boxing/unboxing?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1434" data-line-end="1437">Answer: Performance overhead and memory allocation. Use generics to
+avoid boxing.
+</code></pre>
+<ol start="223">
+<li class="has-line-data" data-line-start="1437" data-line-end="1439"><strong>What is a nullable type?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1440" data-line-end="1443">Answer: A value type wrapped to allow null values using? syntax (e.g.,
+int?, bool?).
+</code></pre>
+<ol start="224">
+<li class="has-line-data" data-line-start="1443" data-line-end="1445"><strong>What is the difference between == and .Equals()?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1446" data-line-end="1451">Answer:
+==: Compares references for objects, values for value types (can be
+overridden)
+.Equals(): Compares values (can be overridden), more reliable
+</code></pre>
+<ol start="225">
+<li class="has-line-data" data-line-start="1451" data-line-end="1453"><strong>What is the difference between var and dynamic?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1454" data-line-end="1458">Answer:
+var: Type is determined at compile-time
+dynamic: Type checking is deferred to runtime
+</code></pre>
+<ol start="226">
+<li class="has-line-data" data-line-start="1458" data-line-end="1460"><strong>What is the purpose of the GetHashCode() method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1461" data-line-end="1464">Answer: Returns a hash value used in hash-based collections (Dictionary,
+HashSet). Must be consistent with Equals().
+</code></pre>
+<ol start="227">
+<li class="has-line-data" data-line-start="1464" data-line-end="1466"><strong>What is GetType() method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1467" data-line-end="1470">Answer: Returns the Type object representing the runtime type of an
+instance.
+</code></pre>
+<ol start="228">
+<li class="has-line-data" data-line-start="1470" data-line-end="1472"><strong>What is reflection?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1473" data-line-end="1476">Answer: The ability to inspect and manipulate types, methods, properties at
+runtime.
+</code></pre>
+<ol start="229">
+<li class="has-line-data" data-line-start="1476" data-line-end="1478"><strong>What is an attribute in C#?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1479" data-line-end="1482">Answer: Metadata that provides information about code without being part
+of the code itself.
+</code></pre>
+<ol start="230">
+<li class="has-line-data" data-line-start="1482" data-line-end="1484"><strong>What is the difference between class and struct in memory allocation?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1485" data-line-end="1488">Answer:
+Class: Stored on heap, reference type
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1490" data-line-end="1492">Struct: Stored on stack, value type (unless boxed)
+</code></pre>
+<ol start="231">
+<li class="has-line-data" data-line-start="1492" data-line-end="1494"><strong>What is the this keyword in a struct?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1495" data-line-end="1498">Answer: Refers to the current instance. In structs, this is a copy, not a
+reference.
+</code></pre>
+<ol start="232">
+<li class="has-line-data" data-line-start="1498" data-line-end="1500"><strong>What is the purpose of the using statement?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1501" data-line-end="1504">Answer: Ensures Dispose() is called on IDisposable objects, even if exceptions
+occur.
+</code></pre>
+<ol start="233">
+<li class="has-line-data" data-line-start="1504" data-line-end="1506"><strong>What is the difference between using statement and using declaration?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1507" data-line-end="1512">Answer:
+Statement: Scope-based disposal
+Declaration (C# 8.0+): Block-scoped disposal using using Type name =
+new Type();
+</code></pre>
+<ol start="234">
+<li class="has-line-data" data-line-start="1512" data-line-end="1514"><strong>What is variance in generics?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1515" data-line-end="1518">Answer: Covariance allows derived types where base types are expected;
+contravariance allows base types where derived types are expected.
+</code></pre>
+<ol start="235">
+<li class="has-line-data" data-line-start="1518" data-line-end="1520"><strong>What is the purpose of where constraints in generics?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1521" data-line-end="1524">Answer: Restrict the types that can be used as type arguments (e.g., where T
+: class, where T : IDisposable).
+</code></pre>
+<ol start="236">
+<li class="has-line-data" data-line-start="1524" data-line-end="1526"><strong>What is the difference between List and IEnumerable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1527" data-line-end="1531">Answer:
+List: Concrete collection, mutable, subscriptable
+IEnumerable: Enumerable abstraction, read-only sequence
+</code></pre>
+<ol start="237">
+<li class="has-line-data" data-line-start="1531" data-line-end="1533"><strong>What is LINQ?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1534" data-line-end="1537">Answer: Language Integrated Query - a set of methods and syntax for
+querying data from various sources.
+</code></pre>
+<ol start="238">
+<li class="has-line-data" data-line-start="1537" data-line-end="1539"><strong>What is the difference between IEnumerable and IEnumerable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1540" data-line-end="1544">Answer:
+IEnumerable: Non-generic, untyped enumeration
+IEnumerable: Generic, type-safe enumeration
+</code></pre>
+<ol start="239">
+<li class="has-line-data" data-line-start="1544" data-line-end="1547"><strong>What is deferred execution in LINQ?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1548" data-line-end="1551">Answer: LINQ queries are not executed until the result is enumerated (e.g.,
+foreach, ToList()).
+</code></pre>
+<ol start="240">
+<li class="has-line-data" data-line-start="1551" data-line-end="1553"><strong>What is the difference between immediate and deferred execution?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1554" data-line-end="1558">Answer:
+Immediate: Executed immediately (ToList(), ToArray(), Count())
+Deferred: Executed when enumerated (Where, Select, OrderBy)
+</code></pre>
+<ol start="241">
+<li class="has-line-data" data-line-start="1558" data-line-end="1560"><strong>What is a delegate?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1561" data-line-end="1564">Answer: A type-safe function pointer. Represents a method with a specific
+signature.
+</code></pre>
+<ol start="242">
+<li class="has-line-data" data-line-start="1564" data-line-end="1566"><strong>What is the difference between Action and Func?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1567" data-line-end="1571">Answer:
+Action: Method that takes parameters but returns void
+Func&lt;T, TResult&gt;: Method that takes parameters and returns a result
+</code></pre>
+<ol start="243">
+<li class="has-line-data" data-line-start="1571" data-line-end="1573"><strong>What is an event?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1574" data-line-end="1577">Answer: A wrapper around a delegate that allows safe subscription and
+notification of subscribers.
+</code></pre>
+<ol start="244">
+<li class="has-line-data" data-line-start="1577" data-line-end="1579"><strong>What is the difference between public field and property?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1580" data-line-end="1585">Answer:
+Field: Direct member access
+Property: Encapsulated access with get/set logic, validation,
+notifications
+</code></pre>
+<ol start="245">
+<li class="has-line-data" data-line-start="1585" data-line-end="1587"><strong>What is auto-property?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1588" data-line-end="1591">Answer: A property with automatically generated backing field, declared
+concisely as public int Id { get; set; }.
+</code></pre>
+<ol start="246">
+<li class="has-line-data" data-line-start="1591" data-line-end="1593"><strong>What is the difference between public and private?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1594" data-line-end="1598">Answer:
+public: Accessible from outside the class
+private: Accessible only within the class
+</code></pre>
+<ol start="247">
+<li class="has-line-data" data-line-start="1598" data-line-end="1600"><strong>What is the purpose of readonly keyword?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1601" data-line-end="1604">Answer: Prevents modification after initialization (field can only be set in
+constructor).
+</code></pre>
+<ol start="248">
+<li class="has-line-data" data-line-start="1605" data-line-end="1607"><strong>What is the difference between readonly and const?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1608" data-line-end="1613">Answer:
+const: Compile-time constant, inlined, must be initialized at declaration
+readonly: Runtime constant, not inlined, can be initialized in
+constructor
+</code></pre>
+<ol start="249">
+<li class="has-line-data" data-line-start="1613" data-line-end="1615">**What is the null-coalescing operator (??)? **</li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1616" data-line-end="1619">Answer: Returns the left operand if it’s not null; otherwise, returns the right
+operand.
+</code></pre>
+<ol start="250">
+<li class="has-line-data" data-line-start="1619" data-line-end="1621"><strong>What is the null-conditional operator (?. and ?[])?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1622" data-line-end="1625">Answer: Safely accesses members/indexes on potentially null objects,
+returning null instead of throwing an exception.
+</code></pre>
+<ol start="251">
+<li class="has-line-data" data-line-start="1625" data-line-end="1627"><strong>What is the difference between checked and unchecked?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1628" data-line-end="1632">Answer:
+checked: Throws OverflowException on numeric overflow
+unchecked: Silently wraps around on overflow
+</code></pre>
+<ol start="252">
+<li class="has-line-data" data-line-start="1632" data-line-end="1634"><strong>What is an indexer?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1635" data-line-end="1638">Answer: A property that allows instances to be indexed like arrays using []
+syntax.
+</code></pre>
+<ol start="253">
+<li class="has-line-data" data-line-start="1638" data-line-end="1640"><strong>What is a partial class?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1641" data-line-end="1644">Answer: A class definition split across multiple files using the partial
+keyword.
+</code></pre>
+<ol start="254">
+<li class="has-line-data" data-line-start="1644" data-line-end="1646"><strong>What is an extension method?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1647" data-line-end="1650">Answer: A static method that appears to be a method of another type,
+extending it with new functionality.
+</code></pre>
+<ol start="255">
+<li class="has-line-data" data-line-start="1650" data-line-end="1652"><strong>What are anonymous types?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1653" data-line-end="1656">Answer: Lightweight types created on-the-fly using new { Property = value }
+syntax.
+</code></pre>
+<ol start="256">
+<li class="has-line-data" data-line-start="1656" data-line-end="1658"><strong>What is the purpose of the sealed keyword?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1659" data-line-end="1662">Answer: Prevents a class from being inherited, ensuring the current
+implementation is final.
+</code></pre>
+<ol start="257">
+<li class="has-line-data" data-line-start="1663" data-line-end="1665"><strong>What is the purpose of the abstract keyword?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1666" data-line-end="1669">Answer: Marks a class or method as abstract, requiring derived classes to
+implement it.
+</code></pre>
+<ol start="258">
+<li class="has-line-data" data-line-start="1669" data-line-end="1671"><strong>What is the difference between abstract class and interface (revisited)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1672" data-line-end="1676">Answer: Abstract classes can have state and implementation; interfaces
+cannot (traditionally). Use interface for contracts, abstract class for shared
+implementation.
+</code></pre>
+<ol start="259">
+<li class="has-line-data" data-line-start="1676" data-line-end="1678"><strong>What is the purpose of default interface methods (C# 8.0+)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1679" data-line-end="1682">Answer: Allows interfaces to provide method implementations, enabling
+backward compatibility when adding new methods.
+</code></pre>
+<ol start="260">
+<li class="has-line-data" data-line-start="1682" data-line-end="1684"><strong>What is the difference between is and as keywords?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1685" data-line-end="1689">Answer:
+is: Checks if an object is an instance of a type (returns bool)
+as: Attempts to cast; returns null if unsuccessful (doesn’t throw)
+</code></pre>
+<ol start="261">
+<li class="has-line-data" data-line-start="1689" data-line-end="1691"><strong>What is pattern matching?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1692" data-line-end="1695">Answer: A feature that allows checking and extracting information from
+objects using patterns.
+</code></pre>
+<ol start="262">
+<li class="has-line-data" data-line-start="1695" data-line-end="1697"><strong>What is the purpose of namespaces?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1698" data-line-end="1701">Answer: Organize code and prevent naming conflicts by grouping types
+under a hierarchy.
+</code></pre>
+<ol start="263">
+<li class="has-line-data" data-line-start="1701" data-line-end="1703"><strong>What is the using directive?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1704" data-line-end="1707">Answer: Imports a namespace, allowing types to be accessed without the full
+qualified name.
+</code></pre>
+<ol start="264">
+<li class="has-line-data" data-line-start="1707" data-line-end="1709"><strong>What is the purpose of XML documentation comments (///?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1710" data-line-end="1713">Answer: Provides documentation for code elements that can be extracted
+and used by IntelliSense and documentation generators.
+</code></pre>
+<ol start="265">
+<li class="has-line-data" data-line-start="1713" data-line-end="1715"><strong>What is the difference between AppDomain and AssemblyLoadContext?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1716" data-line-end="1719">Answer: AppDomain (Framework) manages assemblies within a process;
+AssemblyLoadContext (.NET Core) provides more granular control.
+</code></pre>
+<ol start="266">
+<li class="has-line-data" data-line-start="1719" data-line-end="1722"><strong>What is the purpose of strong naming?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1723" data-line-end="1726">Answer: Cryptographically signs an assembly to ensure authenticity and
+prevent version spoofing.
+</code></pre>
+<ol start="267">
+<li class="has-line-data" data-line-start="1726" data-line-end="1728"><strong>What is a NuGet package?</strong><br>
+Answer: A package format for distributing reusable .NET libraries and tools.</li>
+<li class="has-line-data" data-line-start="1728" data-line-end="1730"><strong>What is the difference between Debug and Release builds?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1731" data-line-end="1736">Answer:
+Debug: Includes debugging symbols, no optimization, faster
+compilation
+Release: Optimized, smaller, faster execution, no symbols
+</code></pre>
+<ol start="269">
+<li class="has-line-data" data-line-start="1736" data-line-end="1738"><strong>What is the purpose of the [Serializable] attribute?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1739" data-line-end="1742">Answer: Marks a class as serializable, allowing it to be converted to a byte
+stream.
+</code></pre>
+<ol start="270">
+<li class="has-line-data" data-line-start="1742" data-line-end="1744"><strong>What is the difference between DataContract and Serializable?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1745" data-line-end="1751">Answer:
+[Serializable]: Binary serialization, requires [NonSerialized] for
+exclusion
+[DataContract]: Data contract serialization, requires [DataMember] for
+inclusion
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="1751" data-line-end="1752"><a id="RealWorld_Scenarios_1751"></a>Real-World Scenarios</h2>
+<h3 class="code-line has-line-data" data-line-start="1753" data-line-end="1754"><a id="These_are_practical_questions_based_on_actual_development_1753"></a>These are practical questions based on actual development</h3>
+<h3 class="code-line has-line-data" data-line-start="1755" data-line-end="1756"><a id="scenarios_1755"></a>scenarios</h3>
+<ol start="271">
+<li class="has-line-data" data-line-start="1757" data-line-end="1760"><strong>You have a Singleton Logger and a Scoped DbContext. How do you log from</strong><br>
+<strong>the DbContext without causing a captive dependency?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1761" data-line-end="1765">Answer: Inject ILoggerFactory (Singleton-safe) instead of ILogger. Or use a
+factory pattern to get the logger when needed.
+Code:
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1766" data-line-end="1770">public class MyDbContext
+{
+private readonly ILoggerFactory _loggerFactory;
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1772" data-line-end="1778">public MyDbContext(ILoggerFactory loggerFactory)
+{
+_loggerFactory = loggerFactory;
+}
+}
+</code></pre>
+<ol start="272">
+<li class="has-line-data" data-line-start="1778" data-line-end="1781"><strong>You need to cache expensive operations. Should you use a Singleton cache</strong><br>
+<strong>service?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1782" data-line-end="1785">Answer: Yes, for application-level caching. Consider thread safety, memory
+management, and invalidation strategies.
+</code></pre>
+<ol start="273">
+<li class="has-line-data" data-line-start="1785" data-line-end="1787"><strong>Your async method is causing deadlocks in a UI context. What’s the solution?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1788" data-line-end="1791">Answer: Use ConfigureAwait(false) to avoid capturing the synchronization
+context. Or ensure async all the way.
+</code></pre>
+<ol start="274">
+<li class="has-line-data" data-line-start="1791" data-line-end="1793"><strong>You have a static utility class. Should you refactor it for testability?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1794" data-line-end="1797">Answer: If it depends on external services, yes. Extract an interface and use
+DI. For pure utilities, static is fine.
+</code></pre>
+<ol start="275">
+<li class="has-line-data" data-line-start="1797" data-line-end="1800"><strong>You need to implement the Unit of Work pattern. Should DbContext be</strong><br>
+<strong>Scoped?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1801" data-line-end="1804">Answer: Yes, DbContext should be Scoped. One context per logical unit of
+work (typically per request).
+</code></pre>
+<ol start="276">
+<li class="has-line-data" data-line-start="1804" data-line-end="1806"><strong>How do you implement a retry policy for a failed async operation?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1807" data-line-end="1810">Answer: Use Polly library with exponential backoff, or manually implement
+retry logic in an async method.
+</code></pre>
+<ol start="277">
+<li class="has-line-data" data-line-start="1810" data-line-end="1813"><strong>You have a background job that needs Scoped services. How do you handle</strong><br>
+<strong>it?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1814" data-line-end="1817">Answer: Create a scope manually: using var scope =
+serviceProvider.CreateScope(); then resolve services.
+</code></pre>
+<ol start="278">
+<li class="has-line-data" data-line-start="1817" data-line-end="1819"><strong>How do you prevent memory leaks from event subscriptions?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1820" data-line-end="1823">Answer: Unsubscribe from events, use weak event patterns, or ensure
+subscribers are garbage collected.
+</code></pre>
+<ol start="279">
+<li class="has-line-data" data-line-start="1823" data-line-end="1826"><strong>You need to validate dependencies at startup. How do you do this?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1827" data-line-end="1830">Answer: Use serviceProvider.GetRequiredService&lt;T&gt;() in startup code, or
+enable ValidateOnBuild.
+</code></pre>
+<ol start="280">
+<li class="has-line-data" data-line-start="1830" data-line-end="1833"><strong>How do you handle cross-cutting concerns like logging, security, and error</strong><br>
+<strong>handling?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1834" data-line-end="1837">Answer: Use decorator pattern with DI, middleware in ASP.NET Core, or
+aspects with AOP libraries.
+</code></pre>
+<ol start="281">
+<li class="has-line-data" data-line-start="1837" data-line-end="1839"><strong>You have a service that depends on configuration. Should it be Singleton?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1840" data-line-end="1843">Answer: Yes, if configuration doesn’t change during runtime. If it does,
+consider Scoped.
+</code></pre>
+<ol start="282">
+<li class="has-line-data" data-line-start="1843" data-line-end="1845"><strong>How do you implement a plugin architecture with DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1846" data-line-end="1849">Answer: Use AssemblyLoadContext to load assemblies dynamically, register
+their services with the DI container.
+</code></pre>
+<ol start="283">
+<li class="has-line-data" data-line-start="1849" data-line-end="1851"><strong>You need to mock static methods in unit tests. What’s the approach?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1852" data-line-end="1855">Answer: Wrap them in an interface/service and inject. Use libraries like Moles
+or Shims for stubborn code.
+</code></pre>
+<ol start="284">
+<li class="has-line-data" data-line-start="1855" data-line-end="1857"><strong>How do you handle async exceptions in a Task.WhenAll scenario?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1858" data-line-end="1861">Answer: Use try-catch around await WhenAll; all exceptions are aggregated
+in AggregateException.
+</code></pre>
+<ol start="285">
+<li class="has-line-data" data-line-start="1861" data-line-end="1864"><strong>You have a high-traffic application with memory pressure. Should you use</strong><br>
+<strong>Transient or Singleton?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1865" data-line-end="1868">Answer: Depends on object size and thread safety. Singleton for stateless,
+large objects; Transient for small, stateful objects.
+</code></pre>
+<ol start="286">
+<li class="has-line-data" data-line-start="1868" data-line-end="1871"><strong>How do you ensure that two Scoped services share the same instance within</strong><br>
+<strong>a request?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1872" data-line-end="1875">Answer: Register them both as Scoped in the same DI container. They’ll share
+the same lifetime.
+</code></pre>
+<ol start="287">
+<li class="has-line-data" data-line-start="1875" data-line-end="1878"><strong>You need to implement a factory pattern that returns different</strong><br>
+<strong>implementations. How?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1879" data-line-end="1882">Answer: Use a factory service registered in DI, returning implementations
+based on conditions.
+</code></pre>
+<ol start="288">
+<li class="has-line-data" data-line-start="1883" data-line-end="1885"><strong>How do you handle versioning of APIs with different dependencies?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1886" data-line-end="1889">Answer: Use keyed services, separate DI containers, or factory methods to
+resolve different versions.
+</code></pre>
+<ol start="289">
+<li class="has-line-data" data-line-start="1889" data-line-end="1891"><strong>You have circular dependencies between services. How do you refactor?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1892" data-line-end="1895">Answer: Introduce an event-based architecture, use a mediator pattern, or
+lazy inject one service.
+</code></pre>
+<ol start="290">
+<li class="has-line-data" data-line-start="1895" data-line-end="1898"><strong>How do you implement a decorator pattern for caching on top of a</strong><br>
+<strong>repository?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1899" data-line-end="1901">Answer:
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1902" data-line-end="1909">services.AddScoped&lt;IRepository&gt;(sp =&gt;
+new CachedRepository(
+new Repository(sp.GetService&lt;IDbContext&gt;()),
+sp.GetService&lt;ICache&gt;()
+)
+);
+</code></pre>
+<ol start="291">
+<li class="has-line-data" data-line-start="1909" data-line-end="1911"><strong>You need to inject named/keyed services based on configuration. How?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1912" data-line-end="1915">Answer: Use a factory method that reads configuration and resolves the
+appropriate service.
+</code></pre>
+<ol start="292">
+<li class="has-line-data" data-line-start="1915" data-line-end="1917"><strong>How do you test async methods that use ConfigureAwait(false)?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1918" data-line-end="1921">Answer: Create a synchronous test wrapper or use async test methods with
+xUnit/NUnit.
+</code></pre>
+<ol start="293">
+<li class="has-line-data" data-line-start="1921" data-line-end="1923"><strong>You have a static property that should be thread-safe. How?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1924" data-line-end="1927">Answer: Use lock, ThreadLocal, Interlocked, or Lazy for thread-safe
+initialization.
+</code></pre>
+<ol start="294">
+<li class="has-line-data" data-line-start="1927" data-line-end="1929"><strong>How do you implement a repository pattern with async operations?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1930" data-line-end="1933">Answer: Define async methods in IRepository interface (GetAsync,
+SaveAsync) and implement in concrete repository.
+</code></pre>
+<ol start="295">
+<li class="has-line-data" data-line-start="1933" data-line-end="1937"><strong>You need to handle graceful degradation in microservices. How do you</strong><br>
+<strong>structure services?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1938" data-line-end="1941">Answer: Use fallback services, circuit breakers, and abstract concerns behind
+interfaces.
+</code></pre>
+<ol start="296">
+<li class="has-line-data" data-line-start="1941" data-line-end="1944"><strong>How do you implement Command Query Responsibility Segregation (CQRS)</strong><br>
+<strong>with DI?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1945" data-line-end="1948">Answer: Register command and query handlers separately, use MediatR or
+custom dispatcher, resolve based on request type.
+</code></pre>
+<ol start="297">
+<li class="has-line-data" data-line-start="1948" data-line-end="1951"><strong>You need to implement soft delete functionality. Should it be in the</strong><br>
+<strong>repository or DbContext?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1952" data-line-end="1955">Answer: Implement with DbContext filters or repository methods. DbContext
+filters are more transparent.
+</code></pre>
+<ol start="298">
+<li class="has-line-data" data-line-start="1955" data-line-end="1957"><strong>How do you prevent N+1 query problems in Entity Framework?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1958" data-line-end="1961">Answer: Use .Include() for eager loading, projections with .Select(), or split
+queries.
+</code></pre>
+<ol start="299">
+<li class="has-line-data" data-line-start="1961" data-line-end="1964"><strong>You have a complex business logic that spans multiple services. How do you</strong><br>
+<strong>organize it?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1965" data-line-end="1968">Answer: Use a Domain-Driven Design approach with aggregates, domain
+services, and application services.
+</code></pre>
+<ol start="300">
+<li class="has-line-data" data-line-start="1968" data-line-end="1971"><strong>How do you monitor and optimize dependency resolution performance in</strong><br>
+<strong>production?</strong></li>
+</ol>
+<pre><code class="has-line-data" data-line-start="1972" data-line-end="1975">Answer: Use Diagnostic tools, measure service resolution time, profile
+allocations, consider compiled DI containers.
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="1975" data-line-end="1976"><a id="Quick_Reference_Table_1975"></a>Quick Reference Table</h2>
+<pre><code class="has-line-data" data-line-start="1978" data-line-end="1980">Concept Singleton Scoped Transient
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1981" data-line-end="1983">Lifetime Application Per Request Per Request
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1984" data-line-end="1986">Instance Count 1 1 per scope Many
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1987" data-line-end="1989">Thread Safety Critical Per thread Usually
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1990" data-line-end="1992">Memory Usage High Medium Low
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1993" data-line-end="1995">Performance Fastest Medium Slowest
+</code></pre>
+<pre><code class="has-line-data" data-line-start="1997" data-line-end="1999">Use Case Logging, Config DbContext, UoW Stateful objects
+</code></pre>
+<h2 class="code-line has-line-data" data-line-start="1999" data-line-end="2000"><a id="Key_Takeaways_1999"></a>Key Takeaways</h2>
+<p class="has-line-data" data-line-start="2001" data-line-end="2002"><strong>Do’s:</strong></p>
+<pre><code class="has-line-data" data-line-start="2004" data-line-end="2011">Use DI for all dependencies
+Keep classes focused (SRP)
+Design for extension (OCP)
+Use scoped for DbContext
+Use async/await for I/O
+Test async code properly
+</code></pre>
+<p class="has-line-data" data-line-start="2011" data-line-end="2012"><strong>Don’ts:</strong></p>
+<pre><code class="has-line-data" data-line-start="2014" data-line-end="2021">Don’t use static for replaceable logic
+Don’t return void from async methods
+Don’t mix sync and async
+Don’t ignore ConfigureAwait
+Don’t create captive dependencies
+Don’t use Service Locator pattern
+</code></pre>
+
+</body>
+</html>
