@@ -1,0 +1,190 @@
+
+## 🔑 MongoDB Compass Query Filters
+
+### 1. Comparison Operators
+
+| Operator | Use                   | Example                                |
+| -------- | --------------------- | -------------------------------------- |
+| `$eq`    | Equal to              | `{ "age": { "$eq": 25 } }`             |
+| `$ne`    | Not equal to          | `{ "status": { "$ne": "active" } }`    |
+| `$gt`    | Greater than          | `{ "age": { "$gt": 18 } }`             |
+| `$gte`   | Greater than or equal | `{ "age": { "$gte": 18 } }`            |
+| `$lt`    | Less than             | `{ "age": { "$lt": 60 } }`             |
+| `$lte`   | Less than or equal    | `{ "age": { "$lte": 60 } }`            |
+| `$in`    | Matches any in array  | `{ "status": { "$in": ["A", "B"] } }`  |
+| `$nin`   | Not in array          | `{ "status": { "$nin": ["X", "Y"] } }` |
+
+---
+
+### 2. Logical Operators
+
+| Operator | Use                         | Example                                                            |
+| -------- | --------------------------- | ------------------------------------------------------------------ |
+| `$and`   | All conditions must be true | `{ "$and": [ { "age": { "$gt": 18 } }, { "status": "active" } ] }` |
+| `$or`    | At least one condition true | `{ "$or": [ { "age": { "$lt": 18 } }, { "status": "pending" } ] }` |
+| `$nor`   | None of conditions true     | `{ "$nor": [ { "age": 18 }, { "status": "inactive" } ] }`          |
+| `$not`   | Negates condition           | `{ "age": { "$not": { "$gt": 30 } } }`                             |
+
+---
+
+### 3. Element Operators
+
+| Operator  | Use                 | Example                            |
+| --------- | ------------------- | ---------------------------------- |
+| `$exists` | Field exists or not | `{ "email": { "$exists": true } }` |
+| `$type`   | Field type check    | `{ "age": { "$type": "int" } }`    |
+
+---
+
+### 4. Evaluation Operators
+
+| Operator      | Use                         | Example                                              |
+| ------------- | --------------------------- | ---------------------------- |
+| `$regex`      | Pattern matching            | `{ "name": { "$regex": "^C", "$options": "i" } }` 
+| `$expr`       | Use aggregation expressions | `{ "$expr": { "$gt": ["$spent", "$budget"] } }`   |
+| `$jsonSchema` | Match schema                | `{ "$jsonSchema": { "required": ["name"] } }`     |
+| `$mod`        | Modulus                     | `{ "age": { "$mod": [2, 0] } }` → even numbers 
+
+---
+
+### 5. Array Operators
+
+| Operator     | Use                     | Example                                                      |
+| ------------ | ----------------------- | -----------|
+| `$all`       | Match all values        | `{ "tags": { "$all": ["red", "blue"] } }`                    |
+| `$elemMatch` | Match elements in array | `{ "results": { "$elemMatch": { "$gt": 80, "$lt": 100 } } }` |
+| `$size`      | Array size              | `{ "tags": { "$size": 3 } }`                                         
+
+---
+
+### 6. Bitwise Operators
+
+| Operator        | Use            | Example                               |
+| --------------- | -------------- | ------------------------------------- |
+| `$bitsAllClear` | All bits clear | `{ "flags": { "$bitsAllClear": 6 } }` |
+| `$bitsAllSet`   | All bits set   | `{ "flags": { "$bitsAllSet": 6 } }`   |
+| `$bitsAnyClear` | Any bit clear  | `{ "flags": { "$bitsAnyClear": 6 } }` |
+| `$bitsAnySet`   | Any bit set    | `{ "flags": { "$bitsAnySet": 6 } }`   |
+
+---
+
+### 7. Geospatial Operators (agar tu coordinates handle kar raha hai toh)
+
+| Operator         | Use                  | Example                                                                        |
+| ---------------- | -------------------- | ------------------------------------------------------------------------------ |
+| `$geoWithin`     | Docs within area     | `{ "loc": { "$geoWithin": { "$center": [[0,0], 10] } } }`                      |
+| `$geoIntersects` | Geometries intersect | `{ "loc": { "$geoIntersects": { "$geometry": { "type": "Polygon", ... } } } }` |
+| `$near`          | Closest points       | `{ "loc": { "$near": [x, y] } }`                                               |
+| `$nearSphere`    | Spherical distance   | `{ "loc": { "$nearSphere": [x, y] } }`                                         |
+
+---
+
+### 8. Text Search
+
+| Operator | Use                               | Example                                |
+| -------- | --------------------------------- | -------------------------------------- |
+| `$text`  | Full-text search (index required) | `{ "$text": { "$search": "coffee" } }` |
+
+---
+
+👉 Compass mein tu ye saare filters Filter box mein JSON format mein likh sakta hai. Jaise agar tujhe `status = active` aur `age > 25` chahiye, toh:
+
+```json
+{ "$and": [ { "status": "active" }, { "age": { "$gt": 25 } } ] }
+```
+
+
+{
+  "email": { 
+    "$regex": "^vgu24ons2baa0284@onlinevgu\\.com$", 
+    "$options": "i" 
+  }
+}
+
+
+
+db.assignments.updateMany(
+  {
+    // Filter: Sirf un documents ko select karo jinke 'questions' array mein
+    // yeh fields मौजूद हैं (Optional, but good for verification)
+    "questions.grace_marks_enabled": { $exists: true } 
+  },
+  {
+    // Update: $unset operator use karke, array ke har object se field hatao
+    $unset: {
+      "questions.$[].grace_marks_enabled": "",
+      "questions.$[].grace_marks_value": "",
+      "questions.$[].grace_marks_reason": ""
+    }
+  }
+)
+
+------------------------------------------- Regex in mongo db
+
+## MongoDB Regex Notes
+
+1. Basic Contains Match
+
+    `{ field: /abc/ }`
+    Matlab field ke andar kahin bhi abc aaya toh match ho jayega.
+
+2. Case Insensitive Match
+
+    `{ field: /abc/i }`
+    Uppercase lowercase ignore karke match karega.
+
+3. Starts With Pattern
+
+    `{ field: /^abc/ }`
+    Value abc se hi start honi chahiye.
+
+4. Ends With Pattern
+
+    `{ field: /abc$/ }`
+    Value abc pe hi end honi chahiye.
+
+5. Exact Full Match
+
+    `{ field: /^abc$/ }`
+    Puri string exactly abc honi chahiye, extra kuch nahi.
+
+6. Contains Only Numbers
+
+    `{ field: /^[0-9]+$/ }`
+    Field pure numeric hona chahiye.
+
+7. Contains Any Digit
+
+    `{ field: /\d+/ }`
+    At least ek digit ho field ke andar.
+
+8. Multiple Values OR Logic
+
+    `{ field: /(abc|xyz)/ }`
+    abc ya xyz me se koi bhi match ho toh chalega.
+
+9. Escaping Special Characters
+
+    `{ field: /abc\.xyz/ }`
+    Dot ko literal dot treat karega, not wildcard.
+
+10. Length Based Match
+
+ `{ field: /^.{5}$/ }`
+ Exactly 5 characters ka string match karega.
+
+11. Negated Regex
+
+ `{ field: { $not: /abc/ } }`
+ Jisme abc nahi ho, sirf woh records laata hai.
+
+12. JSON Safe Regex Format
+
+ `{ field: { $regex: 'abc', $options: 'i' } }`
+ Same result as `/abc/i` but config form me.
+
+13. Your Example Explanation
+
+ `{ course_id: /688/i }`
+ course_id ke andar kahin bhi 688 aaye, case insensitive mode me match ho jayega.
+
