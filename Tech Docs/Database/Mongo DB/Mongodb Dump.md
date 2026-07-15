@@ -8,7 +8,7 @@ MongoDB Dump & Restore – Step-by-Step Guide
 
 Is document ka goal hai:
 
-* Office MongoDB (`vgu_devtest`) ka data **local system par lana**
+* Office MongoDB (`file_name`) ka data **local system par lana**
 * Production/Office database ko **touch kiye bina**
 * Local development & testing ke liye safe environment banana
 
@@ -90,16 +90,16 @@ Agar version show ho jaaye → installation successful ✔️
 ### Command:
 
 ```bash
-mongodump --uri "mongodb+srv://admin_db_user:MOXDPT03cSXaD0rz@cluster0.try4hm.mongodb.net/vgu_devtest?retryWrites=true&w=majority&appName=Cluster0" --out ./vgu_dump
+mongodump --uri "MONGO_URI" --out ./file_dump
 ```
 
 ### Output:
 
 ```
-vgu_dump/
- └── vgu_devtest/
-      ├── users.bson
-      ├── assignments.bson
+file_dump/
+ └── file_name/
+      ├── EXAMPLE1.bson
+      ├── EXAMPLE2.bson
       ├── xyz.metadata.json
 ```
 
@@ -112,13 +112,13 @@ vgu_dump/
 CMD me run:
 
 ```bash
-cd vgu_dump
+cd file_dump
 dir
 ```
 
 Check:
 
-* `vgu_devtest` folder present ho
+* `file_name` folder present ho
 * Multiple `.bson` files ho
 
 ---
@@ -128,13 +128,13 @@ Check:
 ### Option 1: Same Database Name
 
 ```bash
-mongorestore --uri="mongodb://localhost:27017/vgu_devtest" ./vgu_devtest
+mongorestore --uri="MONGO_URI" ./FOLDER_NAME
 ```
 
 ### Option 2 (Recommended): New Local DB Name
 
 ```bash
-mongorestore --db vgu_devtest_local ./vgu_dump/vgu_devtest
+mongorestore --db LOCAL_FILE_NAME ./FOLDER_1/FOLDER_NAME
 ```
 
 ✔️ Local MongoDB me naya database create ho jaayega
@@ -150,7 +150,7 @@ mongosh
 
 ```js
 show dbs
-use vgu_devtest_local
+use file_name_local
 show collections
 db.users.findOne()
 ```
@@ -171,7 +171,7 @@ Agar data aa raha hai → 🎉 DONE!
 Example:
 
 ```bash
-mongorestore --drop --db vgu_devtest_local ./vgu_dump/vgu_devtest
+mongorestore --drop --db file_name_local ./file_dump/file_name
 ```
 
 ---
