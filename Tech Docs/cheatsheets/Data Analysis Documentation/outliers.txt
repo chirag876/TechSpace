@@ -1,0 +1,20 @@
+Introduction to Outliers:
+-> Definition of outliers
+-> Importance of outliers in data analysis
+Detection Techniques:
+-> Univariate methods (z-score, IQR)
+-> Multivariate methods (Mahalanobis distance, isolation forests)
+Handling and Treatment:
+-> Removal: Deleting outliers from the dataset
+-> Transformation: Applying mathematical transformations
+-> Robust methods: Using robust statistical measures
+-> Domain-specific approaches: Handling outliers based on domain knowledge
+Impact on Analysis:
+-> Statistical measures: Effects of outliers on mean, median, variance, etc.
+-> Modeling: Influence of outliers on predictive models and algorithms
+Best Practices and Guidelines:
+-> When to detect and handle outliers
+-> Considerations for outlier detection methods
+-> Steps for robust outlier analysis
+Tools and Libraries:
+-> Overview of software tools and libraries for outlier detection and analysis

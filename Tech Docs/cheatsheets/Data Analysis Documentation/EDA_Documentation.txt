@@ -1,0 +1,101 @@
+ 1. Understand Your Data - Types of Data
+ 2. Handle Missing Data
+ 3. Data Cleaning
+ 4. Data Visualization
+ 5. Statistical Summaries
+ 6. Correlation Analysis:
+ 7. Dive into Distributions
+
+Feature Selection:
+1. Relevant and redundant feature selection
+2. Supervised, unsupervised, semi-supervised feature selection
+3. Wrapper methods
+
+Handling Missing Values (Statistical Method):
+1. Mean, Median, Mode
+2. PCA - Principle Component Analysis
+3. Singular Value Decomposition (SVD)
+
+Transformations:
+- Bell curve
+- Outliers
+- Dummies
+
+Data Cleaning:
+- Data Relations
+- Statistics
+
+Analysis:
+- Bi Variate, Uni Variate, Multivariate analysis
+- Probability distribution
+- Data Drift (Training and testing dataset)
+
+Data Cleaning:
+- Outlier handling
+- Duplicate removal
+- Handling missing values
+- Standardizing/Normalizing data
+- Data type conversions
+
+Data Relations:
+- Identifying and exploring relationships between variables
+- Correlation analysis
+- Cross-tabulations
+- Visualizing data relationships (e.g., scatter plots, heatmaps)
+
+Categories of Text Analysis in EDA:
+
+1. Text Preprocessing:
+   - Objective: Clean and prepare text data for analysis.
+   - Steps:
+      - Tokenization
+      - Removing Stopwords
+      - Stemming/Lemmatization
+
+2. Statistical Analysis:
+   - Objective: Extract numerical insights from text data.
+   - Methods:
+      - Word Frequency Analysis
+      - Sentiment Analysis
+      - Named Entity Recognition (NER)
+
+3. Visualization Techniques:
+   - Objective: Present insights in a visually appealing manner.
+   - Techniques:
+      - Word Clouds
+      - Bar Charts for Word Frequency
+      - Sentiment Plots
+
+4. Topic Modeling:
+   - Objective: Identify latent topics within the text.
+   - Approaches:
+      - Latent Dirichlet Allocation (LDA)
+      - Non-negative Matrix Factorization (NMF)
+
+5. Text Vectorization:
+   - Objective: Convert text into numerical vectors for machine learning.
+   - Techniques:
+      - Bag of Words (BoW)
+      - TF-IDF (Term Frequency-Inverse Document Frequency)
+
+6. Entity Analysis:
+   - Objective: Identify and classify entities within the text.
+   - Tools:
+      - Named Entity Recognition (NER) tools
+      - SpaCy, NLTK for entity extraction
+
+7. Sentiment Analysis:
+   - Objective: Determine the sentiment expressed in the text.
+   - Methods:
+      - Rule-based methods
+      - Machine Learning-based methods
+
+8. Potential Solutions for Work-Related Tasks:
+
+In tackling the task of sentiment analysis on customer reviews, one viable solution is to employ the VADER Sentiment Analysis, a rule-based approach. This method boasts simplicity in implementation and is particularly effective when dealing with social media text. However, it comes with certain limitations; it may struggle with intricate language nuances and is primarily tailored for sentiment analysis, lacking the capability to delve into broader topic analysis.
+
+On the other hand, opting for a machine learning-based solution, such as sentiment analysis with Long Short-Term Memory (LSTM), presents a more intricate yet robust alternative. This approach excels in capturing complex patterns and can adeptly handle contextual nuances within the text. However, it comes with the prerequisite of substantial labeled data for training purposes, and both the training and inference times may be prolonged compared to rule-based methods.
+
+Ultimately, the choice between these solutions hinges on specific factors such as the nature of the data at hand and the overarching goals of the analysis. Each solution has its merits and drawbacks, necessitating a thoughtful consideration of the unique requirements of the sentiment analysis task.
+These are just starting points, and the choice would depend on factors like the nature of your data and the specific goals of your analysis.
+

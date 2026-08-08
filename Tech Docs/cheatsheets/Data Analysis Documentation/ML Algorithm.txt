@@ -1,0 +1,10 @@
+Linear Regression
+Logistic Regression
+Decision Trees
+Random Forest
+Support Vector Machines (SVM)
+K-Nearest Neighbors (KNN)
+Naive Bayes
+K-Means Clustering
+Principal Component Analysis (PCA)
+Gradient Boosting Machines (GBM)

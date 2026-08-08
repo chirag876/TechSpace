@@ -1,0 +1,10 @@
+Univariate analysis
+Bivariate analysis
+Multivariate analysis
+Statistical analysis
+Distribution analysis
+outlier analysis
+Missing values analysis
+Categorical data analysis
+Time series analysis
+Correlation and covariance analysis

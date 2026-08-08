@@ -1,0 +1,9 @@
+Theoretical+practical+conceptual questions:
+python
+power bi/tableau/qlik
+sql/mongo
+pandas/flask/numpy
+pyspark
+Data analysis
+Databricks
+power apps

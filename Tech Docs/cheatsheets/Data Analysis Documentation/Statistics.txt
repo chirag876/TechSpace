@@ -1,0 +1,21 @@
+Types of data
+Mean, median, Mode
+Hypothesis analysis
+Descriptive Statistics:
+-> Measures of Central Tendency (mean, median, mode)
+-> Measures of Dispersion (variance, standard deviation)
+-> Histograms and Boxplots
+Inferential Statistics:
+-> Probability Distributions (especially normal distribution)
+-> Central Limit Theorem
+-> Confidence Intervals
+-> Hypothesis Testing (t-tests, ANOVA)
+Correlation and Regression Analysis:
+-> Pearson correlation coefficient
+-> Linear Regression
+Probability Theory:
+Basic Probability Concepts
+-> Conditional Probability
+Sampling Techniques:
+-> Simple Random Sampling
+

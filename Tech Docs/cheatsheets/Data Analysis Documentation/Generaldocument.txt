@@ -1,0 +1,8 @@
+Data Warehousing concepts:
+-> Databricks
+-> Azure synapse
+-> Fact and dimension table
+-> surrogate key
+-> apache spark
+-> enterprise data Warehousing
+-> time series analysis

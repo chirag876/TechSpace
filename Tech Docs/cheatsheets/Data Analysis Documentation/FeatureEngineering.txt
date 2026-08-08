@@ -1,0 +1,12 @@
+Main concepts of feature engineering:
+
+New feature creation
+encoding Categorical values
+scaling and Normalizing
+discretization
+handling date time feature
+interaction terms
+dimensionality reduction
+feature scaling
+domain specific feature engineering
+
